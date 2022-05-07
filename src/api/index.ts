@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSdk, SubmissionsQuery } from "generated/graphql";
+import { getSdk, SubmissionsQuery } from "generated-gql/graphql";
 import useDebounce from "hooks/useDebounce";
 import sdk from "./sdk";
 

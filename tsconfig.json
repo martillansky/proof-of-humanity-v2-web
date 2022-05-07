@@ -26,7 +26,7 @@
             "assets/*": ["./src/assets/*"],
             "components/*": ["./src/components/*"],
             "constants/*": ["./src/constants/*"],
-            "generated/*": ["./src/generated/*"],
+            "generated-gql/*": ["./src/generated-gql/*"],
             "hooks/*": ["./src/hooks/*"],
             "modules/*": ["./src/modules/*"],
             "pages/*": ["./src/pages/*"],
