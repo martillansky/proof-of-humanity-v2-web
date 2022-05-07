@@ -1,0 +1,11 @@
+node_modules
+
+.parcel-cache
+dist
+
+src/generated
+schema.graphql
+
+package-lock.json
+yarn.lock
+yarn-error.log

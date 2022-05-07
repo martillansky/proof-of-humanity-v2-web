@@ -1,0 +1,12 @@
+query counter {
+  counter(id: 1) {
+    vouchingPhase
+    pendingRemoval
+    pendingRegistration
+    challengedRemoval
+    challengedRegistration
+    registered
+    expired
+    removed
+  }
+}
