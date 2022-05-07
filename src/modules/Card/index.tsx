@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { SubmissionInterface } from "api";
+import { SubmissionInterface } from "api/index";
 import ErrorBoundary from "components/ErrorBoundary";
-import { supportedChains } from "constants";
+import { supportedChains } from "constants/index";
 import useIPFS from "hooks/useIPFS";
 import { camelToTitle } from "utils/case";
 

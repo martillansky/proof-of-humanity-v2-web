@@ -9,7 +9,12 @@ import {
 } from "api/store-jotai";
 import Divider from "components/Divider";
 import Popover from "components/Popover";
-import { ChainID, chainIDs, DISPLAY_BATCH, supportedChains } from "constants";
+import {
+  ChainID,
+  chainIDs,
+  DISPLAY_BATCH,
+  supportedChains,
+} from "constants/index";
 import useDebounce from "hooks/useDebounce";
 import CardList, { LoadingCardList } from "modules/Card/List";
 import { camelToTitle } from "utils/case";

@@ -57,7 +57,8 @@
   },
   "scripts": {
     "dev": "parcel public/index.html --open --public-url /",
-    "build": "parcel build public/index.html --public-url /",
+    "build": "graphql-codegen --config codegen.yml & parcel build public/index.html --public-url /",
+    "start": "parcel dist/index.html --open --public-url /",
     "gen": "graphql-codegen --config codegen.yml"
   }
 }
