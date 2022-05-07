@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getSdk, SubmissionsQuery } from "src/generated/graphql";
-import useDebounce from "src/hooks/useDebounce";
+import { getSdk, SubmissionsQuery } from "generated/graphql";
+import useDebounce from "hooks/useDebounce";
 import sdk from "./sdk";
 
 const chainIDs = Object.keys(sdk);

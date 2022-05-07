@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { SubmissionInterface } from "src/api";
-import ErrorBoundary from "src/components/ErrorBoundary";
-import { supportedChains } from "src/constants";
-import useIPFS from "src/hooks/useIPFS";
-import { camelToTitle } from "src/utils/case";
+import { SubmissionInterface } from "api";
+import ErrorBoundary from "components/ErrorBoundary";
+import { supportedChains } from "constants";
+import useIPFS from "hooks/useIPFS";
+import { camelToTitle } from "utils/case";
 
 interface CardInterface {
   submission: SubmissionInterface;

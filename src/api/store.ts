@@ -1,5 +1,5 @@
-import { DISPLAY_BATCH } from "src/constants";
-import { getSdk, SubmissionsQuery } from "src/generated/graphql";
+import { DISPLAY_BATCH } from "constants";
+import { getSdk, SubmissionsQuery } from "generated/graphql";
 import create from "zustand";
 import { queryFetchIndividual } from ".";
 import sdk from "./sdk";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ALink from "src/components/ALink";
-import Popover from "src/components/Popover";
+import ALink from "components/ALink";
+import Popover from "components/Popover";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
 interface HeaderProps {}

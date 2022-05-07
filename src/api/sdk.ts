@@ -1,6 +1,6 @@
 import { GraphQLClient } from "graphql-request";
-import { subgraphEndpoints } from "src/constants";
-import { getSdk } from "src/generated/graphql";
+import { subgraphEndpoints } from "constants";
+import { getSdk } from "generated/graphql";
 
 const sdk = Object.keys(subgraphEndpoints).reduce(
   (acc, chainID) => ({

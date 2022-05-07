@@ -1,5 +1,5 @@
 import React from "react";
-import ALink from "src/components/ALink";
+import ALink from "components/ALink";
 
 interface HeaderProps {}
 

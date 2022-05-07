@@ -2,7 +2,7 @@ overwrite: true
 schema: "https://api.thegraph.com/subgraphs/name/kleros/proof-of-humanity-mainnet"
 documents: "src/**/*.graphql"
 generates:
-  src/generated/graphql.ts:
+  ./src/generated/graphql.ts:
     plugins:
       - "typescript"
       - "typescript-operations"

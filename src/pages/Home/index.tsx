@@ -6,18 +6,13 @@ import {
   submissionsAtom,
   SubmissionsFilters,
   submissionStatus,
-} from "src/api/store-jotai";
-import Divider from "src/components/Divider";
-import Popover from "src/components/Popover";
-import {
-  ChainID,
-  chainIDs,
-  DISPLAY_BATCH,
-  supportedChains,
-} from "src/constants";
-import useDebounce from "src/hooks/useDebounce";
-import CardList, { LoadingCardList } from "src/modules/Card/List";
-import { camelToTitle } from "src/utils/case";
+} from "api/store-jotai";
+import Divider from "components/Divider";
+import Popover from "components/Popover";
+import { ChainID, chainIDs, DISPLAY_BATCH, supportedChains } from "constants";
+import useDebounce from "hooks/useDebounce";
+import CardList, { LoadingCardList } from "modules/Card/List";
+import { camelToTitle } from "utils/case";
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);

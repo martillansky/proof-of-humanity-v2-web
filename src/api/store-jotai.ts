@@ -1,7 +1,7 @@
-import { getSdk, SubmissionsQuery } from "src/generated/graphql";
+import { getSdk, SubmissionsQuery } from "generated/graphql";
 import { queryFetchIndividual } from ".";
 import { atom } from "jotai";
-import { chainIDs, DISPLAY_BATCH } from "src/constants";
+import { chainIDs, DISPLAY_BATCH } from "constants";
 import { isAddress } from "@ethersproject/address";
 
 type submissionQueryResultType = ArrayElement<SubmissionsQuery["submissions"]>;

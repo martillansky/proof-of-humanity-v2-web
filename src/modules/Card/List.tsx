@@ -1,4 +1,4 @@
-import { SubmissionInterface } from "src/api";
+import { SubmissionInterface } from "api";
 import Card from ".";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import cn from "classnames";
