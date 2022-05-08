@@ -1,4 +1,4 @@
-import { getSdk, SubmissionsQuery } from "generated-gql/graphql";
+import { getSdk, SubmissionsQuery } from "generated/graphql";
 import { queryFetchIndividual } from ".";
 import { atom } from "jotai";
 import { chainIDs, DISPLAY_BATCH } from "constants/index";

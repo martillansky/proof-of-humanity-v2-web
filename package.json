@@ -8,14 +8,15 @@
     "assets": "./src/assets",
     "components": "./src/components",
     "constants": "./src/constants",
-    "generated-gql": "./src/generated-gql",
+    "generated": "./src/generated",
     "hooks": "./src/hooks",
     "modules": "./src/modules",
     "pages": "./src/pages",
     "styles": "./src/styles",
     "types": "./src/types",
     "utils": "./src/utils",
-    "svgs": "./src/assets/svgs"
+    "svgs": "./src/assets/svgs",
+    "process": false
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.6.2",
