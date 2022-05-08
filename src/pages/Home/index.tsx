@@ -1,23 +1,31 @@
 import cn from "classnames";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import {
-  statusFilters,
-  submissionsAtom,
-  SubmissionsFilters,
-  submissionStatus,
-} from "api/store-jotai";
+import { submissionsAtom } from "api/submissions";
 import Divider from "components/Divider";
 import Popover from "components/Popover";
-import {
-  ChainID,
-  chainIDs,
-  DISPLAY_BATCH,
-  supportedChains,
-} from "constants/index";
 import useDebounce from "hooks/useDebounce";
 import CardList, { LoadingCardList } from "modules/Card/List";
 import { camelToTitle } from "utils/case";
+import { statusFilters, SubmissionStatus } from "constants/submissions";
+import { SUBMISSIONS_DISPLAY_BATCH } from "constants/misc";
+import {
+  CHAIN_ID_TO_NAME,
+  ChainID,
+  SUPPORTED_CHAIN_IDS,
+} from "constants/chains";
+
+interface FilterChoiceInterface
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  selected: boolean;
+  text: string;
+}
+
+const FilterChoice = ({ selected, text, ...props }: FilterChoiceInterface) => (
+  <button className={cn({ "bg-orange": selected })} {...props}>
+    {camelToTitle(text)}
+  </button>
+);
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,30 +33,28 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const searchDebounced = useDebounce(searchQuery.trim());
   const [prevListLength, setPrevListLength] = useState(0);
-  const [statusFilter, setStatusFilter] =
-    useState<keyof typeof submissionStatus>("none");
-  const [chainFilter, setChainFilter] = useState<ChainID | "all" | string>(
-    "all"
-  );
+  const [statusFilter, setStatusFilter] = useState<SubmissionStatus>("all");
+  const [chainFilter, setChainFilter] = useState<ChainID | "all">("all");
 
-  const updateSubmissions = async (params: SubmissionsFilters) => {
+  const updateSubmissions = async (loadContinued: boolean = false) => {
     setLoading(true);
-    if (params.loadContinued) setPrevListLength(submissions.length);
-    await loadSubmissions(params);
+    if (loadContinued) setPrevListLength(submissions.length);
+    await loadSubmissions({
+      searchQuery: searchDebounced,
+      status: statusFilter,
+      chain: chainFilter,
+      loadContinued,
+    });
     setLoading(false);
   };
 
   useEffect(() => {
-    updateSubmissions({
-      searchQuery: searchDebounced,
-      loadContinued: false,
-      status: statusFilter,
-    });
-  }, [searchDebounced, statusFilter]);
+    updateSubmissions();
+  }, [searchDebounced, statusFilter, chainFilter]);
 
   const loadExhausted =
     !submissions.length || // No submissions loaded
-    submissions.length % DISPLAY_BATCH || // Submissions loaded did not fill a batch
+    submissions.length % SUBMISSIONS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
     prevListLength === submissions.length; // Submissions loaded filled a batch but no more were loaded previously
 
   return (
@@ -66,38 +72,36 @@ const Home: React.FC = () => {
           <Popover
             trigger={
               <button className="w-64 p-2 border">
-                {camelToTitle(statusFilter === "none" ? "all" : statusFilter)} |{" "}
+                {camelToTitle(statusFilter)}
+                {" | "}
                 {camelToTitle(
-                  chainFilter === "all" ? "all" : supportedChains[chainFilter]
+                  chainFilter === "all" ? "all" : CHAIN_ID_TO_NAME[chainFilter]
                 )}
               </button>
             }
           >
             <div className="grid grid-cols-1 gap-4">
               {statusFilters.map((status) => (
-                <button
+                <FilterChoice
                   key={status}
-                  className={cn({ "bg-orange": status === statusFilter })}
+                  selected={statusFilter === status}
                   onClick={() => setStatusFilter(status)}
-                >
-                  {camelToTitle(status === "none" ? "all" : status)}
-                </button>
+                  text={status}
+                />
               ))}
               <Divider />
-              <button
-                className={cn({ "bg-orange": chainFilter === "all" })}
+              <FilterChoice
+                selected={chainFilter === "all"}
                 onClick={() => setChainFilter("all")}
-              >
-                All
-              </button>
-              {chainIDs.map((chain) => (
-                <button
-                  key={supportedChains[chain]}
-                  className={cn({ "bg-orange": chain === chainFilter })}
-                  onClick={() => setChainFilter(chain)}
-                >
-                  {camelToTitle(supportedChains[chain])}
-                </button>
+                text="all"
+              />
+              {SUPPORTED_CHAIN_IDS.map((chainId) => (
+                <FilterChoice
+                  key={chainId}
+                  selected={chainFilter === chainId}
+                  onClick={() => setChainFilter(chainId)}
+                  text={CHAIN_ID_TO_NAME[chainId]}
+                />
               ))}
             </div>
           </Popover>
@@ -112,13 +116,7 @@ const Home: React.FC = () => {
       {!loading && !loadExhausted && (
         <button
           className="mx-auto my-8 px-8 py-4 bg-orange rounded-full text-white font-bold shadow-md shadow-yellow"
-          onClick={async () => {
-            updateSubmissions({
-              searchQuery: searchDebounced,
-              loadContinued: true,
-              status: statusFilter,
-            });
-          }}
+          onClick={async () => updateSubmissions(true)}
         >
           Load More
         </button>

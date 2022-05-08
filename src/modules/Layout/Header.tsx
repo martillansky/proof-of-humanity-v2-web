@@ -24,14 +24,26 @@ const Header: React.FC<HeaderProps> = () => (
       <ALink href="https://pools.proofofhumanity.id/">Pools</ALink>
     </div>
 
-    <div>
-      {/* <Popover
+    <div className="flex items-center">
+      <Popover
         trigger={
-          <button className="py-2 px-4 rounded-full bg-white text-black mix-blend-lighten font-medium">
+          <button className="mr-2 py-1 px-4 rounded bg-white text-black mix-blend-lighten text-sm">
             Mainnet
           </button>
         }
-      /> */}
+      >
+        <div className="flex flex-col">
+          <span>Mainnet</span>
+          <span>Kovan</span>
+        </div>
+      </Popover>
+
+      <button className="mr-2 w-6 h-6 border-2 bg-white border-white rounded-full grid place-content-center">
+        <ALink href="https://snapshot.org/#/poh.eth/">
+          <ProofOfHumanityLogo height={16} width={16} />
+        </ALink>
+      </button>
+
       <Popover
         trigger={
           <button className="w-6 h-6 border-2 border-white rounded-full font-bold text-sm">

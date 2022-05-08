@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "experimentalDecorators": true,
-        "baseUrl": ".",
+        "baseUrl": "./src/",
         "outDir": "build/dist",
         "module": "esnext",
         "target": "es2017",
@@ -22,27 +22,24 @@
         "allowSyntheticDefaultImports": true,
         "removeComments": true,
         "paths": {
-            "api/*": ["./src/api/*"],
-            "assets/*": ["./src/assets/*"],
-            "components/*": ["./src/components/*"],
-            "constants/*": ["./src/constants/*"],
-            "generated/*": ["./src/generated/*"],
-            "hooks/*": ["./src/hooks/*"],
-            "modules/*": ["./src/modules/*"],
-            "pages/*": ["./src/pages/*"],
-            "styles/*": ["./src/styles/*"],
-            "types/*": ["./src/types/*"],
-            "utils/*": ["./src/utils/*"],
-            "svgs/*": ["./src/assets/svgs/*"],
+            "api/*": ["api/*"],
+            "assets/*": ["assets/*"],
+            "components/*": ["components/*"],
+            "constants/*": ["constants/*"],
+            "generated/*": ["generated/*"],
+            "hooks/*": ["hooks/*"],
+            "modules/*": ["modules/*"],
+            "pages/*": ["pages/*"],
+            "styles/*": ["styles/*"],
+            "types/*": ["types/*"],
+            "utils/*": ["utils/*"],
+            "svgs/*": ["assets/svgs/*"],
         }
     },
     "exclude": [
         "node_modules",
         "build",
-        "scripts",
-        "acceptance-tests",
-        "webpack",
-        "jest",
-        "src/setupTests.ts"
+        "dist",
+        "tailwind.config.cjs"
     ]
 }

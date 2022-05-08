@@ -4,16 +4,18 @@ import Layout from "modules/Layout";
 import Home from "./Home";
 import Profile from "./Profile";
 
-import "../styles/main.pcss";
+import "./style.pcss";
 
-const App: React.FC = () => (
-  <Routes>
-    <Route path="/" element={<Layout />}>
-      <Route index element={<Home />} />
-      <Route path="profile" element={<Profile />} />
-      <Route path="*" element={<h1>Page not found</h1>} />
-    </Route>
-  </Routes>
-);
+const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="*" element={<h1>Page not found</h1>} />
+      </Route>
+    </Routes>
+  );
+};
 
 export default App;

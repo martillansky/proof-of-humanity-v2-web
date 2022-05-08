@@ -1,7 +1,7 @@
-import { SubmissionInterface } from "api/index";
 import Card from ".";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import cn from "classnames";
+import { SubmissionInterface } from "api/submissions";
 
 interface CardListInterface {
   submissions: SubmissionInterface[];

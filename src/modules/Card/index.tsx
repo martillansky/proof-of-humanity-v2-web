@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { SubmissionInterface } from "api/index";
 import ErrorBoundary from "components/ErrorBoundary";
-import { supportedChains } from "constants/index";
 import useIPFS from "hooks/useIPFS";
 import { camelToTitle } from "utils/case";
+import { SubmissionInterface } from "api/submissions";
+import { SUPPORTED_CHAIN_IDS } from "constants/chains";
 
 interface CardInterface {
   submission: SubmissionInterface;
@@ -25,7 +25,7 @@ const CardContent: React.FC<CardInterface> = ({ submission }) => {
       </div>
       <span className="font-bold">{submission.name}</span>
       <span>{submission.creationTime}</span>
-      <span>{supportedChains[submission.chainID]}</span>
+      <span>{SUPPORTED_CHAIN_IDS[submission.chainID]}</span>
     </div>
   );
 };

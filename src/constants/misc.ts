@@ -1,0 +1,1 @@
+export const SUBMISSIONS_DISPLAY_BATCH = 12;

@@ -1,30 +1,22 @@
-import { getSdk, SubmissionsQuery } from "generated/graphql";
-import { queryFetchIndividual } from ".";
+import { SubmissionsQuery } from "generated/graphql";
 import { atom } from "jotai";
-import { chainIDs, DISPLAY_BATCH } from "constants/index";
 import { isAddress } from "@ethersproject/address";
+import { queryFetchIndividual, queryReturnType, sdkReturnType } from ".";
+import { SUBMISSIONS_STATUS, SubmissionStatus } from "constants/submissions";
+import { SUBMISSIONS_DISPLAY_BATCH } from "constants/misc";
+import { ChainID, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { getKeys } from "utils/object";
 
 type submissionQueryResultType = ArrayElement<SubmissionsQuery["submissions"]>;
 
-type sdkReturnType = ReturnType<typeof getSdk>;
-type queryReturnType<Q extends keyof sdkReturnType> = Record<
-  string,
-  Awaited<ReturnType<sdkReturnType[Q]>>
->;
-
-const initialChainStacks = chainIDs.reduce(
-  (acc, chainID) => ({ ...acc, [chainID]: [] }),
-  {}
-);
-
 export interface SubmissionInterface extends submissionQueryResultType {
-  chainID: string;
+  chainID: ChainID;
 }
 
 const normalizeSubmissions = (
-  submissionsData: Record<string, submissionQueryResultType[]>
+  submissionsData: Record<ChainID, submissionQueryResultType[]>
 ) =>
-  Object.keys(submissionsData)
+  getKeys(submissionsData)
     .reduce<SubmissionInterface[]>(
       (acc, chainID) => [
         ...acc,
@@ -37,9 +29,14 @@ const normalizeSubmissions = (
     )
     .sort((sub1, sub2) => sub2.creationTime - sub1.creationTime);
 
+const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce(
+  (acc, chainID) => ({ ...acc, [chainID]: [] }),
+  {}
+);
+
 const cursorAtom = atom(0);
 const chainStacksAtom =
-  atom<Record<string, submissionQueryResultType[]>>(initialChainStacks);
+  atom<Record<number, submissionQueryResultType[]>>(initialChainStacks);
 const normalizedSubmissionsAtom = atom<SubmissionInterface[]>((get) =>
   normalizeSubmissions(get(chainStacksAtom))
 );
@@ -47,40 +44,57 @@ const normalizedSubmissionsAtom = atom<SubmissionInterface[]>((get) =>
 export interface SubmissionsFilters {
   searchQuery: string;
   loadContinued: boolean;
-  status?: keyof typeof submissionStatus;
+  status?: SubmissionStatus;
   submissionDuration?: number;
+  chain: ChainID | "all";
 }
 
 export const submissionsAtom = atom(
   (get) =>
-    get(normalizedSubmissionsAtom).slice(0, DISPLAY_BATCH * get(cursorAtom)),
+    get(normalizedSubmissionsAtom).slice(
+      0,
+      SUBMISSIONS_DISPLAY_BATCH * get(cursorAtom)
+    ),
   async (
     get,
     set,
     {
       searchQuery,
       loadContinued,
-      status = "none",
+      status = "all",
       submissionDuration = 0,
+      chain = "all",
     }: SubmissionsFilters
   ) => {
     let chainStacks = get(chainStacksAtom);
     let cursor = loadContinued ? get(cursorAtom) + 1 : 1;
 
-    const fetchChainIDs: string[] = [];
+    const fetchChainIDs: number[] = [];
     const fetchPromises: Promise<ReturnType<sdkReturnType["submissions"]>>[] =
       [];
 
-    for (const chainID of chainIDs) {
+    chainStacks = SUPPORTED_CHAIN_IDS.reduce(
+      (acc, chainID) => ({
+        ...acc,
+        [chainID]:
+          chain === "all" || chainID === chain ? chainStacks[chainID] : [],
+      }),
+      chainStacks
+    );
+
+    for (const chainID of SUPPORTED_CHAIN_IDS) {
+      if (chain !== "all" && chain !== chainID) continue;
+
       const displayedForChain = get(submissionsAtom).filter(
         (submission) => submission.chainID === chainID
       ).length;
 
       if (
         !loadContinued ||
-        displayedForChain + DISPLAY_BATCH >= chainStacks[chainID].length
+        displayedForChain + SUBMISSIONS_DISPLAY_BATCH >=
+          chainStacks[chainID].length
       ) {
-        const statusFilter = submissionStatus[status].filter;
+        const statusFilter = SUBMISSIONS_STATUS[status].filter;
         const where = {
           // if it's function it needs to be called with submissionDuration
           ...(typeof statusFilter === "function"
@@ -96,7 +110,7 @@ export const submissionsAtom = atom(
         fetchChainIDs.push(chainID);
         fetchPromises.push(
           queryFetchIndividual<"submissions">(chainID, "submissions", {
-            first: DISPLAY_BATCH * 4,
+            first: SUBMISSIONS_DISPLAY_BATCH * 4,
             skip: loadContinued
               ? get(normalizedSubmissionsAtom).filter(
                   (submission) => submission.chainID === chainID
@@ -131,44 +145,3 @@ export const submissionsAtom = atom(
     set(chainStacksAtom, chainStacks);
   }
 );
-
-export const submissionStatus = {
-  none: {
-    filter: {},
-  },
-  vouching: {
-    filter: { status: "Vouching" },
-  },
-  pendingRegistration: {
-    filter: { status: "PendingRegistration", disputed: false },
-  },
-  pendingRemoval: {
-    filter: { status: "PendingRemoval", disputed: false },
-  },
-  challengedRegistration: {
-    filter: { status: "PendingRegistration", disputed: true },
-  },
-  challengedRemoval: {
-    filter: { status: "PendingRemoval", disputed: true },
-  },
-  registered: {
-    filter: (submissionDuration: number) => ({
-      status: "None",
-      registered: true,
-      submissionTime_gte:
-        Math.floor(Date.now() / 1000) - (submissionDuration || 0),
-    }),
-  },
-  expired: {
-    filter: (submissionDuration: number) => ({
-      status: "None",
-      registered: true,
-      submissionTime_lt:
-        Math.floor(Date.now() / 1000) - (submissionDuration || 0),
-    }),
-  },
-} as const;
-
-export const statusFilters = Object.keys(submissionStatus) as Array<
-  keyof typeof submissionStatus
->;
