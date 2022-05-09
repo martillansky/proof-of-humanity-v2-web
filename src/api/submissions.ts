@@ -5,7 +5,6 @@ import { queryFetchIndividual, queryReturnType, sdkReturnType } from ".";
 import { SUBMISSIONS_STATUS, SubmissionStatus } from "constants/submissions";
 import { SUBMISSIONS_DISPLAY_BATCH } from "constants/misc";
 import { ChainID, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { getKeys } from "utils/object";
 
 type submissionQueryResultType = ArrayElement<SubmissionsQuery["submissions"]>;
 
@@ -16,13 +15,13 @@ export interface SubmissionInterface extends submissionQueryResultType {
 const normalizeSubmissions = (
   submissionsData: Record<ChainID, submissionQueryResultType[]>
 ) =>
-  getKeys(submissionsData)
+  Object.keys(submissionsData)
     .reduce<SubmissionInterface[]>(
       (acc, chainID) => [
         ...acc,
-        ...submissionsData[chainID].map((submission) => ({
+        ...submissionsData[Number(chainID) as ChainID].map((submission) => ({
           ...submission,
-          chainID,
+          chainID: Number(chainID),
         })),
       ],
       []
@@ -45,7 +44,7 @@ export interface SubmissionsFilters {
   searchQuery: string;
   loadContinued: boolean;
   status?: SubmissionStatus;
-  submissionDuration?: number;
+  submissionDuration: number;
   chain: ChainID | "all";
 }
 
@@ -61,9 +60,9 @@ export const submissionsAtom = atom(
     {
       searchQuery,
       loadContinued,
+      submissionDuration,
       status = "all",
-      submissionDuration = 0,
-      chain = "all",
+      chain: fromChain = "all",
     }: SubmissionsFilters
   ) => {
     let chainStacks = get(chainStacksAtom);
@@ -77,13 +76,15 @@ export const submissionsAtom = atom(
       (acc, chainID) => ({
         ...acc,
         [chainID]:
-          chain === "all" || chainID === chain ? chainStacks[chainID] : [],
+          fromChain === "all" || chainID === fromChain
+            ? chainStacks[chainID]
+            : [],
       }),
       chainStacks
     );
 
     for (const chainID of SUPPORTED_CHAIN_IDS) {
-      if (chain !== "all" && chain !== chainID) continue;
+      if (fromChain !== "all" && fromChain !== chainID) continue;
 
       const displayedForChain = get(submissionsAtom).filter(
         (submission) => submission.chainID === chainID

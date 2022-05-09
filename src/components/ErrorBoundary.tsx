@@ -3,26 +3,40 @@ import { Component } from "react";
 interface ErrorBoundaryInterface {
   fallback: React.ReactNode;
   children: React.ReactNode;
+  resetSwitch?: any;
 }
 
 interface ErrorBoundaryState {
-  hasError: boolean;
+  error: Error | null;
 }
 
 export default class ErrorBoundary extends Component<
   ErrorBoundaryInterface,
   ErrorBoundaryState
 > {
-  constructor(props: ErrorBoundaryInterface) {
-    super(props);
-    this.state = { hasError: false };
+  state = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
   }
 
-  componentDidCatch() {
-    this.setState({ hasError: true });
+  componentDidUpdate(
+    prevProps: ErrorBoundaryInterface,
+    prevState: ErrorBoundaryState
+  ) {
+    const { error } = this.state;
+    const { resetSwitch } = this.props;
+
+    if (
+      error !== null &&
+      prevState.error !== null &&
+      prevProps.resetSwitch !== resetSwitch
+    ) {
+      this.setState({ error: null });
+    }
   }
 
   render() {
-    return this.state.hasError ? this.props.fallback : this.props.children;
+    return this.state.error ? this.props.fallback : this.props.children;
   }
 }

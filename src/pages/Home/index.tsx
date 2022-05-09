@@ -8,7 +8,10 @@ import useDebounce from "hooks/useDebounce";
 import CardList, { LoadingCardList } from "modules/Card/List";
 import { camelToTitle } from "utils/case";
 import { statusFilters, SubmissionStatus } from "constants/submissions";
-import { SUBMISSIONS_DISPLAY_BATCH } from "constants/misc";
+import {
+  SUBMISSIONS_DISPLAY_BATCH,
+  SUBMISSION_DURATION_TEMP,
+} from "constants/misc";
 import {
   CHAIN_ID_TO_NAME,
   ChainID,
@@ -43,6 +46,7 @@ const Home: React.FC = () => {
       searchQuery: searchDebounced,
       status: statusFilter,
       chain: chainFilter,
+      submissionDuration: SUBMISSION_DURATION_TEMP,
       loadContinued,
     });
     setLoading(false);
@@ -56,6 +60,7 @@ const Home: React.FC = () => {
     !submissions.length || // No submissions loaded
     submissions.length % SUBMISSIONS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
     prevListLength === submissions.length; // Submissions loaded filled a batch but no more were loaded previously
+  // TODO not perfect, maybe add this to a separate atom?
 
   return (
     <div className="p-8 flex flex-col justify-center">
@@ -95,12 +100,12 @@ const Home: React.FC = () => {
                 onClick={() => setChainFilter("all")}
                 text="all"
               />
-              {SUPPORTED_CHAIN_IDS.map((chainId) => (
+              {SUPPORTED_CHAIN_IDS.map((chainID) => (
                 <FilterChoice
-                  key={chainId}
-                  selected={chainFilter === chainId}
-                  onClick={() => setChainFilter(chainId)}
-                  text={CHAIN_ID_TO_NAME[chainId]}
+                  key={chainID}
+                  selected={chainFilter === chainID}
+                  onClick={() => setChainFilter(chainID)}
+                  text={CHAIN_ID_TO_NAME[chainID]}
                 />
               ))}
             </div>

@@ -21,8 +21,6 @@ const Web3Connect: React.FC<{ children: JSX.Element }> = ({ children }) => {
 
   if (!active && tried && error) return <div>Error occured</div>;
 
-  console.log(useWeb3());
-
   return children;
 };
 

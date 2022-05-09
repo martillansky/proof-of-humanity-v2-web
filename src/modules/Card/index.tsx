@@ -3,7 +3,9 @@ import ErrorBoundary from "components/ErrorBoundary";
 import useIPFS from "hooks/useIPFS";
 import { camelToTitle } from "utils/case";
 import { SubmissionInterface } from "api/submissions";
-import { SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { CHAIN_ID_TO_NAME } from "constants/chains";
+import { queryToStatus } from "constants/submissions";
+import { SUBMISSION_DURATION_TEMP } from "constants/misc";
 
 interface CardInterface {
   submission: SubmissionInterface;
@@ -25,25 +27,38 @@ const CardContent: React.FC<CardInterface> = ({ submission }) => {
       </div>
       <span className="font-bold">{submission.name}</span>
       <span>{submission.creationTime}</span>
-      <span>{SUPPORTED_CHAIN_IDS[submission.chainID]}</span>
+      <span>{CHAIN_ID_TO_NAME[submission.chainID]}</span>
     </div>
   );
 };
 
-const Card: React.FC<CardInterface> = ({ submission }) => (
-  <div className="h-72 rounded shadow-xl shadow-yellow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-2xl hover:shadow-yellow transition duration-150 ease-out cursor-pointer">
-    <div className="p-4 flex justify-between bg-yellowish font-light">
-      <span>💡</span>
-      <span>{camelToTitle(submission.status)}</span>
-    </div>
+const Card: React.FC<CardInterface> = ({ submission }) => {
+  const status = queryToStatus({
+    disputed: submission.disputed,
+    registered: submission.registered,
+    status: submission.status,
+    submissionDuration: SUBMISSION_DURATION_TEMP,
+    submissionTime: submission.submissionTime,
+  });
 
-    <ErrorBoundary fallback={<ErrorFallback />}>
-      <Suspense fallback={<LoadingFallback />}>
-        <CardContent submission={submission} />
-      </Suspense>
-    </ErrorBoundary>
-  </div>
-);
+  return (
+    <div className="h-72 rounded shadow-xl shadow-yellow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-2xl hover:shadow-yellow transition duration-150 ease-out cursor-pointer wiggle">
+      <div className="p-4 flex justify-between bg-yellowish font-light">
+        <span>💡</span>
+        <span>{camelToTitle(status)}</span>
+      </div>
+
+      <ErrorBoundary
+        fallback={<ErrorFallback />}
+        resetSwitch={submission.requests[0]?.evidence[0]?.URI}
+      >
+        <Suspense fallback={<LoadingFallback />}>
+          <CardContent submission={submission} />
+        </Suspense>
+      </ErrorBoundary>
+    </div>
+  );
+};
 
 export default Card;
 

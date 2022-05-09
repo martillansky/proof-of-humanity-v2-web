@@ -30,5 +30,24 @@ export function useConnect() {
       activateNetwork(network);
   }, [tried, networkActive, networkError, activateNetwork, active]);
 
+  useEffect((): any => {
+    const { ethereum } = window as any;
+    if (ethereum && ethereum.on && !networkActive && !networkError) {
+      const handleChainChanged = () => activate(injected);
+      const handleAccountsChanged = (accounts: string[]) =>
+        accounts.length > 0 && activate(injected);
+
+      ethereum.on("chainChanged", handleChainChanged);
+      ethereum.on("accountsChanged", handleAccountsChanged);
+
+      return () => {
+        if (ethereum.removeListener) {
+          ethereum.removeListener("chainChanged", handleChainChanged);
+          ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        }
+      };
+    }
+  }, [active, networkError, tried, activate]);
+
   return { tried, error: networkError };
 }
