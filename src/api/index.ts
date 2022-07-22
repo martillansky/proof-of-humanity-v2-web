@@ -35,8 +35,8 @@ export const queryFetch = async <Q extends queryType>(
 };
 
 export const queryFetchIndividual = async <Q extends queryType>(
-  fetchChainID: number,
+  fetchChainId: number,
   query: Q,
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<ReturnType<sdkReturnType[Q]>> =>
-  await sdk[fetchChainID][query](...((params as any) || []));
+  await sdk[fetchChainId][query](...((params as any) || []));

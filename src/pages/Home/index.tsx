@@ -1,9 +1,6 @@
-import cn from "classnames";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { submissionsAtom } from "api/submissions";
-import Divider from "components/Divider";
-import Popover from "components/Popover";
 import useDebounce from "hooks/useDebounce";
 import CardList, { LoadingCardList } from "modules/Card/List";
 import { camelToTitle } from "utils/case";
@@ -14,21 +11,11 @@ import {
 } from "constants/misc";
 import {
   CHAIN_ID_TO_NAME,
-  ChainID,
+  ChainId,
   SUPPORTED_CHAIN_IDS,
 } from "constants/chains";
-
-interface FilterChoiceInterface
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  selected: boolean;
-  text: string;
-}
-
-const FilterChoice = ({ selected, text, ...props }: FilterChoiceInterface) => (
-  <button className={cn({ "bg-orange": selected })} {...props}>
-    {camelToTitle(text)}
-  </button>
-);
+import Dropdown from "components/Dropdown";
+import DropdownItem from "components/DropdownItem";
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -37,7 +24,7 @@ const Home: React.FC = () => {
   const searchDebounced = useDebounce(searchQuery.trim());
   const [prevListLength, setPrevListLength] = useState(0);
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus>("all");
-  const [chainFilter, setChainFilter] = useState<ChainID | "all">("all");
+  const [chainFilter, setChainFilter] = useState<ChainId | "all">("all");
 
   const updateSubmissions = async (loadContinued: boolean = false) => {
     setLoading(true);
@@ -63,54 +50,46 @@ const Home: React.FC = () => {
   // TODO not perfect, maybe add this to a separate atom?
 
   return (
-    <div className="p-8 flex flex-col justify-center">
-      <div className="flex flex-col rounded shadow-xl shadow-yellow mb-4">
-        <div className="px-4 py-2 flex justify-end bg-yellowish">
-          <span className="font-semibold">n Profiles</span>
-        </div>
-        <div className="px-4 py-2 flex">
-          <input
-            className="w-full p-2 mr-2"
-            placeholder="Search (case sensitive)"
-            onChange={(e) => setSearchQuery(e.target.value)}
+    <div className="py-8 px-32 flex flex-col justify-center">
+      <div>
+        <span className="font-semibold">x</span>
+        <span> Profiles</span>
+      </div>
+      <div className="my-4 py-2 flex">
+        <input
+          className="w-full p-2 mr-2 border rounded"
+          placeholder="Search (case sensitive)"
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Dropdown title={camelToTitle(statusFilter)}>
+          {statusFilters.map((status) => (
+            <DropdownItem
+              key={status}
+              selected={statusFilter === status}
+              onSelect={() => setStatusFilter(status)}
+              name={camelToTitle(status)}
+            />
+          ))}
+        </Dropdown>
+        <Dropdown
+          title={camelToTitle(
+            chainFilter === "all" ? "all" : CHAIN_ID_TO_NAME[chainFilter]
+          )}
+        >
+          <DropdownItem
+            selected={chainFilter === "all"}
+            onSelect={() => setChainFilter("all")}
+            name={"all"}
           />
-          <Popover
-            trigger={
-              <button className="w-64 p-2 border">
-                {camelToTitle(statusFilter)}
-                {" | "}
-                {camelToTitle(
-                  chainFilter === "all" ? "all" : CHAIN_ID_TO_NAME[chainFilter]
-                )}
-              </button>
-            }
-          >
-            <div className="grid grid-cols-1 gap-4">
-              {statusFilters.map((status) => (
-                <FilterChoice
-                  key={status}
-                  selected={statusFilter === status}
-                  onClick={() => setStatusFilter(status)}
-                  text={status}
-                />
-              ))}
-              <Divider />
-              <FilterChoice
-                selected={chainFilter === "all"}
-                onClick={() => setChainFilter("all")}
-                text="all"
-              />
-              {SUPPORTED_CHAIN_IDS.map((chainID) => (
-                <FilterChoice
-                  key={chainID}
-                  selected={chainFilter === chainID}
-                  onClick={() => setChainFilter(chainID)}
-                  text={CHAIN_ID_TO_NAME[chainID]}
-                />
-              ))}
-            </div>
-          </Popover>
-        </div>
+          {SUPPORTED_CHAIN_IDS.map((chainID) => (
+            <DropdownItem
+              key={chainID}
+              selected={chainFilter === chainID}
+              onSelect={() => setChainFilter(chainID)}
+              name={CHAIN_ID_TO_NAME[chainID]}
+            />
+          ))}
+        </Dropdown>
       </div>
 
       {loading && !submissions.length ? (
@@ -120,8 +99,8 @@ const Home: React.FC = () => {
       )}
       {!loading && !loadExhausted && (
         <button
-          className="mx-auto my-8 px-8 py-4 bg-orange rounded-full text-white font-bold shadow-md shadow-yellow"
-          onClick={async () => updateSubmissions(true)}
+          className="mx-auto my-8 px-8 py-4 bg-amber-400 rounded-full text-white font-bold shadow-md shadow-yellow"
+          onClick={() => updateSubmissions(true)}
         >
           Load More
         </button>

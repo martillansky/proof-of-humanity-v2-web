@@ -6,6 +6,7 @@ import { SubmissionInterface } from "api/submissions";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
 import { queryToStatus } from "constants/submissions";
 import { SUBMISSION_DURATION_TEMP } from "constants/misc";
+import Image from "components/Image";
 
 interface CardInterface {
   submission: SubmissionInterface;
@@ -19,12 +20,7 @@ const CardContent: React.FC<CardInterface> = ({ submission }) => {
 
   return (
     <div className="p-2 h-full flex flex-col items-center bg-white">
-      <div className="mb-2 flex items-center justify-center h-32 w-32 overflow-hidden rounded-full mx-auto">
-        <img
-          className="h-min w-min"
-          src={`https://ipfs.kleros.io${data?.photo}`}
-        />
-      </div>
+      <Image uri={`https://ipfs.kleros.io${data?.photo}`} rounded />
       <span className="font-bold">{submission.name}</span>
       <span>{submission.creationTime}</span>
       <span>{CHAIN_ID_TO_NAME[submission.chainID]}</span>
@@ -42,10 +38,13 @@ const Card: React.FC<CardInterface> = ({ submission }) => {
   });
 
   return (
-    <div className="h-72 rounded shadow-xl shadow-yellow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-2xl hover:shadow-yellow transition duration-150 ease-out cursor-pointer wiggle">
-      <div className="p-4 flex justify-between bg-yellowish font-light">
-        <span>💡</span>
-        <span>{camelToTitle(status)}</span>
+    <div className="h-72 rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle">
+      <div className="justify-between bg-background font-light">
+        <div className="w-full h-1 bg-sky-500" />
+        <div className="p-2 flex justify-center items-center">
+          <span className="text-sky-500">{camelToTitle(status)}</span>
+          <span className="m-1 h-2 w-2 bg-sky-500 rounded-full" />
+        </div>
       </div>
 
       <ErrorBoundary

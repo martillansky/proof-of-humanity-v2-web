@@ -1,8 +1,8 @@
-import { ChainID } from "./chains";
+import { ChainId } from "./chains";
 
-export const SUBGRAPH_ENDPOINTS: { [key in ChainID]: string } = {
-  [ChainID.MAINNET]:
+export const SUBGRAPH_ENDPOINTS: { [key in ChainId]: string } = {
+  [ChainId.MAINNET]:
     "https://api.thegraph.com/subgraphs/name/kleros/proof-of-humanity-mainnet",
-  [ChainID.KOVAN]:
+  [ChainId.KOVAN]:
     "https://api.thegraph.com/subgraphs/name/kleros/proof-of-humanity-kovan",
 };

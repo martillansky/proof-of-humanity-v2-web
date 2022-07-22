@@ -4,22 +4,22 @@ import { isAddress } from "@ethersproject/address";
 import { queryFetchIndividual, queryReturnType, sdkReturnType } from ".";
 import { SUBMISSIONS_STATUS, SubmissionStatus } from "constants/submissions";
 import { SUBMISSIONS_DISPLAY_BATCH } from "constants/misc";
-import { ChainID, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
 
 type submissionQueryResultType = ArrayElement<SubmissionsQuery["submissions"]>;
 
 export interface SubmissionInterface extends submissionQueryResultType {
-  chainID: ChainID;
+  chainID: ChainId;
 }
 
 const normalizeSubmissions = (
-  submissionsData: Record<ChainID, submissionQueryResultType[]>
+  submissionsData: Record<ChainId, submissionQueryResultType[]>
 ) =>
   Object.keys(submissionsData)
     .reduce<SubmissionInterface[]>(
       (acc, chainID) => [
         ...acc,
-        ...submissionsData[Number(chainID) as ChainID].map((submission) => ({
+        ...submissionsData[Number(chainID) as ChainId].map((submission) => ({
           ...submission,
           chainID: Number(chainID),
         })),
@@ -45,7 +45,7 @@ export interface SubmissionsFilters {
   loadContinued: boolean;
   status?: SubmissionStatus;
   submissionDuration: number;
-  chain: ChainID | "all";
+  chain: ChainId | "all";
 }
 
 export const submissionsAtom = atom(
@@ -68,7 +68,7 @@ export const submissionsAtom = atom(
     let chainStacks = get(chainStacksAtom);
     let cursor = loadContinued ? get(cursorAtom) + 1 : 1;
 
-    const fetchChainIDs: number[] = [];
+    const fetchChainIds: number[] = [];
     const fetchPromises: Promise<ReturnType<sdkReturnType["submissions"]>>[] =
       [];
 
@@ -108,7 +108,7 @@ export const submissionsAtom = atom(
             : undefined),
         };
 
-        fetchChainIDs.push(chainID);
+        fetchChainIds.push(chainID);
         fetchPromises.push(
           queryFetchIndividual<"submissions">(chainID, "submissions", {
             first: SUBMISSIONS_DISPLAY_BATCH * 4,
@@ -123,14 +123,14 @@ export const submissionsAtom = atom(
       }
     }
 
-    if (fetchChainIDs.length) {
+    if (fetchChainIds.length) {
       const res = await Promise.all(fetchPromises);
 
-      const fetchedSubmissions = fetchChainIDs.reduce<
+      const fetchedSubmissions = fetchChainIds.reduce<
         queryReturnType<"submissions">
       >((acc, chainID, i) => ({ ...acc, [chainID]: res[i] }), {});
 
-      chainStacks = fetchChainIDs.reduce(
+      chainStacks = fetchChainIds.reduce(
         (acc, chainID) => ({
           ...acc,
           [chainID]: [

@@ -1,11 +1,10 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { NetworkConnector } from "@web3-react/network-connector";
-import { ChainID, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { RPC_ENDPOINTS } from "constants/rpcs";
+import { ChainId, RPC_ENDPOINTS, SUPPORTED_CHAIN_IDS } from "constants/chains";
 
 export const network = new NetworkConnector({
   urls: RPC_ENDPOINTS,
-  defaultChainId: ChainID.MAINNET,
+  defaultChainId: ChainId.MAINNET,
 });
 
 export const injected = new InjectedConnector({

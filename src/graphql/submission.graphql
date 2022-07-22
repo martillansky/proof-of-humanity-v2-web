@@ -8,7 +8,7 @@ query submissions(
     skip: $skip
     where: $where
     orderBy: creationTime
-    # TODO add lastUpdated
+    # TODO add lastUpdated?
     orderDirection: desc
   ) {
     id
@@ -29,24 +29,4 @@ query submissions(
       }
     }
   }
-  # submissions(
-  #   first: $first
-  #   skip: $skip
-  #   orderBy: creationTime
-  #   # TODO add lastUpdated
-  #   orderDirection: desc
-  # ) {
-  #   name
-  #   creationTime
-  #   requests(
-  #     first: 1
-  #     where: { registration: true }
-  #     orderBy: creationTime
-  #     orderDirection: desc
-  #   ) {
-  #     evidence(orderBy: creationTime, first: 1) {
-  #       URI
-  #     }
-  #   }
-  # }
 }

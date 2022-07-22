@@ -1,9 +1,7 @@
 import React from "react";
 import ALink from "components/ALink";
 
-interface HeaderProps {}
-
-const Header: React.FC<HeaderProps> = () => (
+const Footer: React.FC = () => (
   <nav className="flex justify-between items-center text-white text-lg bg-gradient-to-r from-orange via-orange to-pink shadow-sm px-8 py-4">
     <ALink href="https://proofofhumanity.id/">Learn More</ALink>
 
@@ -15,4 +13,4 @@ const Header: React.FC<HeaderProps> = () => (
   </nav>
 );
 
-export default Header;
+export default Footer;
