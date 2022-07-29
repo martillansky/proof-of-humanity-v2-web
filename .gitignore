@@ -1,7 +1,6 @@
 node_modules
 
 .parcel-cache
-.dist
 
 schema.graphql
 
@@ -10,3 +9,5 @@ yarn.lock
 yarn-error.log
 
 .env
+
+dist

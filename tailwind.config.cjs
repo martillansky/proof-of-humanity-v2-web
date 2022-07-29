@@ -11,37 +11,19 @@ module.exports = {
         yellowish: "#fffcf0",
         background: "#FCFBFA",
       },
-      keyframes: {
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-3deg)" },
-          "50%": { transform: "rotate(3deg)" },
-        },
-        // anvil: {
-        //   "0%": {
-        //     transform: "scale(1) translateY(0px)",
-        //     opacity: 0,
-        //     "box-shadow": "0 0 0 rgba(241, 241, 241, 0)",
-        //   },
-        //   "1%": {
-        //     transform: "scale(0.96) translateY(10px)",
-        //     opacity: 0,
-        //     "box-shadow": "0 0 0 rgba(241, 241, 241, 0)",
-        //   },
-        //   "100%": {
-        //     transform: "scale(1) translateY(0px)",
-        //     opacity: 1,
-        //     "box-shadow": "0 0 500px rgba(241, 241, 241, 0)",
-        //   },
-        // },
-      },
+      // keyframes: {
+      //   progress: {
+      //     "0%": { transform: "scaleX(1)" },
+      //     "100%": { transform: "scaleX(0)" },
+      //   },
+      // },
       fontFamily: {
         sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
       },
     },
-    animation: {
-      wiggle: "wiggle 1s ease-in-out infinite",
-      // anvil: "anvil 1s ease-in-out infinite",
-    },
+    // animation: {
+    //   progress: "progress linear 1 forwards",
+    // },
   },
   plugins: [],
 };

@@ -6,7 +6,7 @@ import {
 } from "hooks/useProofOfHumanity";
 import Challenge from "modules/Challenge";
 import Evidence from "modules/Evidence";
-import { format } from "timeago.js";
+import { format as formatTime } from "timeago.js";
 
 interface RequestsProps {}
 
@@ -34,7 +34,7 @@ const Requests: React.FC<RequestsProps> = () => {
           />
           <span className="font-bold">Alice</span>
           <span>Challenge deadline</span>
-          <span>{format(1658000000000)}</span>
+          <span>{formatTime(1658000000000)}</span>
 
           <Challenge />
         </div>

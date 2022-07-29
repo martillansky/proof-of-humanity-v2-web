@@ -1,20 +1,23 @@
 import React from "react";
 import Popup from "reactjs-popup";
+import Backdrop from "./Backdrop";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
-  trigger: JSX.Element | ((isOpen: boolean) => JSX.Element) | undefined;
+  trigger?: JSX.Element | ((isOpen: boolean) => JSX.Element);
   children: React.ReactNode;
+  open?: boolean;
+  onClose?: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ trigger, children }) => (
-  <Popup modal trigger={trigger} closeOnEscape={false}>
+const Modal: React.FC<ModalProps> = ({ trigger, children, open, onClose }) => (
+  <Popup modal trigger={trigger} closeOnEscape={false} open={open}>
     {(close) => (
       <>
-        <div
-          className="fixed
-                     top-0 left-0 h-screen z-10 w-full
-                     bg-slate-400/50"
-          onClick={close}
+        <Backdrop
+          onClose={() => {
+            close();
+            if (onClose) onClose();
+          }}
         />
         <div
           className="fixed

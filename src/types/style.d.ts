@@ -5,10 +5,12 @@ declare module "*.svg" {
   export default content;
 }
 
-declare module "*.jpg";
-declare module "*.png";
+declare module "*.jpg" {
+  const uri: string;
+  export default uri;
+}
 
-// declare module "*.json" {
-//   const value: ContractInterface;
-//   export default value;
-// }
+declare module "*.png" {
+  const uri: string;
+  export default uri;
+}

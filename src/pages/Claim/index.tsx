@@ -12,6 +12,7 @@ const Claim: React.FC = () => {
   const { account, activate } = useWeb3();
   const tookNoticeState = useState(false);
   const photoUriState = useState("");
+  const videoUriState = useState("");
   const nameState = useState("");
   const bioState = useState("");
   const [step, setStep] = useState(0);
@@ -29,6 +30,7 @@ const Claim: React.FC = () => {
               previous: () => setStep((s) => Math.max(0, s - 1)),
               tookNoticeState,
               photoUriState,
+              videoUriState,
               nameState,
               bioState,
             }}

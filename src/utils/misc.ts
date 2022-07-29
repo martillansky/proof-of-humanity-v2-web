@@ -1,6 +1,6 @@
 import ABC2048 from "./base2048/words";
 
-export const concatenateBuffers = (...buffers: Buffer[]) => {
+export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
   const totalByteLength = buffers.reduce((sum, bf) => sum + bf.byteLength, 0);
   const temporary = new Uint8Array(totalByteLength);
 

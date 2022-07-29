@@ -1,3 +1,4 @@
+import cn from "classnames";
 import Field from "components/Field";
 import Modal from "components/Modal";
 import { Reason } from "constants/enum";
@@ -9,14 +10,53 @@ import {
 import { useState } from "react";
 import { uploadToIPFS } from "utils/ipfs";
 
-interface ChallengeProps {}
+interface ReasonCardInterface {
+  text: string;
+  reason: Reason;
+  currentReason: Reason | null;
+  setReason: React.Dispatch<React.SetStateAction<Reason | null>>;
+}
 
-const Challenge: React.FC<ChallengeProps> = () => {
+const ReasonCard: React.FC<ReasonCardInterface> = ({
+  text,
+  reason,
+  currentReason,
+  setReason,
+}) => (
+  <div
+    className={cn("p-1 bg-amber-100 rounded", {
+      "outline outline-2 outline-amber-500": reason === currentReason,
+    })}
+    onClick={() => setReason(reason)}
+  >
+    {text}
+  </div>
+);
+
+const Challenge: React.FC = () => {
   const [challengeRequest] = useChallengeRequest();
   const [justification, setJustification] = useState("");
   const [reason, setReason] = useState<Reason | null>(null);
 
   const arbitrationCost = useArbitrationCost();
+
+  const submit = async () => {
+    if (!reason || !justification || !arbitrationCost) return;
+
+    const evidenceUri = await uploadToIPFS(
+      "evidence.json",
+      Buffer.from(
+        JSON.stringify({
+          name: "Challenge Justification",
+          description: justification,
+        })
+      )
+    );
+
+    challengeRequest("0x0", reason, "0xDuP", evidenceUri, {
+      value: arbitrationCost,
+    });
+  };
 
   return (
     <Modal
@@ -31,10 +71,30 @@ const Challenge: React.FC<ChallengeProps> = () => {
           {arbitrationCost && formatEther(arbitrationCost)} ETH Deposit
         </div>
         <div className="w-full my-4 grid grid-cols-4 gap-2">
-          <div className="bg-amber-100 rounded">Incorrect Submission</div>
-          <div className="bg-amber-100 rounded">Deceased</div>
-          <div className="bg-amber-100 rounded">Duplicate</div>
-          <div className="bg-amber-100 rounded">Does Not Exist</div>
+          <ReasonCard
+            reason={Reason.IncorrectSubmission}
+            text={"Incorrect Submission"}
+            currentReason={reason}
+            setReason={setReason}
+          />
+          <ReasonCard
+            reason={Reason.Deceased}
+            text={"Deceased"}
+            currentReason={reason}
+            setReason={setReason}
+          />
+          <ReasonCard
+            reason={Reason.Duplicate}
+            text={"Duplicate"}
+            currentReason={reason}
+            setReason={setReason}
+          />
+          <ReasonCard
+            reason={Reason.DoesNotExist}
+            text={"Does Not Exist"}
+            currentReason={reason}
+            setReason={setReason}
+          />
         </div>
         <Field
           textarea
@@ -44,23 +104,7 @@ const Challenge: React.FC<ChallengeProps> = () => {
         />
         <button
           className="my-4 p-2 bg-blue-500 border rounded-full font-bold text-white self-end"
-          onClick={async () => {
-            if (!reason || !justification || !arbitrationCost) return;
-
-            const evidenceUri = await uploadToIPFS(
-              "evidence.json",
-              Buffer.from(
-                JSON.stringify({
-                  name: "Challenge Justification",
-                  description: justification,
-                })
-              )
-            );
-
-            await challengeRequest("0x0", reason, "0xDuP", evidenceUri, {
-              value: arbitrationCost,
-            });
-          }}
+          onClick={submit}
         >
           Challenge request
         </button>

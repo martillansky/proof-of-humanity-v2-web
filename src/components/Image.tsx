@@ -11,20 +11,19 @@ interface ImageProps {
 const Image: React.FC<ImageProps> = ({ uri, rounded, previewed }) => {
   const image = (
     <div
-      className={cn(
-        "mb-2 flex items-center justify-center h-32 w-32 overflow-hidden mx-auto",
-        { "rounded-full": rounded, "cursor-pointer": previewed }
-      )}
-    >
-      <img className="h-min w-min" src={uri} />
-    </div>
+      className={cn("w-32 h-32 bg-no-repeat bg-cover bg-center", {
+        "rounded-full": rounded,
+        "cursor-pointer": previewed,
+      })}
+      style={{ backgroundImage: `url('${uri}')` }}
+    />
   );
 
   if (!previewed) return image;
 
   return (
     <Preview trigger={image}>
-      <img src={uri} />
+      <img className="max-h-screen rounded" src={uri} />
     </Preview>
   );
 };

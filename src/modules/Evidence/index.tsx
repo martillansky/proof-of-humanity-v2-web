@@ -19,6 +19,27 @@ const Evidence: React.FC<EvidenceProps> = () => {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
+  const submit = async () => {
+    const evidence: Evidence = { name: title, description };
+
+    if (file) {
+      evidence.fileURI = await uploadToIPFS(
+        file.name,
+        await file.arrayBuffer()
+      );
+    }
+
+    const evidenceUri = await uploadToIPFS(
+      "evidence.json",
+      Buffer.from(JSON.stringify(evidence))
+    );
+
+    await submitEvidence(
+      "0x1db3439a222c519ab44bb1144fc28167b4fa6ee6",
+      evidenceUri
+    );
+  };
+
   return (
     <Accordion title="Evidence">
       <div className="border-t">
@@ -51,27 +72,7 @@ const Evidence: React.FC<EvidenceProps> = () => {
             </Uploader>
             <button
               className="my-4 p-2 bg-blue-500 border rounded-full font-bold text-white self-end"
-              onClick={async () => {
-                const evidence: Evidence = { name: title, description };
-
-                if (file) {
-                  evidence.fileURI = await uploadToIPFS(
-                    file.name,
-                    await file.arrayBuffer()
-                  );
-                }
-
-                const evidenceUri = await uploadToIPFS(
-                  "evidence.json",
-                  Buffer.from(JSON.stringify(evidence))
-                );
-
-                console.log({ evidenceUri });
-
-                const tx = await submitEvidence(AddressZero, evidenceUri);
-
-                console.log({ tx });
-              }}
+              onClick={submit}
             >
               Submit evidence
             </button>

@@ -6,6 +6,7 @@ interface UploaderProps
   onDrop: <T extends File>(acceptedFiles: T[]) => void;
   type: "all" | "video" | "image";
   label?: string;
+  disabled?: boolean;
 }
 
 const MEDIA_TYPES = {
@@ -18,10 +19,12 @@ const Uploader: React.FC<UploaderProps> = ({
   type,
   label,
   children,
+  disabled,
   ...props
 }) => {
   // const [dragEntered, setDragEntered] = useState(false);
   const { getRootProps, getInputProps } = useDropzone({
+    disabled,
     multiple: false,
     accept: type !== "all" ? MEDIA_TYPES[type] : undefined,
     // onDragEnter: () => setDragEntered(true),
@@ -33,7 +36,7 @@ const Uploader: React.FC<UploaderProps> = ({
   });
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col cursor-pointer">
       {label && <span className="mt-4 mb-2 text-lg">{label}</span>}
       <div {...props} {...getRootProps()}>
         <input {...getInputProps()} />

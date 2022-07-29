@@ -47,38 +47,36 @@ const Info: React.FC = () => {
         </label>
       </div>
 
-      {tookNotice && (
-        <>
-          <span className="text-3xl font-bold my-8">Basic information</span>
+      {/* {tookNotice && ( */}
+      <>
+        <span className="text-3xl font-bold my-8">Basic information</span>
 
-          <span>
-            Registering to Proof of Humanity requires you to set a name. You can
-            use a pseudonym if you feel more comfortable.
-          </span>
+        <span>
+          Registering to Proof of Humanity requires you to set a name. You can
+          use a pseudonym if you feel more comfortable.
+        </span>
 
-          <span className="mt-4 mb-2 font-bold">Display Name</span>
-          <input
-            className="p-2 border rounded"
-            placeholder="Name in which you are known"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+        <span className="mt-4 mb-2 font-bold">Display Name</span>
+        <input
+          className="p-2 border rounded"
+          placeholder="Name in which you are known"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-          <span className="mt-4 mb-2 font-bold">Short bio</span>
-          <input
-            className="p-2 border rounded"
-            placeholder="short bio (ex: Cypherpunk, smart contract developer)"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
-        </>
-      )}
+        <span className="mt-4 mb-2 font-bold">Short bio</span>
+        <input
+          className="p-2 border rounded"
+          placeholder="short bio (ex: Cypherpunk, smart contract developer)"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+        />
 
-      {tookNotice && (
         <div className="m-4">
           <Button onClick={advance}>Advance</Button>
         </div>
-      )}
+      </>
+      {/* )} */}
     </>
   );
 };

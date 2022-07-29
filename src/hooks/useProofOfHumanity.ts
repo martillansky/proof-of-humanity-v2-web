@@ -1,5 +1,4 @@
 import { Contracts } from "constants/contracts";
-import { BigNumber } from "ethers";
 import { ProofOfHumanity } from "generated/contracts";
 import useCall from "./useCall";
 import { useContract } from "./useContract";

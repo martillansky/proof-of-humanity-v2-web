@@ -1,6 +1,7 @@
 import { TransactionReceipt } from "@ethersproject/providers";
-import { Contract, ContractTransaction } from "ethers";
+import { Contract, ContractTransaction, logger } from "ethers";
 import { useCallback, useReducer } from "react";
+import { toast } from "react-toastify";
 
 interface State {
   status: "None" | "Pending" | "Mining" | "Success" | "Error";
@@ -15,7 +16,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   method: F
   //TODO add keys to mutate after sending (use functions?)
   //   mutateKeys: any[][]
-): [(...params: Parameters<C[F]>) => Promise<void>, State] => {
+): [(...params: Parameters<C[F]>) => Promise<unknown>, State] => {
   const [state, setState] = useReducer<StateReducer>(
     (s, a) => ({ ...s, ...a }),
     { status: "None", receipt: null, error: null }
@@ -27,17 +28,21 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         if (!contract) return;
 
         setState({ status: "Pending", receipt: null, error: null });
+        toast.info("Sending transaction");
+
         const transaction: ContractTransaction = await contract[method](
           ...params
         );
-        setState({ status: "Mining" });
-        const receipt = await transaction.wait();
-        setState({ status: "Success", receipt });
-        //   mutateKeys.forEach((key) => mutate(key));
-      } catch (err) {
-        console.error(err);
 
+        setState({ status: "Mining" });
+
+        const receipt = await transaction.wait();
+
+        setState({ status: "Success", receipt });
+        toast.success("Transaction sent");
+      } catch (err) {
         setState({ status: "Error", error: err.message });
+        toast.error("Transaction rejected");
       }
     },
     [contract]

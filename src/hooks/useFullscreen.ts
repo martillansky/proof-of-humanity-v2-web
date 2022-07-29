@@ -1,19 +1,78 @@
-import { useState } from "react";
+import { RefObject, useEffect, useState } from "react";
+import screenfull from "screenfull";
+import { off, on } from "utils/events";
 
-const useFullscreen = () => {
-  const [fullscreen, setFullscreen] = useState(false);
+export interface FullScreenOptions {
+  video?: RefObject<
+    HTMLVideoElement & {
+      webkitEnterFullscreen?: () => void;
+      webkitExitFullscreen?: () => void;
+    }
+  >;
+  onClose?: (error?: Error) => void;
+}
 
-  const toggleFullscreen = () => {
-    // webkitRequest();
-    setFullscreen(true);
+const useFullscreen = (
+  ref: RefObject<Element>,
+  options: FullScreenOptions = {}
+) => {
+  const { video, onClose = () => {} } = options;
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    if (!ref.current) return;
+
+    const onWebkitEndFullscreen = () => {
+      if (video?.current)
+        off(video.current, "webkitendfullscreen", onWebkitEndFullscreen);
+      onClose();
+    };
+
+    const onChange = () => {
+      if (screenfull.isEnabled) {
+        setIsFullscreen(screenfull.isFullscreen);
+        if (!screenfull.isFullscreen) onClose();
+      }
+    };
+
+    if (screenfull.isEnabled) {
+      try {
+        screenfull.request(ref.current);
+        setIsFullscreen(true);
+      } catch (error) {
+        onClose(error);
+        setIsFullscreen(false);
+      }
+      screenfull.on("change", onChange);
+    } else if (video && video.current && video.current.webkitEnterFullscreen) {
+      video.current.webkitEnterFullscreen();
+      on(video.current, "webkitendfullscreen", onWebkitEndFullscreen);
+      setIsFullscreen(true);
+    } else {
+      onClose();
+      setIsFullscreen(false);
+    }
+
+    return () => {
+      setIsFullscreen(false);
+      if (screenfull.isEnabled) {
+        try {
+          screenfull.off("change", onChange);
+          screenfull.exit();
+        } catch {}
+      } else if (video && video.current && video.current.webkitExitFullscreen) {
+        off(video.current, "webkitendfullscreen", onWebkitEndFullscreen);
+        video.current.webkitExitFullscreen();
+      }
+    };
+  }, [isFullscreen, video, ref]);
+
+  return {
+    isFullscreen,
+    setFullscreen: setIsFullscreen,
+    toggleFullscreen: () => setIsFullscreen((o) => !o),
   };
-
-  const exitFullscreen = () => {
-    // webkitExitFullscreen();
-    setFullscreen(false);
-  };
-
-  return { fullscreen, toggleFullscreen, exitFullscreen };
 };
 
 export default useFullscreen;
