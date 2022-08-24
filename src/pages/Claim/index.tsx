@@ -7,11 +7,11 @@ import { injected } from "utils/connectors";
 const Claim: React.FC = () => {
   const { account, activate } = useWeb3();
 
-  // mx-auto my-16 px-10 py-6 w-3/5
-
   return (
     <div
-      className="mx-auto mt-8 mb-16 px-2 py-4 w-11/12
+      className="mx-auto mt-8 mb-16 px-4 py-4 w-11/12
+                 sm:mt-12 sm:px-8 sm:py-6 sm:w-5/6
+                 lg:mt-16 lg:px-10 lg:py-6 lg:w-3/5
                  flex flex-col
                  border rounded bg-white shadow"
     >
