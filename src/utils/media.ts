@@ -1,8 +1,8 @@
 import Jimp from "jimp";
-import { base64ToUint8Array, concatenateBuffers, randomString } from "./misc";
+import { concatenateBuffers, randomString } from "./misc";
 import { createFFmpeg, FFmpeg } from "@ffmpeg/ffmpeg";
-import { uploadToIPFS } from "./ipfs";
 import { on } from "./events";
+import { Area } from "react-easy-crop";
 
 function exifRemoved(buffer: Uint8Array) {
   const dv = new DataView(buffer.buffer);
@@ -85,65 +85,23 @@ const createImage = (url: string): Promise<HTMLImageElement> =>
     image.src = url;
   });
 
-function getRadianAngle(degreeValue: number) {
-  return (degreeValue * Math.PI) / 180;
-}
-
-/**
- * Returns the new bounding area of a rotated rectangle.
- */
-function rotateSize(width: number, height: number, rotation: number) {
-  const rotRad = getRadianAngle(rotation);
-
-  return {
-    width:
-      Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-    height:
-      Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
-  };
-}
-
-interface Crop {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 export const getCroppedPhoto = async (
   photoUri: string,
-  pixelCrop: Crop,
-  rotation = 0,
+  pixelCrop: Area,
   flip = { horizontal: false, vertical: false }
 ) => {
   const image = await createImage(photoUri);
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
 
-  if (!context) {
-    return null;
-  }
+  if (!context) return null;
 
-  const rotRad = getRadianAngle(rotation);
+  canvas.width = image.width;
+  canvas.height = image.height;
 
-  // calculate bounding box of the rotated image
-  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
-    image.width,
-    image.height,
-    rotation
-  );
-
-  // set canvas size to match the bounding box
-  canvas.width = bBoxWidth;
-  canvas.height = bBoxHeight;
-
-  // translate canvas context to a central location to allow rotating and flipping around the center
-  context.translate(bBoxWidth / 2, bBoxHeight / 2);
-  context.rotate(rotRad);
+  context.translate(image.width / 2, image.height / 2);
   context.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
   context.translate(-image.width / 2, -image.height / 2);
-
-  // draw rotated image
   context.drawImage(image, 0, 0);
 
   // croppedAreaPixels values are bounding box relative
@@ -174,29 +132,29 @@ export const loadFFMPEG = async () => {
   await ffmpeg.load();
 };
 
-export async function videoSanitizer(
-  inputBuffer: Uint8Array,
-  callback: (progress: number) => void,
-  mirrored: boolean,
-  duration: number
-) {
+export const videoSanitizer = async (
+  inputBuffer: ArrayBufferLike
+  // callback?: (progress: number) => void,
+  // duration?: number
+) => {
   try {
     await loadFFMPEG();
 
-    ffmpeg.setProgress((progress) => {
-      // if (progress.time === undefined) return;
-      // callback(progress.time / duration);
-    });
+    // ffmpeg.setProgress((progress) => {
+    // if (progress.time === undefined) return;
+    // callback(progress.time / duration);
+    // });
 
-    const inputName = randomString(46);
-    const outputName = randomString(46);
-    const outputFilename = `${outputName}.mp4`;
+    const inputName = randomString(16);
+    const outputFilename = `${randomString(16)}.mp4`;
 
-    const options = [
+    ffmpeg.FS("writeFile", inputName, new Uint8Array(inputBuffer));
+
+    await ffmpeg.run(
       "-i",
       inputName,
       "-map_metadata",
-      -1,
+      "-1",
       "-c:v",
       "libx264",
       "-c:a",
@@ -205,25 +163,33 @@ export async function videoSanitizer(
       "26",
       "-preset",
       "superfast",
-      "-vf",
-      "mpdecimate",
-      ...(mirrored ? ["-vf", "mirror"] : []),
-      outputFilename,
-    ];
-
-    ffmpeg.FS("writeFile", inputName, inputBuffer);
-    await ffmpeg.run(...options);
-
-    const videoURI = await uploadToIPFS(
-      outputFilename,
-      Buffer.from(ffmpeg.FS("readFile", outputFilename))
+      // "-vf",
+      // "mpdecimate",
+      outputFilename
     );
 
-    ffmpeg.FS("unlink", inputName);
-    ffmpeg.FS("unlink", outputFilename);
-
-    return videoURI;
+    return ffmpeg.FS("readFile", outputFilename);
   } catch (err) {
     console.error(err);
+    return inputBuffer;
   }
-}
+};
+
+// const options = [
+//   "-i",
+//   inputName,
+//   "-map_metadata",
+//   -1,
+//   "-c:v",
+//   "libx264",
+//   "-c:a",
+//   "copy",
+//   "-crf",
+//   "26",
+//   "-preset",
+//   "superfast",
+//   "-vf",
+//   "mpdecimate",
+//   // ...(mirrored ? ["-vf", "mirror"] : []),
+//   outputFilename,
+// ];

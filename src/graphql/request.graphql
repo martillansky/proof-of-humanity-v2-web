@@ -1,0 +1,49 @@
+query Request($id: ID!) {
+  request(id: $id) {
+    status
+    registration
+    requester
+    creationTime
+    lastStatusChange
+    soul {
+      id
+      claimed
+    }
+    claimer {
+      id
+      name
+    }
+    vouches {
+      from {
+        id
+      }
+      for {
+        id
+      }
+      soul {
+        id
+      }
+    }
+    evidence(orderBy: creationTime) {
+      creationTime
+      id
+      URI
+      sender
+    }
+    challenges(orderBy: creationTime) {
+      id
+      appealPeriodStart
+      appealPeriodEnd
+      reason
+      disputeId
+      challenger
+      nbRounds
+      rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
+        requesterPaid
+        challengerPaid
+        requesterFunds
+        challengerFunds
+      }
+    }
+  }
+}

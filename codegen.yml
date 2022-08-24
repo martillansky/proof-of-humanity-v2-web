@@ -1,5 +1,5 @@
 overwrite: true
-schema: "https://api.thegraph.com/subgraphs/name/kleros/proof-of-humanity-mainnet"
+schema: "https://api.thegraph.com/subgraphs/name/andreimvp/poh-v2"
 documents: "src/**/*.graphql"
 generates:
   ./src/generated/graphql.ts:

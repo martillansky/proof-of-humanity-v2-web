@@ -1,3 +1,102 @@
 @tailwind base;
+@layer base {
+  html {
+    @apply text-black;
+  }
+
+  button {
+    @apply cursor-pointer select-none;
+  }
+}
+
 @tailwind components;
+@layer components {
+  .slider-thumb::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 rounded-full bg-[#ff9966] cursor-pointer;
+  }
+
+  .divider {
+    @apply h-0.5 w-full gradient rounded;
+  }
+
+  .inp-title {
+    @apply mb-2 text-[#ff9966] text-sm font-semibold uppercase;
+  }
+
+  .inp {
+    @apply w-full px-4 py-2 background rounded-sm font-semibold;
+  }
+
+  .checkbox {
+    @apply w-4 h-4 border-2 border-[#ff9966] rounded-sm background
+         checked:text-[#ff9966]
+           focus:ring-2 focus:ring-offset-1 focus:ring-[#ff9966]/60;
+  }
+
+  .radio {
+    @apply w-4 h-4 border-2 border-[#ff9966] rounded-full background
+         checked:text-[#ff9966]
+           focus:ring-2 focus:ring-offset-2 focus:ring-[#ff9966]/60;
+  }
+
+  .bordered {
+    @apply p-0.5 gradient rounded;
+  }
+
+  .btn-main {
+    @apply centered gradient w-full py-2 rounded-sm text-white font-semibold uppercase;
+  }
+
+  .txt {
+    @apply text-sm font-semibold;
+  }
+
+  .backdrop {
+    @apply fixed top-0 left-0 h-screen z-10 w-full flex justify-center items-center bg-slate-800/30 backdrop-blur;
+  }
+}
+
 @tailwind utilities;
+@layer utilities {
+  .centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .absolute-centered {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .background {
+    background: #fffbf7;
+  }
+
+  .gradient {
+    background: linear-gradient(
+      150deg,
+      #ff9966 33%,
+      #ff9571,
+      #ff917c,
+      #ff8e87,
+      #ff8d93,
+      #ff8c9e,
+      #ff8ca9 95%
+    );
+  }
+
+  .gradient-fill {
+    fill: linear-gradient(
+      150deg,
+      #ff9966 33%,
+      #ff9571,
+      #ff917c,
+      #ff8e87,
+      #ff8d93,
+      #ff8c9e,
+      #ff8ca9 95%
+    );
+  }
+}

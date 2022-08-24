@@ -1,6 +1,5 @@
 import React from "react";
 import Popup from "reactjs-popup";
-import Backdrop from "./Backdrop";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   trigger?: JSX.Element | ((isOpen: boolean) => JSX.Element);
@@ -13,8 +12,9 @@ const Modal: React.FC<ModalProps> = ({ trigger, children, open, onClose }) => (
   <Popup modal trigger={trigger} closeOnEscape={false} open={open}>
     {(close) => (
       <>
-        <Backdrop
-          onClose={() => {
+        <div
+          className="backdrop"
+          onClick={() => {
             close();
             if (onClose) onClose();
           }}

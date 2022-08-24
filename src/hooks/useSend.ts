@@ -1,5 +1,5 @@
 import { TransactionReceipt } from "@ethersproject/providers";
-import { Contract, ContractTransaction, logger } from "ethers";
+import { Contract, ContractTransaction } from "ethers";
 import { useCallback, useReducer } from "react";
 import { toast } from "react-toastify";
 
@@ -25,6 +25,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   const send = useCallback(
     async (...params: Parameters<C[F]>) => {
       try {
+        console.log({ contract, state });
         if (!contract) return;
 
         setState({ status: "Pending", receipt: null, error: null });
@@ -45,7 +46,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         toast.error("Transaction rejected");
       }
     },
-    [contract]
+    [contract, method]
   );
 
   return [send, state];

@@ -5,9 +5,9 @@ import App from "./pages/App";
 import { BrowserRouter as Router } from "react-router-dom";
 import Web3Manager from "modules/Web3Manager";
 import { ToastContainer } from "react-toastify";
-// import { injectStyle } from "react-toastify/dist/inject-style";
+import { injectStyle } from "react-toastify/dist/inject-style";
 
-// injectStyle();
+injectStyle();
 
 const container = document.getElementById("root");
 const root = createRoot(container!);

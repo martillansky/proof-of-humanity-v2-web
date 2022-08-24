@@ -1,61 +1,85 @@
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import ErrorBoundary from "components/ErrorBoundary";
 import useIPFS from "hooks/useIPFS";
 import { camelToTitle } from "utils/case";
-import { SubmissionInterface } from "api/submissions";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
-import { queryToStatus } from "constants/submissions";
-import { SUBMISSION_DURATION_TEMP } from "constants/misc";
+import { queryToStatus } from "constants/requests";
 import Image from "components/Image";
+import { Link } from "react-router-dom";
+import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
+import { RequestInterface } from "api/requests";
+import { timeAgo } from "utils/time";
+import { ipfs } from "utils/ipfs";
+import cn from "classnames";
+import { Status } from "generated/graphql";
 
-interface CardInterface {
-  submission: SubmissionInterface;
-}
+const STATUS_TO_COLOR: Record<Status, string> = {
+  Vouching: "vouching",
+  Resolving: "resolving",
+  Disputed: "disputed",
+  Resolved: "resolved",
+};
 
-const CardContent: React.FC<CardInterface> = ({ submission }) => {
-  const [evidenceURI] = useIPFS(submission.requests[0]?.evidence[0]?.URI, {
+const CardContent: React.FC<{ request: RequestInterface }> = ({ request }) => {
+  const [evidenceURI] = useIPFS<EvidenceFileInterface>(
+    request.evidence[0]?.URI,
+    { suspense: true }
+  );
+  const [data] = useIPFS<RegistrationFileInterface>(evidenceURI?.fileURI, {
     suspense: true,
   });
-  const [data] = useIPFS(evidenceURI?.fileURI, { suspense: true });
 
   return (
     <div className="p-2 h-full flex flex-col items-center bg-white">
-      <Image uri={`https://ipfs.kleros.io${data?.photo}`} rounded />
-      <span className="font-bold">{submission.name}</span>
-      <span>{submission.creationTime}</span>
-      <span>{CHAIN_ID_TO_NAME[submission.chainID]}</span>
+      <Image uri={ipfs(data?.photo!)} rounded />
+      <span className="font-bold">
+        {request.registration ? request.claimer!.name : request.soul.name}
+      </span>
+      <span>{timeAgo(request.creationTime)}</span>
+      <span>{CHAIN_ID_TO_NAME[request.chainID]}</span>
     </div>
   );
 };
 
-const Card: React.FC<CardInterface> = ({ submission }) => {
-  const status = queryToStatus({
-    disputed: submission.disputed,
-    registered: submission.registered,
-    status: submission.status,
-    submissionDuration: SUBMISSION_DURATION_TEMP,
-    submissionTime: submission.submissionTime,
-  });
+const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
+  const status = useMemo(
+    () => queryToStatus(request.status, request.registration),
+    [request]
+  );
 
   return (
-    <div className="h-72 rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle">
-      <div className="justify-between bg-background font-light">
-        <div className="w-full h-1 bg-sky-500" />
+    <Link
+      to={`/request/${request.id.replace("#", "/")}/${CHAIN_ID_TO_NAME[
+        request.chainID
+      ].toLowerCase()}`}
+      className="h-72 rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
+    >
+      <div className="justify-between background font-light">
+        <div
+          className={cn("w-full h-1", `bg-${STATUS_TO_COLOR[request.status]}`)}
+        />
         <div className="p-2 flex justify-center items-center">
-          <span className="text-sky-500">{camelToTitle(status)}</span>
-          <span className="m-1 h-2 w-2 bg-sky-500 rounded-full" />
+          <span className={`text-${STATUS_TO_COLOR[request.status]}`}>
+            {camelToTitle(status)}
+          </span>
+          <span
+            className={cn(
+              "m-1 h-2 w-2 rounded-full",
+              `bg-${STATUS_TO_COLOR[request.status]}`
+            )}
+          />
         </div>
       </div>
 
       <ErrorBoundary
         fallback={<ErrorFallback />}
-        resetSwitch={submission.requests[0]?.evidence[0]?.URI}
+        resetSwitch={request.evidence[0]?.URI}
       >
         <Suspense fallback={<LoadingFallback />}>
-          <CardContent submission={submission} />
+          <CardContent request={request} />
         </Suspense>
       </ErrorBoundary>
-    </div>
+    </Link>
   );
 };
 

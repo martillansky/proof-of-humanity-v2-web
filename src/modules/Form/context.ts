@@ -1,23 +1,23 @@
-import { createContext, useContext } from "react";
+import { SetStateAction } from "jotai";
+import { createContext, Dispatch, useContext } from "react";
+import { emptySubmission, SubmissionAction, SubmissionInfo } from "./reducer";
 
 interface FormContextValues {
+  state: SubmissionInfo;
+  dispatch: Dispatch<SubmissionAction>;
   advance: () => void;
-  previous: () => void;
-  tookNoticeState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
-  photoUriState: [string, React.Dispatch<React.SetStateAction<string>>];
-  videoUriState: [string, React.Dispatch<React.SetStateAction<string>>];
-  nameState: [string, React.Dispatch<React.SetStateAction<string>>];
-  bioState: [string, React.Dispatch<React.SetStateAction<string>>];
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+  tookNotice: boolean;
+  setTookNotice: Dispatch<SetStateAction<boolean>>;
 }
 
 const FormContext = createContext<FormContextValues>({
+  state: emptySubmission,
+  dispatch: () => {},
   advance: () => {},
-  previous: () => {},
-  tookNoticeState: [false, () => {}],
-  photoUriState: ["", () => {}],
-  videoUriState: ["", () => {}],
-  nameState: ["", () => {}],
-  bioState: ["", () => {}],
+  setStep: () => {},
+  tookNotice: false,
+  setTookNotice: () => {},
 });
 
 export const useFormContext = () => useContext(FormContext);

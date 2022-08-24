@@ -1,12 +1,14 @@
 import axios from "axios";
+import { bufferFrom, randomString } from "./misc";
 
 export const uploadToIPFS = async (
-  fileName: string,
-  buffer: ArrayBufferLike
+  content: string | ArrayBuffer,
+  // buffer: ArrayBufferLike,
+  fileName?: string
 ) => {
   const result = await axios.post("https://ipfs.kleros.io/add", {
-    fileName,
-    buffer,
+    fileName: fileName || randomString(16),
+    buffer: bufferFrom(content),
   });
   const data = result.data.data;
   return `/ipfs/${data[1].hash}${data[0].path}`;

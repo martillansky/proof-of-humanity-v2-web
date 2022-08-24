@@ -11,172 +11,30 @@ import type {
 
 const _abi = [
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: "string",
-        name: "_evidence",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_name",
-        type: "string",
-      },
-    ],
-    name: "addSubmission",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IArbitrator",
-        name: "_arbitrator",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "_arbitratorExtraData",
-        type: "bytes",
-      },
-      {
-        internalType: "string",
-        name: "_registrationMetaEvidence",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_clearingMetaEvidence",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "_submissionBaseDeposit",
-        type: "uint256",
-      },
-      {
-        internalType: "uint64",
-        name: "_submissionDuration",
-        type: "uint64",
-      },
-      {
-        internalType: "uint64",
-        name: "_renewalPeriodDuration",
-        type: "uint64",
-      },
-      {
-        internalType: "uint64",
-        name: "_challengePeriodDuration",
-        type: "uint64",
-      },
-      {
-        internalType: "uint256[3]",
-        name: "_multipliers",
-        type: "uint256[3]",
-      },
-      {
-        internalType: "uint64",
-        name: "_requiredNumberOfVouches",
-        type: "uint64",
-      },
-    ],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
-  {
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "_submissionID",
+        indexed: false,
+        internalType: "contract IArbitrator",
+        name: "arbitrator",
         type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_requestID",
-        type: "uint256",
-      },
-    ],
-    name: "AddSubmission",
-    type: "event",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address[]",
-        name: "_submissionIDs",
-        type: "address[]",
-      },
-      {
-        internalType: "string[]",
-        name: "_evidence",
-        type: "string[]",
-      },
-      {
-        internalType: "string[]",
-        name: "_names",
-        type: "string[]",
-      },
-    ],
-    name: "addSubmissionManually",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-    ],
-    name: "addVouch",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "_challengeID",
+        name: "disputeId",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "enum ProofOfHumanity.Party",
-        name: "_party",
+        name: "side",
         type: "uint8",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_contributor",
-        type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_amount",
+        name: "amount",
         type: "uint256",
       },
     ],
@@ -189,300 +47,75 @@ const _abi = [
       {
         indexed: false,
         internalType: "contract IArbitrator",
-        name: "_arbitrator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_governor",
+        name: "arbitrator",
         type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_submissionBaseDeposit",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_submissionDuration",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_challengePeriodDuration",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_requiredNumberOfVouches",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_sharedStakeMultiplier",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_winnerStakeMultiplier",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_loserStakeMultiplier",
+        name: "disputeId",
         type: "uint256",
       },
     ],
-    name: "ArbitratorComplete",
+    name: "AppealCreated",
     type: "event",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-      {
-        internalType: "enum ProofOfHumanity.Reason",
-        name: "_reason",
-        type: "uint8",
-      },
-      {
-        internalType: "address",
-        name: "_duplicateID",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "_evidence",
-        type: "string",
-      },
-    ],
-    name: "challengeRequest",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
   },
   {
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "_submissionID",
+        indexed: false,
+        internalType: "contract IArbitrator",
+        name: "arbitrator",
         type: "address",
       },
       {
-        indexed: true,
+        indexed: false,
+        internalType: "bytes",
+        name: "arbitratorExtraData",
+        type: "bytes",
+      },
+    ],
+    name: "ArbitratorChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
-        name: "_requestID",
+        name: "requestId",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_challengeID",
+        name: "challengeId",
         type: "uint256",
       },
     ],
-    name: "ChallengeResolved",
+    name: "ChallengePeriodRestart",
     type: "event",
   },
   {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        internalType: "contract IArbitrator",
-        name: "_arbitrator",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "_arbitratorExtraData",
-        type: "bytes",
-      },
-    ],
-    name: "changeArbitrator",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint64",
-        name: "_submissionDuration",
-        type: "uint64",
-      },
-      {
-        internalType: "uint64",
-        name: "_renewalPeriodDuration",
-        type: "uint64",
-      },
-      {
-        internalType: "uint64",
-        name: "_challengePeriodDuration",
-        type: "uint64",
-      },
-    ],
-    name: "changeDurations",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
+        indexed: false,
         internalType: "address",
-        name: "_governor",
+        name: "crossChainProofOfHumanity",
         type: "address",
       },
     ],
-    name: "changeGovernor",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_loserStakeMultiplier",
-        type: "uint256",
-      },
-    ],
-    name: "changeLoserStakeMultiplier",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "string",
-        name: "_registrationMetaEvidence",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_clearingMetaEvidence",
-        type: "string",
-      },
-    ],
-    name: "changeMetaEvidence",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint64",
-        name: "_requiredNumberOfVouches",
-        type: "uint64",
-      },
-    ],
-    name: "changeRequiredNumberOfVouches",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_sharedStakeMultiplier",
-        type: "uint256",
-      },
-    ],
-    name: "changeSharedStakeMultiplier",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-      {
-        internalType: "address[]",
-        name: "_vouches",
-        type: "address[]",
-      },
-      {
-        internalType: "bytes[]",
-        name: "_signatures",
-        type: "bytes[]",
-      },
-      {
-        internalType: "uint256[]",
-        name: "_expirationTimestamps",
-        type: "uint256[]",
-      },
-    ],
-    name: "changeStateToPending",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_submissionBaseDeposit",
-        type: "uint256",
-      },
-    ],
-    name: "changeSubmissionBaseDeposit",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_winnerStakeMultiplier",
-        type: "uint256",
-      },
-    ],
-    name: "changeWinnerStakeMultiplier",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    name: "CrossChainProxyChanged",
+    type: "event",
   },
   {
     anonymous: false,
@@ -519,6 +152,31 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "uint64",
+        name: "soulLifespan",
+        type: "uint64",
+      },
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "renewalPeriodDuration",
+        type: "uint64",
+      },
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "challengePeriodDuration",
+        type: "uint64",
+      },
+    ],
+    name: "DurationsChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "contract IArbitrator",
         name: "_arbitrator",
@@ -547,83 +205,84 @@ const _abi = [
     type: "event",
   },
   {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-    ],
-    name: "executeRequest",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
       {
+        indexed: false,
         internalType: "uint256",
-        name: "_challengeID",
+        name: "requestId",
         type: "uint256",
       },
       {
-        internalType: "enum ProofOfHumanity.Party",
-        name: "_side",
-        type: "uint8",
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
       },
     ],
-    name: "fundAppeal",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-    ],
-    name: "fundSubmission",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
+    name: "EvidenceAppended",
+    type: "event",
   },
   {
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
-        name: "_submissionID",
+        name: "beneficiary",
         type: "address",
       },
       {
-        indexed: true,
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
-        name: "_challengeID",
+        name: "requestId",
         type: "uint256",
       },
       {
         indexed: false,
-        internalType: "enum ProofOfHumanity.Party",
-        name: "_side",
-        type: "uint8",
+        internalType: "uint256",
+        name: "challengeId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "round",
+        type: "uint256",
       },
     ],
-    name: "HasPaidAppealFee",
+    name: "FeesAndRewardsWithdrawn",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "governor",
+        type: "address",
+      },
+    ],
+    name: "GovernorChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: "Initialized",
     type: "event",
   },
   {
@@ -646,163 +305,124 @@ const _abi = [
     type: "event",
   },
   {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-      {
+        indexed: false,
         internalType: "uint256",
-        name: "_requestID",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_iterations",
+        name: "requestBaseDeposit",
         type: "uint256",
       },
     ],
-    name: "processVouches",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: "string",
-        name: "_evidence",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_name",
-        type: "string",
-      },
-    ],
-    name: "reapplySubmission",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
+    name: "RequestBaseDepositChanged",
+    type: "event",
   },
   {
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_requestID",
+        name: "requestId",
         type: "uint256",
       },
-    ],
-    name: "ReapplySubmission",
-    type: "event",
-  },
-  {
-    constant: false,
-    inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        indexed: false,
+        internalType: "uint256",
+        name: "challengeId",
+        type: "uint256",
       },
       {
+        indexed: false,
+        internalType: "enum ProofOfHumanity.Reason",
+        name: "reason",
+        type: "uint8",
+      },
+      {
+        indexed: false,
         internalType: "string",
-        name: "_evidence",
+        name: "evidence",
         type: "string",
       },
     ],
-    name: "removeSubmission",
-    outputs: [],
-    payable: true,
-    stateMutability: "payable",
-    type: "function",
+    name: "RequestChallenged",
+    type: "event",
   },
   {
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
-        name: "_requester",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "_submissionID",
+        name: "claimer",
         type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_requestID",
+        name: "amount",
         type: "uint256",
       },
     ],
-    name: "RemoveSubmission",
+    name: "RequestContribution",
     type: "event",
   },
   {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
-    ],
-    name: "removeSubmissionManually",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-    ],
-    name: "removeVouch",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
+        indexed: false,
         internalType: "uint256",
-        name: "_disputeID",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_ruling",
+        name: "requestId",
         type: "uint256",
       },
     ],
-    name: "rule",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    name: "RequestExecuted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+    ],
+    name: "RequestWithdrawn",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "requiredNumberOfVouches",
+        type: "uint64",
+      },
+    ],
+    name: "RequiredNumberOfVouchesChanged",
+    type: "event",
   },
   {
     anonymous: false,
@@ -835,44 +455,61 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_submissionID",
+        name: "requester",
         type: "address",
       },
       {
         indexed: true,
-        internalType: "uint256",
-        name: "_requestID",
-        type: "uint256",
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_challengeID",
+        name: "requestId",
         type: "uint256",
       },
-    ],
-    name: "SubmissionChallenged",
-    type: "event",
-  },
-  {
-    constant: false,
-    inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
       },
       {
+        indexed: false,
         internalType: "string",
-        name: "_evidence",
+        name: "name",
         type: "string",
       },
     ],
-    name: "submitEvidence",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    name: "SoulClaim",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "expirationTime",
+        type: "uint64",
+      },
+    ],
+    name: "SoulGrantedManually",
+    type: "event",
   },
   {
     anonymous: false,
@@ -880,14 +517,133 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_submissionID",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
+      },
+    ],
+    name: "SoulRenewal",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
+      },
+    ],
+    name: "SoulRevokal",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "human",
+        type: "address",
+      },
+    ],
+    name: "SoulRevokedManually",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "sharedStakeMultiplier",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "winnerStakeMultiplier",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "loserStakeMultiplier",
+        type: "uint256",
+      },
+    ],
+    name: "StakeMultipliersChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "claimer",
+        type: "address",
+      },
+    ],
+    name: "StateAdvanced",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "voucher",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "_voucher",
+        name: "vouched",
         type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
     ],
     name: "VouchAdded",
@@ -899,65 +655,114 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_submissionID",
+        name: "voucher",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "_voucher",
+        name: "vouched",
         type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
     ],
     name: "VouchRemoved",
     type: "event",
   },
   {
-    constant: false,
+    anonymous: false,
     inputs: [
       {
-        internalType: "address payable",
-        name: "_beneficiary",
-        type: "address",
+        indexed: false,
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
-      },
-      {
+        indexed: false,
         internalType: "uint256",
-        name: "_requestID",
+        name: "requestId",
         type: "uint256",
       },
       {
+        indexed: false,
         internalType: "uint256",
-        name: "_challengeID",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_round",
+        name: "endIndex",
         type: "uint256",
       },
     ],
-    name: "withdrawFeesAndRewards",
+    name: "VouchesProcessed",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_human",
+        type: "address",
+      },
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+    ],
+    name: "addVouch",
     outputs: [],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    constant: false,
-    inputs: [],
-    name: "withdrawSubmission",
+    inputs: [
+      {
+        internalType: "address",
+        name: "_claimer",
+        type: "address",
+      },
+      {
+        internalType: "address[]",
+        name: "_vouches",
+        type: "address[]",
+      },
+      {
+        components: [
+          {
+            internalType: "uint64",
+            name: "expirationTime",
+            type: "uint64",
+          },
+          {
+            internalType: "uint8",
+            name: "v",
+            type: "uint8",
+          },
+          {
+            internalType: "bytes32",
+            name: "r",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
+            name: "s",
+            type: "bytes32",
+          },
+        ],
+        internalType: "struct ProofOfHumanity.SignatureVouch[]",
+        name: "_signatureVouches",
+        type: "tuple[]",
+      },
+    ],
+    name: "advanceState",
     outputs: [],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "uint256",
@@ -968,14 +773,14 @@ const _abi = [
     name: "arbitratorDataList",
     outputs: [
       {
-        internalType: "contract IArbitrator",
-        name: "arbitrator",
-        type: "address",
-      },
-      {
         internalType: "uint96",
         name: "metaEvidenceUpdates",
         type: "uint96",
+      },
+      {
+        internalType: "contract IArbitrator",
+        name: "arbitrator",
+        type: "address",
       },
       {
         internalType: "bytes",
@@ -983,12 +788,10 @@ const _abi = [
         type: "bytes",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "address",
@@ -1001,25 +804,28 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "arbitratorDisputeIDToDisputeData",
+    name: "arbitratorDisputeIdToDisputeData",
     outputs: [
       {
         internalType: "uint96",
-        name: "challengeID",
+        name: "requestId",
         type: "uint96",
       },
       {
-        internalType: "address",
-        name: "submissionID",
-        type: "address",
+        internalType: "uint96",
+        name: "challengeId",
+        type: "uint96",
+      },
+      {
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "challengePeriodDuration",
     outputs: [
@@ -1029,43 +835,285 @@ const _abi = [
         type: "uint64",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint64",
+        name: "_requestId",
+        type: "uint64",
+      },
+      {
+        internalType: "enum ProofOfHumanity.Reason",
+        name: "_reason",
+        type: "uint8",
+      },
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+    ],
+    name: "challengeRequest",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IArbitrator",
+        name: "_arbitrator",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "_arbitratorExtraData",
+        type: "bytes",
+      },
+    ],
+    name: "changeArbitrator",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
-        name: "_submissionID",
+        name: "_crossChainProofOfHumanity",
         type: "address",
       },
+    ],
+    name: "changeCrossChainProofOfHumanity",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint64",
+        name: "_soulLifespan",
+        type: "uint64",
+      },
+      {
+        internalType: "uint64",
+        name: "_renewalPeriodDuration",
+        type: "uint64",
+      },
+      {
+        internalType: "uint64",
+        name: "_challengePeriodDuration",
+        type: "uint64",
+      },
+    ],
+    name: "changeDurations",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_governor",
+        type: "address",
+      },
+    ],
+    name: "changeGovernor",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_registrationMetaEvidence",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_clearingMetaEvidence",
+        type: "string",
+      },
+    ],
+    name: "changeMetaEvidence",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestBaseDeposit",
+        type: "uint256",
+      },
+    ],
+    name: "changeRequestBaseDeposit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint64",
+        name: "_requiredNumberOfVouches",
+        type: "uint64",
+      },
+    ],
+    name: "changeRequiredNumberOfVouches",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_sharedStakeMultiplier",
         type: "uint256",
       },
       {
+        internalType: "uint256",
+        name: "_winnerStakeMultiplier",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_loserStakeMultiplier",
+        type: "uint256",
+      },
+    ],
+    name: "changeStakeMultipliers",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+    ],
+    name: "claimSoul",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+    ],
+    name: "claimSoul",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "crossChainProofOfHumanity",
+    outputs: [
+      {
         internalType: "address",
-        name: "_duplicateID",
+        name: "",
         type: "address",
       },
     ],
-    name: "checkRequestDuplicates",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+    ],
+    name: "executeRequest",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_challengeId",
+        type: "uint256",
+      },
+      {
+        internalType: "enum ProofOfHumanity.Party",
+        name: "_side",
+        type: "uint8",
+      },
+    ],
+    name: "fundAppeal",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_claimer",
+        type: "address",
+      },
+    ],
+    name: "fundRequest",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getArbitratorDataListCount",
     outputs: [
@@ -1075,26 +1123,24 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestId",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "_challengeID",
+        name: "_challengeId",
         type: "uint256",
       },
     ],
@@ -1102,7 +1148,7 @@ const _abi = [
     outputs: [
       {
         internalType: "uint16",
-        name: "lastRoundID",
+        name: "lastRoundId",
         type: "uint16",
       },
       {
@@ -1112,7 +1158,7 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "disputeID",
+        name: "disputeId",
         type: "uint256",
       },
       {
@@ -1120,32 +1166,44 @@ const _abi = [
         name: "ruling",
         type: "uint8",
       },
-      {
-        internalType: "uint64",
-        name: "duplicateSubmissionIndex",
-        type: "uint64",
-      },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "address",
-        name: "_submissionID",
+        name: "_claimer",
         type: "address",
+      },
+    ],
+    name: "getClaimerRequestId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestId",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "_challengeID",
+        name: "_challengeId",
         type: "uint256",
       },
       {
@@ -1162,26 +1220,29 @@ const _abi = [
     name: "getContributions",
     outputs: [
       {
-        internalType: "uint256[3]",
-        name: "contributions",
-        type: "uint256[3]",
+        internalType: "uint256",
+        name: "forRequester",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "forChallenger",
+        type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestId",
         type: "uint256",
       },
     ],
@@ -1193,21 +1254,19 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestId",
         type: "uint256",
       },
     ],
@@ -1215,38 +1274,28 @@ const _abi = [
     outputs: [
       {
         internalType: "bool",
-        name: "disputed",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "resolved",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
         name: "requesterLost",
         type: "bool",
       },
       {
-        internalType: "enum ProofOfHumanity.Reason",
-        name: "currentReason",
+        internalType: "uint8",
+        name: "usedReasons",
         type: "uint8",
       },
       {
         internalType: "uint16",
-        name: "nbParallelDisputes",
+        name: "arbitratorDataId",
         type: "uint16",
       },
       {
         internalType: "uint16",
-        name: "lastChallengeID",
+        name: "lastChallengeId",
         type: "uint16",
       },
       {
-        internalType: "uint16",
-        name: "arbitratorDataID",
-        type: "uint16",
+        internalType: "uint64",
+        name: "challengePeriodEnd",
+        type: "uint64",
       },
       {
         internalType: "address payable",
@@ -1259,31 +1308,34 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "uint8",
-        name: "usedReasons",
+        internalType: "enum ProofOfHumanity.Status",
+        name: "status",
+        type: "uint8",
+      },
+      {
+        internalType: "enum ProofOfHumanity.Reason",
+        name: "currentReason",
         type: "uint8",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
       {
         internalType: "uint256",
-        name: "_requestID",
+        name: "_requestId",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "_challengeID",
+        name: "_challengeId",
         type: "uint256",
       },
       {
@@ -1300,9 +1352,14 @@ const _abi = [
         type: "bool",
       },
       {
-        internalType: "uint256[3]",
-        name: "paidFees",
-        type: "uint256[3]",
+        internalType: "uint256",
+        name: "paidFeesRequester",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "paidFeesChallenger",
+        type: "uint256",
       },
       {
         internalType: "enum ProofOfHumanity.Party",
@@ -1315,58 +1372,54 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: "address",
-        name: "_submissionID",
-        type: "address",
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
       },
     ],
-    name: "getSubmissionInfo",
+    name: "getSoulInfo",
     outputs: [
       {
-        internalType: "enum ProofOfHumanity.Status",
-        name: "status",
-        type: "uint8",
-      },
-      {
-        internalType: "uint64",
-        name: "submissionTime",
-        type: "uint64",
-      },
-      {
-        internalType: "uint64",
-        name: "index",
-        type: "uint64",
-      },
-      {
         internalType: "bool",
-        name: "registered",
+        name: "vouching",
         type: "bool",
       },
       {
         internalType: "bool",
-        name: "hasVouched",
+        name: "pendingRevokal",
         type: "bool",
+      },
+      {
+        internalType: "uint64",
+        name: "nbPendingRequests",
+        type: "uint64",
+      },
+      {
+        internalType: "uint64",
+        name: "expirationTime",
+        type: "uint64",
+      },
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
       },
       {
         internalType: "uint256",
-        name: "numberOfRequests",
+        name: "nbRequests",
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "governor",
     outputs: [
@@ -1376,16 +1429,133 @@ const _abi = [
         type: "address",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "address",
+        name: "_owner",
+        type: "address",
+      },
+      {
+        internalType: "uint64",
+        name: "_expirationTime",
+        type: "uint64",
+      },
+    ],
+    name: "grantSoulManually",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "success",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
-        name: "_submissionID",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "humans",
+    outputs: [
+      {
+        internalType: "uint160",
+        name: "",
+        type: "uint160",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IArbitrator",
+        name: "_arbitrator",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "_arbitratorExtraData",
+        type: "bytes",
+      },
+      {
+        internalType: "string",
+        name: "_registrationMetaEvidence",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_clearingMetaEvidence",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestBaseDeposit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint64",
+        name: "_soulLifespan",
+        type: "uint64",
+      },
+      {
+        internalType: "uint64",
+        name: "_renewalPeriodDuration",
+        type: "uint64",
+      },
+      {
+        internalType: "uint64",
+        name: "_challengePeriodDuration",
+        type: "uint64",
+      },
+      {
+        internalType: "uint256[3]",
+        name: "_multipliers",
+        type: "uint256[3]",
+      },
+      {
+        internalType: "uint64",
+        name: "_requiredNumberOfVouches",
+        type: "uint64",
+      },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "initialized",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_humanId",
         type: "address",
       },
     ],
@@ -1397,12 +1567,29 @@ const _abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+    ],
+    name: "isSoulClaimed",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "loserStakeMultiplier",
     outputs: [
@@ -1412,12 +1599,64 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_iterations",
+        type: "uint256",
+      },
+    ],
+    name: "processVouches",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_human",
+        type: "address",
+      },
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+    ],
+    name: "removeVouch",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+    ],
+    name: "renewSoul",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "renewalPeriodDuration",
     outputs: [
@@ -1427,12 +1666,23 @@ const _abi = [
         type: "uint64",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [],
+    name: "requestBaseDeposit",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "requiredNumberOfVouches",
     outputs: [
@@ -1442,12 +1692,70 @@ const _abi = [
         type: "uint64",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+    ],
+    name: "revokeSoul",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_humanId",
+        type: "address",
+      },
+    ],
+    name: "revokeSoulManually",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "expirationTime",
+        type: "uint64",
+      },
+      {
+        internalType: "uint160",
+        name: "soulId",
+        type: "uint160",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_disputeId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_ruling",
+        type: "uint256",
+      },
+    ],
+    name: "rule",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "sharedStakeMultiplier",
     outputs: [
@@ -1457,44 +1765,12 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
-    name: "submissionBaseDeposit",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "submissionCounter",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "submissionDuration",
+    name: "soulLifespan",
     outputs: [
       {
         internalType: "uint64",
@@ -1502,12 +1778,33 @@ const _abi = [
         type: "uint64",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
+    inputs: [
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "string",
+        name: "_evidence",
+        type: "string",
+      },
+    ],
+    name: "submitEvidence",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -1519,6 +1816,11 @@ const _abi = [
         name: "",
         type: "address",
       },
+      {
+        internalType: "uint160",
+        name: "",
+        type: "uint160",
+      },
     ],
     name: "vouches",
     outputs: [
@@ -1528,12 +1830,10 @@ const _abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "winnerStakeMultiplier",
     outputs: [
@@ -1543,8 +1843,47 @@ const _abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address payable",
+        name: "_beneficiary",
+        type: "address",
+      },
+      {
+        internalType: "uint160",
+        name: "_soulId",
+        type: "uint160",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_challengeId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_round",
+        type: "uint256",
+      },
+    ],
+    name: "withdrawFeesAndRewards",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "withdrawRequest",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

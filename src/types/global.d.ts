@@ -1,9 +1,14 @@
-import type { PopupProps, PopupActions } from "reactjs-popup/dist/types";
+declare module "*.svg" {
+  const content: React.FC<React.SVGAttributes<SVGElement>>;
+  export default content;
+}
 
-declare module "reactjs-popup" {
-  const Popup: React.ForwardRefExoticComponent<
-    (PopupProps | { children: (close: () => void) => JSX.Element }) &
-      React.RefAttributes<PopupActions>
-  >;
-  export = Popup;
+declare module "*.jpg" {
+  const uri: string;
+  export default uri;
+}
+
+declare module "*.png" {
+  const uri: string;
+  export default uri;
 }

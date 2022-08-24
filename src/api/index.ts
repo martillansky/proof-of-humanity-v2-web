@@ -10,7 +10,7 @@ export type queryReturnType<Q extends queryType> = Record<
   Awaited<ReturnType<sdkReturnType[Q]>>
 >;
 
-const sdk = SUPPORTED_CHAIN_IDS.reduce(
+export const sdk = SUPPORTED_CHAIN_IDS.reduce(
   (acc, chainID) => ({
     ...acc,
     [chainID]: getSdk(new GraphQLClient(SUBGRAPH_ENDPOINTS[chainID])),
@@ -18,7 +18,26 @@ const sdk = SUPPORTED_CHAIN_IDS.reduce(
   {} as Record<number, sdkReturnType>
 );
 
-export const queryFetch = async <Q extends queryType>(
+type MULTIPLE_ENTITIES_QUERY = "Counter" | "Requests" | "Souls";
+type SINGLE_ENTITY_QUERY = "Request";
+
+export const queryFetchSingle = async <Q extends SINGLE_ENTITY_QUERY>(
+  fetchChainId: number,
+  query: Q,
+  id: string
+): Promise<ReturnType<sdkReturnType[Q]>> =>
+  await sdk[fetchChainId][query]({ id });
+
+export const queryFetch = async <Q extends MULTIPLE_ENTITIES_QUERY>(
+  fetchChainId: number,
+  query: Q,
+  ...params: Parameters<sdkReturnType[Q]>
+): Promise<ReturnType<sdkReturnType[Q]>> =>
+  await sdk[fetchChainId][query](...((params as any) || []));
+
+export const queryFetchAllChains = async <
+  Q extends "Counter" | "Requests" | "Souls"
+>(
   query: Q,
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<queryReturnType<Q>> => {
@@ -33,10 +52,3 @@ export const queryFetch = async <Q extends queryType>(
     {}
   );
 };
-
-export const queryFetchIndividual = async <Q extends queryType>(
-  fetchChainId: number,
-  query: Q,
-  ...params: Parameters<sdkReturnType[Q]>
-): Promise<ReturnType<sdkReturnType[Q]>> =>
-  await sdk[fetchChainId][query](...((params as any) || []));

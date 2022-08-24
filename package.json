@@ -24,6 +24,7 @@
     "@graphql-codegen/typescript-graphql-request": "^4.4.6",
     "@graphql-codegen/typescript-operations": "2.3.6",
     "@parcel/transformer-svg-react": "^2.5.0",
+    "@tailwindcss/forms": "^0.5.2",
     "@typechain/ethers-v5": "^10.1.0",
     "@types/lodash.chunk": "^4.2.7",
     "@types/react": "^18.0.1",

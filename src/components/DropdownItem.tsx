@@ -12,7 +12,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
   name,
   onSelect,
 }) => (
-  <span className={cn({ "bg-yellowish": selected })} onClick={onSelect}>
+  <span className={cn({ "bg-orange-100": selected })} onClick={onSelect}>
     {name}
   </span>
 );

@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils";
 import ABC2048 from "./base2048/words";
 
 export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
@@ -24,11 +26,14 @@ const characters =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export const randomString = (length: number) =>
-  Array(length).reduce(
+  [...Array(length)].reduce(
     (acc) =>
       acc + characters.charAt(Math.floor(Math.random() * characters.length)),
     ""
   );
+
+export const formatEth = (wei: BigNumber, precision: number = 4) =>
+  +parseFloat(formatEther(wei)).toFixed(precision);
 
 const genBase2048 = () => {
   const ALPHABET_MAP = {};
@@ -117,3 +122,32 @@ const genBase2048 = () => {
 };
 
 export const base2048 = genBase2048();
+
+export const bufferFrom = (
+  value: string | ArrayBuffer,
+  {
+    encoding,
+    offset,
+    length,
+  }: { encoding: BufferEncoding; offset: number; length?: number } = {
+    encoding: "utf8",
+    offset: 0,
+  }
+) => {
+  if (Object.prototype.toString.call(value).slice(8, -1) === "ArrayBuffer") {
+    offset >>>= 0;
+    const maxLength = (value as ArrayBuffer).byteLength - offset;
+    if (maxLength < 0) throw new RangeError("'offset' is out of bounds");
+    if (length === undefined) {
+      length = maxLength;
+    } else {
+      length >>>= 0;
+      if (length > maxLength) throw new RangeError("'length' is out of bounds");
+    }
+    return Buffer.from((value as ArrayBuffer).slice(offset, offset + length));
+  }
+
+  return typeof value === "string"
+    ? Buffer.from(value, encoding)
+    : Buffer.from(value);
+};

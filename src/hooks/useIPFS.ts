@@ -8,7 +8,10 @@ interface useIPFSConfig {
 const ipfsFetcher = async (ipfsURI: string) =>
   (await axios.get(`https://ipfs.kleros.io${ipfsURI}`)).data;
 
-const useIPFS = (uri: string, { suspense }: useIPFSConfig = {}) => {
+const useIPFS = <T>(
+  uri?: string,
+  { suspense }: useIPFSConfig = {}
+): [T | undefined, Error] => {
   const { data, error } = useSWR(uri || null, ipfsFetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,

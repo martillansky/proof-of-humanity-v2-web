@@ -1,0 +1,32 @@
+import { Web3ErrorCode } from "constants/web3";
+import { BigNumber } from "ethers";
+import { ProofOfHumanity } from "generated/contracts";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import useProofOfHumanity from "./useProofOfHumanity";
+
+export const useGasFees = <F extends keyof ProofOfHumanity["callStatic"]>(
+  method: F,
+  params: Parameters<ProofOfHumanity[F]> | null
+): [BigNumber | null, boolean] => {
+  const poh = useProofOfHumanity();
+  const [estimationError, setEstimationError] = useState(false);
+  const { data, error } = useSWR(
+    !estimationError && poh && params !== null
+      ? [poh.address, method, ...params]
+      : null,
+    async () => poh && (await (poh.estimateGas[method] as any)(...params!))
+  );
+
+  useEffect(() => {
+    if (
+      !error ||
+      !error.error ||
+      error.error.code !== Web3ErrorCode.EXECUTION_REVERTED
+    )
+      return;
+    setEstimationError(true);
+  }, [error]);
+
+  return [data, estimationError];
+};

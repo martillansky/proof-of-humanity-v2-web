@@ -1,12 +1,12 @@
-query counter {
-  counter(id: 1) {
-    vouchingPhase
-    pendingRemoval
-    pendingRegistration
-    challengedRemoval
-    challengedRegistration
+query Counter {
+  counter(id: 0) {
+    vouching
+    pendingClaims
+    challengedClaims
     registered
-    expired
+    pendingRevokals
+    challengedRevokal
     removed
+    expired
   }
 }

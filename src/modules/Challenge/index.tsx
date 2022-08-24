@@ -44,18 +44,16 @@ const Challenge: React.FC = () => {
     if (!reason || !justification || !arbitrationCost) return;
 
     const evidenceUri = await uploadToIPFS(
-      "evidence.json",
       Buffer.from(
         JSON.stringify({
           name: "Challenge Justification",
           description: justification,
         })
-      )
+      ),
+      "evidence.json"
     );
 
-    challengeRequest("0x0", reason, "0xDuP", evidenceUri, {
-      value: arbitrationCost,
-    });
+    challengeRequest("0", 0, reason, evidenceUri, { value: arbitrationCost });
   };
 
   return (

@@ -10,7 +10,7 @@ const getLibrary = (provider: any): Web3Provider =>
     typeof provider.chainId === "number"
       ? provider.chainId
       : typeof provider.chainId === "string"
-      ? parseInt(provider.chainId)
+      ? +provider.chainId
       : "any"
   );
 

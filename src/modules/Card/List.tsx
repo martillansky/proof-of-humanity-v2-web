@@ -1,16 +1,12 @@
 import Card from ".";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import cn from "classnames";
-import { SubmissionInterface } from "api/submissions";
+import { RequestInterface } from "api/requests";
 
-interface CardListInterface {
-  submissions: SubmissionInterface[];
-}
-
-const CardList: React.FC<CardListInterface> = ({ submissions }) => (
+const CardList: React.FC<{ requests: RequestInterface[] }> = ({ requests }) => (
   <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-    {submissions.map((submission, i) => (
-      <Card key={i} submission={submission} />
+    {requests.map((requests, i) => (
+      <Card key={i} request={requests} />
     ))}
   </div>
 );
@@ -22,7 +18,7 @@ export const LoadingCardList: React.FC = () => (
     {[...Array(12)].map((_, i) => (
       <div
         key={i}
-        className="h-72 rounded bg-white shadow-xl shadow-yellow flex items-center justify-center"
+        className="h-72 rounded bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center"
       >
         <ProofOfHumanityLogo
           className={cn({ "-scale-x-100 scale-y-100": Math.random() > 0.5 })}

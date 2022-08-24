@@ -1,14 +1,11 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { submissionsAtom } from "api/submissions";
+import { requestsAtom } from "api/requests";
 import useDebounce from "hooks/useDebounce";
 import CardList, { LoadingCardList } from "modules/Card/List";
 import { camelToTitle } from "utils/case";
-import { statusFilters, SubmissionStatus } from "constants/submissions";
-import {
-  SUBMISSIONS_DISPLAY_BATCH,
-  SUBMISSION_DURATION_TEMP,
-} from "constants/misc";
+import { statusFilters, RequestStatus } from "constants/requests";
+import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import {
   CHAIN_ID_TO_NAME,
   ChainId,
@@ -19,21 +16,20 @@ import DropdownItem from "components/DropdownItem";
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [submissions, loadSubmissions] = useAtom(submissionsAtom);
+  const [requests, loadRequests] = useAtom(requestsAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const searchDebounced = useDebounce(searchQuery.trim());
   const [prevListLength, setPrevListLength] = useState(0);
-  const [statusFilter, setStatusFilter] = useState<SubmissionStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<RequestStatus>("all");
   const [chainFilter, setChainFilter] = useState<ChainId | "all">("all");
 
   const updateSubmissions = async (loadContinued: boolean = false) => {
     setLoading(true);
-    if (loadContinued) setPrevListLength(submissions.length);
-    await loadSubmissions({
+    if (loadContinued) setPrevListLength(requests.length);
+    await loadRequests({
       searchQuery: searchDebounced,
       status: statusFilter,
       chain: chainFilter,
-      submissionDuration: SUBMISSION_DURATION_TEMP,
       loadContinued,
     });
     setLoading(false);
@@ -44,17 +40,17 @@ const Home: React.FC = () => {
   }, [searchDebounced, statusFilter, chainFilter]);
 
   const loadExhausted =
-    !submissions.length || // No submissions loaded
-    submissions.length % SUBMISSIONS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
-    prevListLength === submissions.length; // Submissions loaded filled a batch but no more were loaded previously
+    !requests.length || // No requests loaded
+    requests.length % REQUESTS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
+    prevListLength === requests.length; // Submissions loaded filled a batch but no more were loaded previously
   // TODO not perfect, maybe add this to a separate atom?
 
   return (
     <div className="py-8 px-32 flex flex-col justify-center">
-      <div>
+      {/* <div>
         <span className="font-semibold">x</span>
         <span> Profiles</span>
-      </div>
+      </div> */}
       <div className="my-4 py-2 flex">
         <input
           className="w-full p-2 mr-2 border rounded"
@@ -92,14 +88,14 @@ const Home: React.FC = () => {
         </Dropdown>
       </div>
 
-      {loading && !submissions.length ? (
+      {loading && !requests.length ? (
         <LoadingCardList />
       ) : (
-        <CardList submissions={submissions} />
+        <CardList requests={requests} />
       )}
       {!loading && !loadExhausted && (
         <button
-          className="mx-auto my-8 px-8 py-4 bg-amber-400 rounded-full text-white font-bold shadow-md shadow-yellow"
+          className="mx-auto my-8 px-8 py-4 bg-amber-400 rounded-full text-white font-bold shadow-md shadow-orange-500/10"
           onClick={() => updateSubmissions(true)}
         >
           Load More

@@ -1,82 +1,88 @@
-import ALink from "components/ALink";
-import Button from "components/Button";
-import Checkbox from "components/Checkbox";
 import useWeb3 from "hooks/useWeb3";
-import React from "react";
 import { useFormContext } from "./context";
 
 const Info: React.FC = () => {
   const { account } = useWeb3();
-  const { tookNoticeState, nameState, bioState, advance } = useFormContext();
-  const [tookNotice, setTookNotice] = tookNoticeState;
-
-  const [name, setName] = nameState;
-  const [bio, setBio] = bioState;
+  const {
+    advance,
+    tookNotice,
+    setTookNotice,
+    state: { soulId, name, bio },
+    dispatch,
+  } = useFormContext();
 
   return (
     <>
-      <span className="text-3xl font-bold my-8">
-        Create your Proof of Humanity profile
-      </span>
+      <div className="w-full my-4 flex flex-col text-2xl font-extralight">
+        <span>Create your</span>
+        <span>
+          <strong className="font-semibold uppercase">Proof of Humanity</strong>{" "}
+          Profile
+        </span>
+        <div className="divider mt-4 w-2/3" />
+      </div>
 
-      <span className="mb-8">
+      <span className="mb-6 txt">
         Submitting your profile to Proof of Humanity takes an average of 5-10
         minutes, an existing Ethereum account and requires you to record a video
         of yourself talking.
       </span>
 
-      <span>Your connected wallet is:</span>
-      <div className="px-4 py-2 border-2 border-orange rounded-full font-bold">
-        {account}
+      <legend className="inp-title">Connected wallet</legend>
+      <div className="bordered">
+        <div className="inp">{account}</div>
       </div>
 
-      <ALink className="font-bold text-blue-500" href="https://tornado.cash">
-        Learn how to increase your privacy with Tornado Cash
-      </ALink>
-
-      <div>
-        <Checkbox
-          id="notice"
-          checked={tookNotice}
-          handler={() => setTookNotice((c) => !c)}
+      <legend className="inp-title mt-8">Soul you claim</legend>
+      <div className="bordered">
+        <input
+          className="inp placeholder:text-orange-500/40"
+          placeholder="ID of the soul you want to claim"
+          value={soulId}
+          onChange={(e) =>
+            dispatch({ type: "SOUL_ID", payload: e.target.value })
+          }
         />
-        <label htmlFor="notice" className="">
+      </div>
+
+      <legend className="inp-title mt-8">Display Name</legend>
+      <div className="bordered">
+        <input
+          className="inp placeholder:text-orange-500/40"
+          placeholder="name by which you are known"
+          value={name}
+          onChange={(e) => dispatch({ type: "NAME", payload: e.target.value })}
+        />
+      </div>
+
+      <legend className="inp-title mt-8">Short bio</legend>
+      <div className="bordered">
+        <input
+          className="inp placeholder:text-orange-500/40"
+          placeholder="short bio (ex: cypherpunk, smart contract developer)"
+          value={bio}
+          onChange={(e) => dispatch({ type: "BIO", payload: e.target.value })}
+        />
+      </div>
+
+      <div className="mt-8 mb-16 flex items-center cursor-pointer">
+        <input
+          id="notice"
+          type="checkbox"
+          className="checkbox mx-2 cursor-pointer"
+          checked={tookNotice}
+          onChange={() => setTookNotice((c) => !c)}
+        />
+        <label className="txt cursor-pointer" htmlFor="notice">
           I understand this wallet will be irreversebly linked to my real world
           person and I will not use that wallet for any private or sensitive
           information.
         </label>
       </div>
 
-      {/* {tookNotice && ( */}
-      <>
-        <span className="text-3xl font-bold my-8">Basic information</span>
-
-        <span>
-          Registering to Proof of Humanity requires you to set a name. You can
-          use a pseudonym if you feel more comfortable.
-        </span>
-
-        <span className="mt-4 mb-2 font-bold">Display Name</span>
-        <input
-          className="p-2 border rounded"
-          placeholder="Name in which you are known"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <span className="mt-4 mb-2 font-bold">Short bio</span>
-        <input
-          className="p-2 border rounded"
-          placeholder="short bio (ex: Cypherpunk, smart contract developer)"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        />
-
-        <div className="m-4">
-          <Button onClick={advance}>Advance</Button>
-        </div>
-      </>
-      {/* )} */}
+      <button className="btn-main" onClick={advance}>
+        NEXT
+      </button>
     </>
   );
 };

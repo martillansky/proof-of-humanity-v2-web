@@ -8,11 +8,15 @@ import { injected } from "utils/connectors";
 import { shortenAddress } from "utils/address";
 import { Web3Provider } from "@ethersproject/providers";
 import { RPCMethod, Web3ErrorCode } from "constants/web3";
-import { ChainId, CHAIN_ID_TO_NAME, CHAIN_SETTING } from "constants/chains";
+import {
+  ChainId,
+  CHAIN_ID_TO_NAME,
+  CHAIN_SETTING,
+  SUPPORTED_CHAIN_IDS,
+} from "constants/chains";
 import { hexValue } from "ethers/lib/utils";
-import { camelToTitle } from "utils/case";
 
-const DISPLAYED_CHAINS = [ChainId.MAINNET, ChainId.KOVAN];
+const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 
 const Header: React.FC = () => {
   const { account, activate, library, chainId } = useWeb3React<Web3Provider>();
@@ -49,8 +53,7 @@ const Header: React.FC = () => {
                  w-full
                  grid grid-cols-2 sm:grid-cols-3
                  text-white text-lg
-                 bg-gradient-to-r from-orange via-orange to-pink
-                 shadow-sm"
+                 gradient shadow-sm"
     >
       <Link to="/" className="flex items-center">
         <ProofOfHumanityLogo height={32} width={32} />
@@ -67,9 +70,9 @@ const Header: React.FC = () => {
                    font-bold whitespace-nowrap"
       >
         <Link to="/requests">Requests</Link>
+        <Link to="/souls">Souls</Link>
         {account && <Link to={`/soul/${account}`}>Soul</Link>}
         <Link to="/claim">Claim</Link>
-        <Link to="/souls">Souls</Link>
         {/* <ALink href="https://pools.proofofhumanity.id/">Pools</ALink> */}
       </div>
 
@@ -85,7 +88,7 @@ const Header: React.FC = () => {
                          rounded
                          text-black text-sm"
             >
-              {camelToTitle(CHAIN_ID_TO_NAME[chainId || ChainId.MAINNET])}
+              {CHAIN_ID_TO_NAME[chainId || ChainId.RINKEBY]}
             </button>
           }
         >
@@ -96,7 +99,7 @@ const Header: React.FC = () => {
                 className="cursor-pointer"
                 onClick={() => switchChain(chainId)}
               >
-                {camelToTitle(CHAIN_ID_TO_NAME[chainId])}
+                {CHAIN_ID_TO_NAME[chainId]}
               </button>
             ))}
           </div>

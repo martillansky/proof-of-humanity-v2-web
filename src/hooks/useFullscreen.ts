@@ -17,7 +17,9 @@ const useFullscreen = (
   options: FullScreenOptions = {}
 ) => {
   const { video, onClose = () => {} } = options;
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(
+    !!((document as any).webkitIsFullscreen || (document as any).mozFullScreen)
+  );
 
   useEffect(() => {
     if (!isFullscreen) return;

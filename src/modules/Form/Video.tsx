@@ -1,108 +1,103 @@
 import useFullscreen from "hooks/useFullscreen";
 import React, { useRef, useState } from "react";
-import useUserMedia from "hooks/useUserMedia";
 import getBlobDuration from "get-blob-duration";
 import useWeb3 from "hooks/useWeb3";
-import { base2048 } from "utils/misc";
-import { IS_ANDROID, IS_IOS } from "constants/media";
+import { IS_IOS } from "constants/media";
 import { useFormContext } from "./context";
 import ReactWebcam from "react-webcam";
-import cn from "classnames";
-import Button from "components/Button";
 import Uploader from "components/Uploader";
 import Webcam from "components/Webcam";
+import { phraseFromAddress } from "utils/address";
+import { videoSanitizer } from "utils/media";
+import cn from "classnames";
 
-import SpeakerImage from "assets/images/speaker.png";
-import SignImage from "assets/images/sign.png";
-
-const CameraButton: React.FC<{
-  onClick: () => void;
-  children: React.ReactNode;
-}> = ({ onClick, children }) => (
-  <button
-    className="p-2 rounded-full bg-orange text-white font-bold"
-    onClick={onClick}
-  >
-    {children}
-  </button>
-);
+import UploadIcon from "assets/svg/UploadMajor.svg";
+import CameraIcon from "assets/svg/CameraMajor.svg";
+import ResetIcon from "assets/svg/ResetMinor.svg";
+import Video from "components/Video";
 
 const MIN_DIMS = { width: 352, height: 352 };
 
-const Video: React.FC = () => {
+const VideoStep: React.FC = () => {
   const { account } = useWeb3();
-  const { videoUriState, previous, advance } = useFormContext();
-  const [videoUri, setVideoUri] = videoUriState;
+  const {
+    advance,
+    state: { video },
+    dispatch,
+  } = useFormContext();
+  // const [video, setVideo] = useState<{
+  //   uri: string;
+  //   buffer: Buffer;
+  // } | null>(null);
 
   const fullscreenRef = useRef(null);
-  const { setFullscreen, toggleFullscreen } = useFullscreen(fullscreenRef);
+  const { isFullscreen, setFullscreen, toggleFullscreen } =
+    useFullscreen(fullscreenRef);
 
-  const { devices, setFacingMode } = useUserMedia();
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const [recording, setRecording] = useState(false);
-  const [recordedVideo, setRecordedVideo] = useState<BlobPart[]>([]);
-  const [recordingMode, setRecordingMode] = useState("");
-  const [mirrored, setMirrored] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [file, setFile] = useState<Blob | null>(null);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [showCamera, setShowCamera] = useState(false);
   const [camera, setCamera] = useState<ReactWebcam | null>(null);
+  const [recording, setRecording] = useState(false);
+  // const [recordedVideo, setRecordedVideo] = useState<BlobPart[]>([]);
+  const [recordingMode, setRecordingMode] = useState<"phrase" | "sign" | null>(
+    null
+  );
+  // const [duration, setDuration] = useState(0);
+  // const [file, setFile] = useState<Blob | null>(null);
 
-  const handleStartCaptureClick = () => {
+  const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
+
+  const startRecording = () => {
+    console.log(recorder, recording);
     if (!camera || !camera.stream) return;
-
-    setRecording(true);
-
-    mediaRecorderRef.current = new MediaRecorder(camera.stream, {
+    const mediaRecorder = new MediaRecorder(camera.stream, {
       mimeType: IS_IOS ? "video/mp4" : "video/webm",
     });
 
-    mediaRecorderRef.current.ondataavailable = ({ data }) =>
-      setRecordedVideo(recordedVideo.concat(data));
+    mediaRecorder.ondataavailable = async ({ data }) => {
+      // const newlyRecorded = recordedVideo.concat(data);
+      // setRecordedVideo(newlyRecorded);
+      // const blob = new Blob(newlyRecorded, {
+      //   type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
+      // });
+      // setDuration(await getBlobDuration(blob));
+      // setVideoUri(URL.createObjectURL(blob));
+      // setFile(blob);
 
-    mediaRecorderRef.current.onstop = async () => {
-      setFullscreen(false);
-      const blob = new Blob(recordedVideo, {
-        type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
-      });
-      setRecording(false);
-      setCameraEnabled(false);
-      setDuration(await getBlobDuration(blob));
-      setVideoUri(URL.createObjectURL(blob));
-      setFile(blob);
+      const vid = await videoSanitizer(Buffer.from(await data.arrayBuffer()));
+
+      const uri = URL.createObjectURL(
+        new Blob([vid], {
+          type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
+        })
+      );
+
+      console.log({ vid, uri });
+      dispatch({ type: "VIDEO", payload: { content: vid, uri } });
     };
 
-    mediaRecorderRef.current.start();
+    mediaRecorder.onstop = async () => {
+      setFullscreen(false);
+      setRecording(false);
+    };
+
+    mediaRecorder.start();
+
+    setRecorder(mediaRecorder);
+    setRecording(true);
   };
 
-  const handleStopCaptureClick = () => {
-    if (!mediaRecorderRef.current || recording) return;
-    mediaRecorderRef.current.stop();
+  const stopRecording = () => {
+    if (!recorder || !recording) return;
+    recorder.stop();
   };
 
-  const switchCamera = () => {
-    if (IS_IOS || IS_ANDROID)
-      setFacingMode((fm) => (fm === "environment" ? "user" : "environment"));
-  };
-
-  // const goBack = () => {
-  //   const goPrevious = recordingMode === "";
-
-  //   setRecording(false);
-  //   setCameraEnabled(false);
-  //   setVideoUri("");
-  //   setRecordedVideo([]);
-  //   setFile(null);
-  //   setRecordingMode("");
-
-  //   if (goPrevious) previous();
-  // };
-
-  const generatePhrase = () => {
-    if (!account) return;
-    const address = account.slice(2);
-    const words = base2048.encode(Buffer.from(address, "hex"));
-    return words.split(" ").slice(0, 8).join(" ");
+  const retakeVideo = () => {
+    setShowCamera(false);
+    setRecording(false);
+    dispatch({ type: "DELETE_VIDEO" });
+    // setRecordedVideo([]);
+    // setFile(null);
+    setRecordingMode(null);
   };
 
   // const uploadVideo = async () => {
@@ -130,124 +125,171 @@ const Video: React.FC = () => {
   // };
 
   return (
-    <div className="flex flex-col items-center">
-      <span>Are you ready to speak?</span>
-      <span>
-        You must be in a quiet room, with a working microphone and be able to
-        read from your screen. If you are unable to comply, then an alternative
-        process is available.
+    <>
+      <span className="w-full my-4 flex flex-col text-2xl font-semibold">
+        Video
+        <div className="divider mt-4 w-2/3" />
       </span>
-      <div className="flex">
-        <button
-          className="border"
-          onClick={() => {
-            setRecordingMode("speaking");
-            setCameraEnabled(true);
-          }}
-        >
-          <img src={SpeakerImage} />
-          <span>I am able to identify my account using my voice and sight</span>
-        </button>
-        <button
-          className="border"
-          onClick={() => {
-            setRecordingMode("visual");
-            setCameraEnabled(true);
-          }}
-        >
-          <img src={SignImage} />
-          <span>I would prefer to use a visual method</span>
-        </button>
-      </div>
 
-      <span>Confirmation phrase: {generatePhrase()}</span>
+      {!showCamera && !video && (
+        <>
+          <span className="txt mb-4">
+            You must be in a quiet room, with a working microphone and be able
+            to read from your screen. You must speak the phrase{" "}
+            <span className="text-[#ff9966]">"</span>
+            <strong>
+              I certify I am a real human and not registered in this registry
+            </strong>
+            <span className="text-[#ff9966]">"</span> accompanied by one of the
+            following:
+          </span>
 
-      <div className="w-full my-4 grid grid-cols-2">
-        <Webcam
-          enabled={cameraEnabled}
-          fullscreenRef={fullscreenRef}
-          loadCamera={setCamera}
-          trigger={
-            <button className="p-2 bg-blue-500 border rounded font-bold text-3xl text-white">
-              Take photo with camera
-            </button>
-          }
-        >
-          <div className="absolute bottom-4 grid grid-cols-3 gap-2">
-            <i className="animate-ping" />
+          <div className="flex">
             <div
-              className={cn("buttons-camera-container", {
-                "video-mirrored": mirrored,
+              className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
+                "gradient background font-semibold": recordingMode === "sign",
               })}
             >
-              {recording ? (
-                <CameraButton onClick={handleStopCaptureClick}>
-                  STOP RECORD
-                </CameraButton>
-              ) : (
-                <>
-                  <CameraButton onClick={handleStartCaptureClick}>
-                    RECORD
-                  </CameraButton>
-                  <CameraButton onClick={() => setMirrored((m) => !m)}>
-                    MIRROR
-                  </CameraButton>
-                  {devices.length > 1 && (IS_IOS || IS_ANDROID) && (
-                    <CameraButton onClick={switchCamera}>SWITCH</CameraButton>
-                  )}
-                  <CameraButton onClick={toggleFullscreen}>
-                    FULLSCREEN
-                  </CameraButton>
-                </>
-              )}
+              <button
+                className="w-full h-full bg-white rounded-sm hover:bg-slate-100"
+                onClick={() => setRecordingMode("sign")}
+              >
+                Hold a sign with your address
+              </button>
+            </div>
+            <div
+              className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
+                "gradient background font-semibold": recordingMode === "phrase",
+              })}
+            >
+              <button
+                className="w-full h-full bg-white rounded-sm hover:bg-slate-100"
+                onClick={() => setRecordingMode("phrase")}
+              >
+                Speak a phrase generated from your address
+              </button>
             </div>
           </div>
-        </Webcam>
+        </>
+      )}
 
-        <Uploader
-          className="w-full flex flex-col justify-center p-2 border-dashed border-2 border-sky-500 rounded"
-          type="video"
-          onDrop={async (received) => {
-            const file = received[0];
-            const blob = new Blob([file], { type: file.type });
-            const uri = URL.createObjectURL(blob);
+      {recordingMode === "phrase" && (
+        <span className="txt my-2">
+          Confirmation phrase: <strong>{phraseFromAddress(account)}</strong>
+        </span>
+      )}
 
-            const duration = await getBlobDuration(blob);
-            if (duration > 60 * 2) return console.error("Video is too long");
+      {recordingMode === "sign" && (
+        <span className="txt my-2">
+          Hold sign with your address: <strong>{account}</strong>
+        </span>
+      )}
 
-            const video = document.createElement("video");
-            video.crossOrigin = "anonymous";
-            video.src = uri;
-            video.preload = "auto";
+      {recordingMode && !showCamera && !video && (
+        <div className="relative w-full mt-12 bordered grid grid-cols-2">
+          <Uploader
+            className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"
+            type="video"
+            onDrop={async (received) => {
+              const file = received[0];
+              const blob = new Blob([file], { type: file.type });
+              const uri = URL.createObjectURL(blob);
 
-            video.addEventListener("loadeddata", () => {
-              if (
-                video.videoWidth < MIN_DIMS.width ||
-                video.videoHeight < MIN_DIMS.height
-              )
-                return console.error("Video dimensions are too small");
+              console.log({ uri });
 
-              setFile(blob);
-              setRecording(false);
-              setCameraEnabled(false);
-              setVideoUri(uri);
-              setDuration(duration);
-            });
-          }}
+              const duration = await getBlobDuration(blob);
+              if (duration > 60 * 2) return console.error("Video is too long");
+
+              const vid = document.createElement("video");
+              vid.crossOrigin = "anonymous";
+              vid.src = uri;
+              vid.preload = "auto";
+
+              vid.addEventListener("loadeddata", async () => {
+                if (
+                  vid.videoWidth < MIN_DIMS.width ||
+                  vid.videoHeight < MIN_DIMS.height
+                )
+                  return console.error("Video dimensions are too small");
+
+                // const buffer = await videoSanitizer(
+                //   Buffer.from(await blob.arrayBuffer())
+                // );
+
+                // setFile(blob);
+                setRecording(false);
+                dispatch({
+                  type: "VIDEO",
+                  payload: { uri, content: await blob.arrayBuffer() },
+                });
+                // setVideo({
+                //   uri,
+                //   buffer: Buffer.from(await blob.arrayBuffer()),
+                // });
+                // setDuration(duration);
+              });
+            }}
+          >
+            <UploadIcon className="w-12 h-12 mr-4 fill-[#ff9966]" />
+            <span className="text-lg font-semibold">Upload video</span>
+          </Uploader>
+
+          <span
+            className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
+                         p-1
+                         border-2 border-slate-200
+                         bg-white rounded-full 
+                         text-[#ff9966] text-xs font-semibold"
+          >
+            OR
+          </span>
+
+          <button
+            className="flex items-center justify-center p-2 font-semibold text-lg text-white"
+            onClick={() => setShowCamera(true)}
+          >
+            <div className="flex flex-col">
+              <span>Record with</span>
+              <span>camera</span>
+            </div>
+            <CameraIcon className="w-12 h-12 ml-4 fill-white" />
+          </button>
+        </div>
+      )}
+
+      {showCamera && (
+        <div tabIndex={0} ref={fullscreenRef}>
+          <Webcam
+            video
+            recording={recording}
+            action={recording ? stopRecording : startRecording}
+            fullscreen={isFullscreen}
+            toggleFullscreen={toggleFullscreen}
+            loadCamera={setCamera}
+          />
+        </div>
+      )}
+
+      {!!video && (
+        <div className="flex flex-col items-center">
+          <Video uri={video.uri} />
+          <button className="btn-main mt-4" onClick={advance}>
+            Next
+          </button>
+        </div>
+      )}
+
+      {(showCamera || !!video) && (
+        <button
+          className="centered mt-4 text-[#ff9966] font-semibold text-lg uppercase"
+          onClick={() => retakeVideo()}
         >
-          <span className="text-3xl font-bold">Or upload an image</span>
-          <p>Drag 'n drop some files here, or click to select files</p>
-        </Uploader>
-      </div>
-
-      {videoUri && <video src={videoUri} controls />}
-
-      <div className="m-4 grid grid-cols-2 gap-2">
-        <Button onClick={previous}>Previous</Button>
-        <Button onClick={advance}>Advance</Button>
-      </div>
-    </div>
+          <ResetIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+          {showCamera ? "Return" : "Retake"}
+        </button>
+      )}
+    </>
   );
 };
 
-export default Video;
+export default VideoStep;

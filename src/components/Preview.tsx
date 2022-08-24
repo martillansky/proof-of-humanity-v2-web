@@ -1,6 +1,5 @@
 import React from "react";
 import Popup from "reactjs-popup";
-import Backdrop from "./Backdrop";
 
 interface PreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   trigger: JSX.Element | ((isOpen: boolean) => JSX.Element) | undefined;
@@ -9,7 +8,11 @@ interface PreviewProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Preview: React.FC<PreviewProps> = ({ trigger, children }) => (
   <Popup trigger={trigger} modal nested>
-    {(close) => <Backdrop onClose={close}>{children}</Backdrop>}
+    {(close) => (
+      <div className="backdrop" onClick={close}>
+        {children}
+      </div>
+    )}
   </Popup>
 );
 

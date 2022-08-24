@@ -1,16 +1,13 @@
-import Button from "components/Button";
 import React, { useRef, useState } from "react";
-import { useFormContext } from "./context";
 import ReactWebcam from "react-webcam";
 import useFullscreen from "hooks/useFullscreen";
 import { getCroppedPhoto, sanitizeImage } from "utils/media";
 import { base64ToUint8Array } from "utils/misc";
-import useUserMedia from "hooks/useUserMedia";
 import Uploader from "components/Uploader";
 import Cropper from "react-easy-crop";
-import Modal from "components/Modal";
 import Image from "components/Image";
-import Webcam, { CameraButton } from "components/Webcam";
+import Webcam from "components/Webcam";
+import { useFormContext } from "./context";
 import type { Area, Point } from "react-easy-crop/types";
 
 import FacialFeaturesImage from "assets/images/facial-features.jpg";
@@ -20,72 +17,93 @@ import SunglassesImage from "assets/images/sunglasses.jpg";
 import HijabImage from "assets/images/hijab.jpg";
 import NiqabImage from "assets/images/niqab.jpg";
 import BWImage from "assets/images/b&w.jpg";
-import MaskImage from "assets/images/mask.jpg";
+
+import CircleTick from "assets/svg/CircleTickMinor.svg";
+import CircleCancel from "assets/svg/CircleCancelMinor.svg";
+import UploadIcon from "assets/svg/UploadMajor.svg";
+import CameraIcon from "assets/svg/CameraMajor.svg";
+import ResetIcon from "assets/svg/ResetMinor.svg";
+import ZoomIcon from "assets/svg/SearchMajor.svg";
+import CheckmarkIcon from "assets/svg/MobileAcceptMajor.svg";
+
+const ExamplePic: React.FC<{ uri: string; wrong?: boolean }> = ({
+  uri,
+  wrong,
+}) => (
+  <div className="flex flex-col items-center">
+    <Image className="w-28 h-28 mb-2" uri={uri} />
+    {wrong ? (
+      <CircleCancel className="w-4 h-4 fill-red-500" />
+    ) : (
+      <CircleTick className="w-4 h-4 fill-green-500" />
+    )}
+  </div>
+);
 
 const Photo: React.FC = () => {
-  const { advance, previous, photoUriState } = useFormContext();
-  const { switchCamera } = useUserMedia();
+  const {
+    advance,
+    dispatch,
+    state: { photo },
+  } = useFormContext();
 
   const fullscreenRef = useRef(null);
-  const { setFullscreen, toggleFullscreen } = useFullscreen(fullscreenRef);
+  const { isFullscreen, setFullscreen, toggleFullscreen } =
+    useFullscreen(fullscreenRef);
 
-  const [originalPhoto, setOriginalPhoto] = useState<ArrayBuffer | null>(null);
-  const [originalPhotoUri, setOriginalPhotoUri] = useState("");
-  const [photo, setPhoto] = useState<ArrayBuffer | null>(null);
-  const [photoUri, setPhotoUri] = photoUriState;
+  const [originalPhoto, setOriginalPhoto] = useState<{
+    uri: string;
+    buffer: Buffer;
+  } | null>(null);
 
-  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [showCamera, setShowCamera] = useState(false);
   const [camera, setCamera] = useState<ReactWebcam | null>(null);
-
   const [cropPixels, setCropPixels] = useState<Area | null>(null);
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [maxZoom, setMaxZoom] = useState(3);
   const [zoom, setZoom] = useState(1);
 
-  const loadOriginalPhoto = async (blob: Blob) => {
-    setOriginalPhoto(await blob.arrayBuffer());
-    setOriginalPhotoUri(URL.createObjectURL(blob));
-    setCameraEnabled(false);
-  };
-
   const onCrop = async () => {
-    if (!cropPixels) return;
+    if (!cropPixels || !originalPhoto) return;
     if (cropPixels.width < 256 || cropPixels.height < 256)
       return console.error("Size error");
 
-    const cropped = await getCroppedPhoto(originalPhotoUri, cropPixels);
+    const cropped = await getCroppedPhoto(originalPhoto.uri, cropPixels);
     if (!cropped) return;
 
     const sanitized = await sanitizeImage(
       Buffer.from(base64ToUint8Array(cropped.split(",")[1]))
     );
 
-    setPhoto(sanitized);
-    setPhotoUri(
-      URL.createObjectURL(new Blob([sanitized], { type: "image/jpeg" }))
-    );
+    dispatch({
+      type: "PHOTO",
+      payload: {
+        content: sanitized,
+        uri: URL.createObjectURL(new Blob([sanitized], { type: "image/jpeg" })),
+      },
+    });
   };
 
-  const takePhoto = () => {
+  const takePhoto = async () => {
     setFullscreen(false);
     if (!camera) return;
 
-    const originalPhoto = camera.getScreenshot();
-    if (!originalPhoto) return;
+    const screenshot = camera.getScreenshot();
+    if (!screenshot) return;
 
-    loadOriginalPhoto(
-      new Blob([base64ToUint8Array(originalPhoto.split(",")[1])], {
-        type: "buffer",
-      })
-    );
+    const buffer = Buffer.from(base64ToUint8Array(screenshot.split(",")[1]));
+    setOriginalPhoto({
+      uri: URL.createObjectURL(new Blob([buffer], { type: "buffer" })),
+      buffer,
+    });
+
+    setShowCamera(false);
   };
 
   const retakePhoto = () => {
-    setOriginalPhoto(new ArrayBuffer(0));
-    setOriginalPhotoUri("");
-    setPhoto(new ArrayBuffer(0));
-    setPhotoUri("");
-    setCameraEnabled(true);
+    setShowCamera(false);
+    dispatch({ type: "DELETE_PHOTO" });
+    setOriginalPhoto(null);
     setZoom(1);
     setCrop({ x: 0, y: 0 });
     setCropPixels(null);
@@ -93,80 +111,117 @@ const Photo: React.FC = () => {
 
   return (
     <>
-      <span className="text-3xl font-bold my-8">Face Photo</span>
+      <span className="w-full my-4 flex flex-col text-2xl font-semibold">
+        {originalPhoto && !photo ? "Crop photo" : "Take Photo"}
+        <div className="divider mt-4 w-2/3" />
+      </span>
 
-      <span className="font-bold">Photo Instructions:</span>
-      <ul>
-        <li>
-          The photo should include the face of the submitter facing the camera
-          and the facial features must be visible.
-        </li>
-        <li>
-          Face should not be covered under heavy make-up, large piercings or
-          masks hindering the visibility of facial features. Headcover not
-          covering the internal region of the face is acceptable (For example, a
-          hijab is acceptable for a submitter but a niqab is not).
-        </li>
-        <li>
-          It can include items worn daily (ex: headscarf, turban, wig, light
-          makeup, etc) provided they do not violate the previous point. It
-          cannot include special items worn only on special occasions.
-        </li>
-      </ul>
+      <span className="txt pb-8">
+        {originalPhoto && !photo
+          ? "Make sure your face is centered and not rotated"
+          : "The photo should include the face of the submitter facing the camera and the facial features must be visible"}
+      </span>
 
-      <div className="grid grid-cols-4 gap-2">
-        <Image uri={FacialFeaturesImage} rounded />
-        <Image uri={NotFrontFacingImage} rounded />
-        <Image uri={GlassesImage} rounded />
-        <Image uri={SunglassesImage} rounded />
-        <Image uri={HijabImage} rounded />
-        <Image uri={NiqabImage} rounded />
-        <Image uri={BWImage} rounded />
-        <Image uri={MaskImage} rounded />
-      </div>
+      {!showCamera && !originalPhoto && !photo && (
+        <div className="flex flex-col items-center">
+          <div className="w-full flex justify-around pb-8">
+            <div className="w-fit flex flex-col items-center">
+              <span className="pb-2">Face the camera</span>
+              <div className="grid grid-cols-2 gap-2">
+                <ExamplePic uri={FacialFeaturesImage} />
+                <ExamplePic uri={NotFrontFacingImage} wrong={true} />
+              </div>
+            </div>
 
-      <div className="w-full my-4 grid grid-cols-2">
-        <Webcam
-          enabled={cameraEnabled}
-          fullscreenRef={fullscreenRef}
-          loadCamera={setCamera}
-          trigger={
-            <button className="p-2 bg-blue-500 border rounded font-bold text-3xl text-white">
-              Take photo with camera
-            </button>
-          }
-        >
-          <div className="absolute bottom-4 grid grid-cols-3 gap-2">
-            <CameraButton onClick={switchCamera}>SWITCH</CameraButton>
-            <CameraButton onClick={takePhoto}>TAKE</CameraButton>
-            <CameraButton onClick={toggleFullscreen}>FULLSCREEN</CameraButton>
+            <div className="w-fit flex flex-col items-center">
+              <span className="pb-2">No filters</span>
+              <div className="w-fit grid grid-cols-1">
+                <ExamplePic uri={BWImage} wrong={true} />
+              </div>
+            </div>
           </div>
-        </Webcam>
 
-        <Uploader
-          className="w-full flex flex-col justify-center p-2 border-dashed border-2 border-sky-500 rounded"
-          type="image"
-          onDrop={async (received) => {
-            const file = received[0];
-            loadOriginalPhoto(new Blob([file], { type: file.type }));
-          }}
-          disabled={!!originalPhoto}
-        >
-          <span className="text-3xl font-bold">Or upload an image</span>
-          <p>Drag 'n drop some files here, or click to select files</p>
-        </Uploader>
-      </div>
+          <div className="w-fit flex flex-col items-center">
+            <span className="pb-2">All facial features must be visible</span>
+            <div className="grid grid-cols-4 gap-2">
+              <ExamplePic uri={HijabImage} />
+              <ExamplePic uri={NiqabImage} wrong={true} />
+              <ExamplePic uri={GlassesImage} />
+              <ExamplePic uri={SunglassesImage} wrong={true} />
+            </div>
+          </div>
+          <div className="relative w-full mt-12 bordered grid grid-cols-2">
+            <Uploader
+              className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"
+              type="image"
+              onDrop={async (received) => {
+                const file = received[0];
+                setOriginalPhoto({
+                  uri: URL.createObjectURL(
+                    new Blob([file], { type: file.type })
+                  ),
+                  buffer: Buffer.from(await file.arrayBuffer()),
+                });
+              }}
+              disabled={!!originalPhoto}
+            >
+              <UploadIcon className="w-12 h-12 mr-4 fill-[#ff9966]" />
+              <span className="text-lg font-semibold">Upload photo</span>
+            </Uploader>
 
-      <Modal open={!!originalPhoto && !photo} onClose={retakePhoto}>
-        <div className="flex flex-col">
-          <span className="text-3xl font-bold my-8">Crop your photo</span>
-          <span className="mb-8">
-            Make sure your face is centered and not rotated.
-          </span>
+            <span
+              className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
+                         p-1
+                         border-2 border-slate-200
+                         bg-white rounded-full 
+                         text-[#ff9966] text-xs font-semibold"
+            >
+              OR
+            </span>
 
-          <div className="relative w-full h-96">
+            <button
+              className="flex items-center justify-center p-2 font-semibold text-lg text-white"
+              onClick={() => setShowCamera(true)}
+            >
+              <div className="flex flex-col">
+                <span>Take with</span>
+                <span>camera</span>
+              </div>
+              <CameraIcon className="w-12 h-12 ml-4 fill-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showCamera && (
+        <div tabIndex={0} ref={fullscreenRef}>
+          <Webcam
+            fullscreen={isFullscreen}
+            toggleFullscreen={toggleFullscreen}
+            loadCamera={setCamera}
+            action={takePhoto}
+          />
+        </div>
+      )}
+
+      {!showCamera && !!originalPhoto && !photo && (
+        <>
+          <div className="centered mx-12 mb-4">
+            <ZoomIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+            <input
+              className="w-full h-0.5 bg-slate-200 appearance-none slider-thumb"
+              type="range"
+              min={1}
+              max={maxZoom}
+              step={0.05}
+              value={zoom}
+              onChange={(event) => setZoom(parseFloat(event.target.value))}
+            />
+          </div>
+
+          <div className="relative w-full h-96 mb-2 bg-slate-200">
             <Cropper
-              image={originalPhotoUri}
+              image={originalPhoto?.uri}
               crop={crop}
               zoom={zoom}
               maxZoom={maxZoom}
@@ -189,27 +244,31 @@ const Photo: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-col">
-            <span>Size</span>
-            <input
-              type="range"
-              min={1}
-              max={maxZoom}
-              step={0.05}
-              value={zoom}
-              onChange={(event) => setZoom(parseFloat(event.target.value))}
-            />
-          </div>
-          <Button onClick={onCrop}>Ready</Button>
+          <button className="btn-main" onClick={onCrop}>
+            <CheckmarkIcon className="w-6 h-6 mr-2 fill-white" />
+            Ready
+          </button>
+        </>
+      )}
+
+      {!!photo && (
+        <div className="flex flex-col items-center">
+          <Image uri={photo.uri} rounded previewed />
+          <button className="btn-main mt-4" onClick={advance}>
+            Next
+          </button>
         </div>
-      </Modal>
+      )}
 
-      {photo && <Image uri={photoUri} rounded previewed />}
-
-      <div className="m-4 grid grid-cols-2 gap-2">
-        <Button onClick={previous}>Previous</Button>
-        <Button onClick={advance}>Advance</Button>
-      </div>
+      {(showCamera || !!originalPhoto || !!photo) && (
+        <button
+          className="centered mt-4 text-[#ff9966] font-semibold text-lg uppercase"
+          onClick={() => retakePhoto()}
+        >
+          <ResetIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+          {showCamera ? "Return" : "Retake"}
+        </button>
+      )}
     </>
   );
 };

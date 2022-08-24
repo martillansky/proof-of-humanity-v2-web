@@ -5,11 +5,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        orange: "#FFB978",
-        pink: "#FDC9D3",
-        yellow: "#ff990040",
-        yellowish: "#fffcf0",
-        background: "#FCFBFA",
+        vouching: "#fa9938",
+        resolving: "#5fd35f",
+        disputed: "#dd47eb",
+        resolved: "#3858fa",
+        black: "#26140B",
       },
       // keyframes: {
       //   progress: {
@@ -25,5 +25,15 @@ module.exports = {
     //   progress: "progress linear 1 forwards",
     // },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
+  safelist: [
+    "bg-vouching",
+    "text-vouching",
+    "bg-resolving",
+    "text-resolving",
+    "bg-disputed",
+    "text-disputed",
+    "bg-resolved",
+    "text-resolved",
+  ],
 };
