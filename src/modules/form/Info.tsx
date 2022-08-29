@@ -1,4 +1,5 @@
 import Field from "components/Field";
+import { BigNumber } from "ethers";
 import useWeb3 from "hooks/useWeb3";
 import { useFormContext } from "./context";
 
@@ -33,9 +34,10 @@ const Info: React.FC = () => {
 
       <Field label="Connected wallet" value={account} disabled />
       <Field
+        disabled
         label="Soul you claim"
         placeholder="ID of the soul you want to claim"
-        value={soulId}
+        value={soulId || BigNumber.from(account).toString()}
         onChange={(e) => dispatch({ type: "SOUL_ID", payload: e.target.value })}
       />
       <Field

@@ -1,6 +1,9 @@
 import { SoulInterface } from "api/souls";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
+import { BigNumber } from "ethers";
 import useWeb3 from "hooks/useWeb3";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { shortenAddress } from "utils/address";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
@@ -11,7 +14,7 @@ interface SoulWidgetProps {
 const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
   const { account } = useWeb3();
 
-  console.log(account);
+  const soulId = useMemo(() => BigNumber.from(soul.id).toString(), [soul.id]);
 
   return (
     <div className="px-8 pb-8 flex flex-col justify-center items-center rounded bg-white">
@@ -22,7 +25,7 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
       </div>
       <div className="w-full flex flex-col items-center">
         <div className="mt-20">
-          Soul ID: <strong>{soul.id}</strong>
+          Soul ID: <strong>{soulId}</strong>
           <div>{soul.claimed ? `Claimed` : `Not claimed`}</div>
           {soul.claimed && <div>Owner: {shortenAddress(soul.owner!.id)}</div>}
         </div>
@@ -33,7 +36,9 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
           {soul.nbPendingRequests} pending requests
         </div>
         <div className="mb-8">Claimed</div>
-        <button className="btn-main">Claim this soul</button>
+        <Link className="btn-main" to={`/claim/${soulId}`}>
+          Claim this soul
+        </Link>
         {soul.claimed && account && account === soul.owner!.id && (
           <button className="btn-main">Transfer to another chain</button>
         )}
