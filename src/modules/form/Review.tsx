@@ -3,8 +3,7 @@ import Field from "components/Field";
 import Image from "components/Image";
 import Label from "components/Label";
 import Video from "components/Video";
-import { BigNumber } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils";
+import { formatEther } from "ethers/lib/utils";
 import useBalance from "hooks/useBalance";
 import { useGasFees } from "hooks/useGasFees";
 import { useClaimSoul, useRequestTotalCost } from "hooks/useProofOfHumanity";
@@ -25,7 +24,9 @@ const Review: React.FC<ReviewProps> = () => {
   } = useFormContext();
   const [claimSoul] = useClaimSoul();
   const totalCost = useRequestTotalCost();
-  const [selfFunded, setSelfFunded] = useState<BigNumber>(totalCost || Zero);
+  const [selfFunded, setSelfFunded] = useState<number>(
+    parseFloat(formatEther(totalCost || Zero))
+  );
 
   const [estimatedGasFees, estimationError] = useGasFees(
     "claimSoul(string,string)",
@@ -130,18 +131,23 @@ const Review: React.FC<ReviewProps> = () => {
         </Label>
         <div className="txt flex flex-col mb-16">
           <div className="inline-flex items-center">
-            <div className="bordered w-48 mr-2">
+            <div className="w-48 mr-2">
               <Field
-                className="text-right"
-                value={formatEther(selfFunded)}
+                type="number"
+                className="no-spinner text-right"
+                step={0.01}
+                value={selfFunded}
                 onChange={(event) =>
-                  setSelfFunded(parseEther(event.target.value))
+                  setSelfFunded(parseFloat(event.target.value))
                 }
               />
             </div>
             /
             <span
-              onClick={() => totalCost && setSelfFunded(totalCost)}
+              onClick={() =>
+                totalCost &&
+                setSelfFunded(parseFloat(formatEther(totalCost.toString())))
+              }
               className="mx-1 text-[#ff9966] font-semibold underline underline-offset-2 cursor-pointer"
             >
               {totalCost && formatEther(totalCost)}
