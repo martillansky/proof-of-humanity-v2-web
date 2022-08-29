@@ -10,7 +10,7 @@ import Webcam from "components/Webcam";
 import { useFormContext } from "./context";
 import type { Area, Point } from "react-easy-crop/types";
 
-import FacialFeaturesImage from "assets/images/facial-features.jpg";
+import FrontFacingImage from "assets/images/front-facing.jpg";
 import NotFrontFacingImage from "assets/images/not-front-facing.jpg";
 import GlassesImage from "assets/images/glasses.jpg";
 import SunglassesImage from "assets/images/sunglasses.jpg";
@@ -126,15 +126,15 @@ const Photo: React.FC = () => {
         <div className="flex flex-col items-center">
           <div className="w-full flex justify-around pb-8">
             <div className="w-fit flex flex-col items-center">
-              <span className="pb-2">Face the camera</span>
+              <span className="txt pb-2">Face the camera</span>
               <div className="grid grid-cols-2 gap-2">
-                <ExamplePic uri={FacialFeaturesImage} />
+                <ExamplePic uri={FrontFacingImage} />
                 <ExamplePic uri={NotFrontFacingImage} wrong={true} />
               </div>
             </div>
 
             <div className="w-fit flex flex-col items-center">
-              <span className="pb-2">No filters</span>
+              <span className="txt pb-2">No filters</span>
               <div className="w-fit grid grid-cols-1">
                 <ExamplePic uri={BWImage} wrong={true} />
               </div>
@@ -142,7 +142,9 @@ const Photo: React.FC = () => {
           </div>
 
           <div className="w-fit flex flex-col items-center">
-            <span className="pb-2">All facial features must be visible</span>
+            <span className="txt pb-2">
+              All facial features must be visible
+            </span>
             <div className="grid grid-cols-4 gap-2">
               <ExamplePic uri={HijabImage} />
               <ExamplePic uri={NiqabImage} wrong={true} />

@@ -1,5 +1,6 @@
 import { SoulInterface } from "api/souls";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
+import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
@@ -8,6 +9,10 @@ interface SoulWidgetProps {
 }
 
 const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
+  const { account } = useWeb3();
+
+  console.log(account);
+
   return (
     <div className="px-8 pb-8 flex flex-col justify-center items-center rounded bg-white">
       <div className="bordered absolute -top-16 w-32 h-32 rounded-full shadow-md">
@@ -29,6 +34,9 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
         </div>
         <div className="mb-8">Claimed</div>
         <button className="btn-main">Claim this soul</button>
+        {soul.claimed && account && account === soul.owner!.id && (
+          <button className="btn-main">Transfer to another chain</button>
+        )}
       </div>
     </div>
   );

@@ -54,25 +54,32 @@ const VideoStep: React.FC = () => {
     });
 
     mediaRecorder.ondataavailable = async ({ data }) => {
-      // const newlyRecorded = recordedVideo.concat(data);
+      const newlyRecorded = ([] as BlobPart[]).concat(data);
       // setRecordedVideo(newlyRecorded);
-      // const blob = new Blob(newlyRecorded, {
-      //   type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
-      // });
+      const blob = new Blob(newlyRecorded, {
+        type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
+      });
       // setDuration(await getBlobDuration(blob));
       // setVideoUri(URL.createObjectURL(blob));
       // setFile(blob);
 
-      const vid = await videoSanitizer(Buffer.from(await data.arrayBuffer()));
+      // const vid = await videoSanitizer(Buffer.from(await data.arrayBuffer()));
 
-      const uri = URL.createObjectURL(
-        new Blob([vid], {
-          type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
-        })
-      );
+      // const uri = URL.createObjectURL(
+      //   new Blob([vid], {
+      //     type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
+      //   })
+      // );
 
-      console.log({ vid, uri });
-      dispatch({ type: "VIDEO", payload: { content: vid, uri } });
+      // console.log({ vid, uri });
+      dispatch({
+        type: "VIDEO",
+        payload: {
+          content: await blob.arrayBuffer(),
+          uri: URL.createObjectURL(blob),
+        },
+      });
+      setShowCamera(false);
     };
 
     mediaRecorder.onstop = async () => {

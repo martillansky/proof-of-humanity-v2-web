@@ -10,8 +10,13 @@ import { formatEth } from "utils/misc";
 import Field from "components/Field";
 import Label from "components/Label";
 import ReasonCard from "./ReasonCard";
+import { RequestQueryItem } from "api/types";
 
-const Challenge: React.FC = () => {
+interface ChallengeInterface {
+  request: RequestQueryItem;
+}
+
+const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
   const [challengeRequest] = useChallengeRequest();
   const [justification, setJustification] = useState("");
   const [reason, setReason] = useState<Reason | null>(null);
@@ -31,7 +36,9 @@ const Challenge: React.FC = () => {
       "evidence.json"
     );
 
-    challengeRequest("0", 0, reason, evidenceUri, { value: arbitrationCost });
+    challengeRequest(request.soul.id, request.realIndex, reason, evidenceUri, {
+      value: arbitrationCost,
+    });
   };
 
   return (

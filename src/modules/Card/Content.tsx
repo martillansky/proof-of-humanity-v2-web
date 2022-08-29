@@ -7,6 +7,8 @@ import { ipfs } from "utils/ipfs";
 import { timeAgo } from "utils/time";
 
 const Content: React.FC<{ request: RequestInterface }> = ({ request }) => {
+  console.log(request.claimer?.name);
+
   const [evidenceURI] = useIPFS<EvidenceFileInterface>(
     request.evidence[0]?.URI,
     { suspense: true }
@@ -15,11 +17,13 @@ const Content: React.FC<{ request: RequestInterface }> = ({ request }) => {
     suspense: true,
   });
 
+  console.log(request.evidence[0]?.URI, { evidenceURI }, { data });
+
   return (
     <div className="p-2 h-full flex flex-col items-center bg-white">
       <Image uri={ipfs(data?.photo!)} rounded />
       <span className="font-bold">
-        {request.registration ? request.claimer!.name : request.soul.name}
+        {request.registration ? request.claimer!.name : "REMOVAL"}
       </span>
       <span>{timeAgo(request.creationTime)}</span>
       <span>{CHAIN_ID_TO_NAME[request.chainID]}</span>

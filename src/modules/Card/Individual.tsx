@@ -12,6 +12,7 @@ import { ErrorFallback, LoadingFallback } from "./misc";
 import Content from "./Content";
 
 const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
+  console.log("|||||||", { request });
   const status = useMemo(
     () => queryToStatus(request.status, request.registration),
     [request]

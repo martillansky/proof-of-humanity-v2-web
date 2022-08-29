@@ -13,6 +13,7 @@ import {
   useAdvanceState,
   useChallengePeriodDuration,
   useExecuteRequest,
+  useFundRequest,
   useRequestTotalCost,
   useRequiredNumberOfVouches,
 } from "hooks/useProofOfHumanity";
@@ -25,7 +26,7 @@ import Field from "components/Field";
 import Label from "components/Label";
 import Identicon from "components/Identicon";
 import ALink from "components/ALink";
-import { explorerLink } from "utils/address";
+import { explorerLink, shortenAddress } from "utils/address";
 import Video from "components/Video";
 import { STATUS_TO_COLOR } from "constants/misc";
 import cn from "classnames";
@@ -58,6 +59,7 @@ const Request: React.FC = () => {
   const [advanceState] = useAdvanceState();
   const [executeRequest] = useExecuteRequest();
   const [addVouch] = useAddVouch();
+  const [fundRequest] = useFundRequest();
   const totalCost = useRequestTotalCost();
 
   if (!request || !evidence || !registration || !soul || !index || !chainId) {
@@ -66,7 +68,12 @@ const Request: React.FC = () => {
   }
 
   return (
-    <div className="w-3/5 m-auto p-8 flex flex-col justify-center">
+    <div
+      className="mt-8 mb-16 w-11/12
+                 sm:mt-12 sm:w-5/6
+                 lg:mt-16 lg:w-3/5
+                 mx-auto flex flex-col justify-center"
+    >
       <div className="p-4 border flex justify-between rounded shadow bg-white">
         <span>Request</span>
         <div className="flex items-center">
@@ -82,8 +89,8 @@ const Request: React.FC = () => {
         </div>
       </div>
 
-      <div className="my-6 border flex rounded bg-white shadow">
-        <div className="pt-8 pb-48 px-8 w-2/5 flex flex-col background items-center">
+      <div className="my-6 border flex flex-col md:flex-row rounded bg-white shadow">
+        <div className="pt-8 md:pb-48 px-8 md:w-2/5 flex flex-col background items-center">
           <Image uri={ipfs(registration.photo)} rounded previewed />
 
           <span className="font-bold">
@@ -97,7 +104,8 @@ const Request: React.FC = () => {
           <Label>
             Vouches:{" "}
             <strong>
-              {request.vouches.length} / {requiredVouches?.toNumber()}
+              {request.claimer?.vouchesReceived.length} /{" "}
+              {requiredVouches?.toNumber()}
             </strong>
           </Label>
           <button
@@ -129,7 +137,14 @@ const Request: React.FC = () => {
                   {totalCost && formatEth(totalCost)} ETH Deposit
                 </div>
                 <Field label="Amount" value={formatEth(totalCost)} />
-                <button className="btn-main mt-12">Fund</button>
+                <button
+                  onClick={async () =>
+                    await fundRequest(request.requester, { value: totalCost })
+                  }
+                  className="btn-main mt-12"
+                >
+                  Fund
+                </button>
               </div>
             </Modal>
           )}
@@ -159,7 +174,7 @@ const Request: React.FC = () => {
             )}
           </Label>
 
-          <Challenge />
+          <Challenge request={request} />
 
           <Label>
             Last status change: <TimeAgo time={request.lastStatusChange} />
@@ -176,7 +191,7 @@ const Request: React.FC = () => {
               className="ml-2 font-semibold underline underline-offset-2"
               href={explorerLink(request.requester, chainId)}
             >
-              {request.requester}
+              {shortenAddress(request.requester)}
             </ALink>
           </div>
 

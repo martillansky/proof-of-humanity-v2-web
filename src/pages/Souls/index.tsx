@@ -42,7 +42,12 @@ const Souls: React.FC = () => {
   // TODO not perfect, maybe add this to a separate atom?
 
   return (
-    <div className="py-8 px-32 flex flex-col justify-center">
+    <div
+      className="py-4 px-8
+                 sm:px-12
+                 md:py-8 md:px-16
+                 lg:px-32"
+    >
       <div className="my-4 py-2 flex">
         <input
           className="w-full p-2 mr-2 border rounded"
@@ -70,7 +75,7 @@ const Souls: React.FC = () => {
         </Dropdown>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         {souls.map((soul) => (
           <Popup modal key={soul.id} trigger={<SoulCard soul={soul} />}>
             {(close) => (

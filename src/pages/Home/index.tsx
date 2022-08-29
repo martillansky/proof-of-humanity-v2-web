@@ -46,11 +46,13 @@ const Home: React.FC = () => {
   // TODO not perfect, maybe add this to a separate atom?
 
   return (
-    <div className="py-8 px-32 flex flex-col justify-center">
-      {/* <div>
-        <span className="font-semibold">x</span>
-        <span> Profiles</span>
-      </div> */}
+    <div
+      className="py-4 px-8
+                 flex flex-col justify-center
+                 sm:px-12
+                 md:py-8 md:px-16
+                 lg:px-32"
+    >
       <div className="my-4 py-2 flex">
         <input
           className="w-full p-2 mr-2 border rounded"

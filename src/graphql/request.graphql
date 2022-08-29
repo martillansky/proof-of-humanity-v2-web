@@ -1,6 +1,7 @@
 query Request($id: ID!) {
   request(id: $id) {
     status
+    realIndex
     registration
     requester
     creationTime
@@ -12,16 +13,13 @@ query Request($id: ID!) {
     claimer {
       id
       name
-    }
-    vouches {
-      from {
-        id
-      }
-      for {
-        id
-      }
-      soul {
-        id
+      vouchesReceived {
+        from {
+          id
+        }
+        soul {
+          id
+        }
       }
     }
     evidence(orderBy: creationTime) {

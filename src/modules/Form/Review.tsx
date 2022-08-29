@@ -21,7 +21,7 @@ const Review: React.FC<ReviewProps> = () => {
   const { account } = useWeb3();
   const {
     setStep,
-    state: { name, bio, photo, video },
+    state: { soulId, name, bio, photo, video },
   } = useFormContext();
   const [claimSoul] = useClaimSoul();
   const totalCost = useRequestTotalCost();
@@ -31,6 +31,8 @@ const Review: React.FC<ReviewProps> = () => {
     "claimSoul(string,string)",
     [name, "ipfs/randomhashtoestimategasfees/evidence.json"]
   );
+
+  const [ipfsUri, setIpfsUri] = useState<string>();
 
   const balance = useBalance();
 
@@ -50,22 +52,28 @@ const Review: React.FC<ReviewProps> = () => {
 
     if (!photo || !video) return;
 
-    const [photoUri, videoUri] = await Promise.all([
-      uploadToIPFS(photo.content),
-      uploadToIPFS(video.content),
-    ]);
+    let uri = ipfsUri;
+    if (!uri) {
+      const [photoUri, videoUri] = await Promise.all([
+        uploadToIPFS(photo.content),
+        uploadToIPFS(video.content),
+      ]);
 
-    const fileURI = await uploadToIPFS(
-      JSON.stringify({ name, bio, photo: photoUri, video: videoUri }),
-      "file.json"
-    );
+      const fileURI = await uploadToIPFS(
+        JSON.stringify({ name, bio, photo: photoUri, video: videoUri }),
+        "file.json"
+      );
 
-    const evidenceUri = await uploadToIPFS(
-      JSON.stringify({ fileURI, name: "Registration" }),
-      "registration.json"
-    );
+      const evidenceUri = await uploadToIPFS(
+        JSON.stringify({ fileURI, name: "Registration" }),
+        "registration.json"
+      );
 
-    await claimSoul(name, evidenceUri);
+      uri = evidenceUri;
+      setIpfsUri(evidenceUri);
+    }
+
+    if (soulId) await claimSoul(soulId, uri, name);
   };
 
   return (
@@ -90,10 +98,10 @@ const Review: React.FC<ReviewProps> = () => {
       </span>
 
       {photo && video && (
-        <div className="w-full flex items-center justify-center mx-auto">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-center mx-auto">
           <Image uri={photo.uri} rounded previewed />
           <Video
-            className="h-40 ml-8 cursor-pointer"
+            className="h-40 mt-4 sm:mt-0 sm:ml-8 cursor-pointer"
             uri={video.uri}
             previewed
           />

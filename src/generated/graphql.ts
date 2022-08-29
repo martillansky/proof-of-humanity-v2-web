@@ -1987,7 +1987,7 @@ export type RequestQueryVariables = Exact<{
 }>;
 
 
-export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, soul: { __typename?: 'Soul', id: any, claimed: boolean }, claimer?: { __typename?: 'Claimer', id: any, name?: string | null } | null, vouches: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any }, for: { __typename?: 'Claimer', id: any }, soul: { __typename?: 'Soul', id: any } }>, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }> } | null };
+export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, realIndex: any, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, soul: { __typename?: 'Soul', id: any, claimed: boolean }, claimer?: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any }, soul: { __typename?: 'Soul', id: any } }> } | null, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }> } | null };
 
 export type RequestsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -2026,6 +2026,7 @@ export const RequestDocument = gql`
     query Request($id: ID!) {
   request(id: $id) {
     status
+    realIndex
     registration
     requester
     creationTime
@@ -2037,16 +2038,13 @@ export const RequestDocument = gql`
     claimer {
       id
       name
-    }
-    vouches {
-      from {
-        id
-      }
-      for {
-        id
-      }
-      soul {
-        id
+      vouchesReceived {
+        from {
+          id
+        }
+        soul {
+          id
+        }
       }
     }
     evidence(orderBy: creationTime) {

@@ -2,14 +2,12 @@ import ALink from "components/ALink";
 import Identicon from "components/Identicon";
 import TimeAgo from "components/TimeAgo";
 import { ChainId } from "constants/chains";
-import { RequestQuery } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
-import { explorerLink } from "utils/address";
+import { explorerLink, shortenAddress } from "utils/address";
 import { ipfs } from "utils/ipfs";
 import AttachmentIcon from "assets/svg/AttachmentMajor.svg";
 import { romanize } from "utils/misc";
-
-type RequestQueryItem = NonNullable<RequestQuery["request"]>;
+import { RequestQueryItem } from "api/types";
 
 interface EvidenceItemInterface {
   index: number;
@@ -49,7 +47,7 @@ const EvidenceItem: React.FC<EvidenceItemInterface> = ({
               className="text-blue-500 underline underline-offset-2"
               href={explorerLink(evidence.sender, chainId)}
             >
-              {evidence.sender}
+              {shortenAddress(evidence.sender)}
             </ALink>
           </span>
           <TimeAgo time={evidence.creationTime} />

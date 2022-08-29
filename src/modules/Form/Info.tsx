@@ -66,7 +66,11 @@ const Info: React.FC = () => {
         </label>
       </div>
 
-      <button className="btn-main" onClick={advance}>
+      <button
+        className="btn-main"
+        disabled={!soulId || !name || !tookNotice}
+        onClick={advance}
+      >
         NEXT
       </button>
     </>

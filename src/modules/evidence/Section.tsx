@@ -1,3 +1,4 @@
+import { RequestQueryItem } from "api/types";
 import Accordion from "components/Accordion";
 import Field from "components/Field";
 import Label from "components/Label";
@@ -5,13 +6,10 @@ import Modal from "components/Modal";
 import Uploader from "components/Uploader";
 import { ChainId } from "constants/chains";
 import { BigNumberish } from "ethers";
-import { RequestQuery } from "generated/graphql";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
 import React, { useState } from "react";
 import { uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
-
-type RequestQueryItem = NonNullable<RequestQuery["request"]>;
 
 interface EvidenceProps {
   soulId: BigNumberish;
