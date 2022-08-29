@@ -50,7 +50,7 @@ const Header: React.FC = () => {
       >
         <Link to="/">Requests</Link>
         <Link to="/souls">Souls</Link>
-        {account && <Link to={`/soul/${account}`}>Soul</Link>}
+        {/* {account && <Link to={`/soul/${account}`}>Soul</Link>} */}
         {account && <Link to="/claim">Claim</Link>}
       </div>
 
