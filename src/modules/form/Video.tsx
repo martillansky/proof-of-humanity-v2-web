@@ -101,29 +101,40 @@ const VideoStep: React.FC = () => {
               I certify I am a real human and not registered in this registry
             </strong>
             <span className="text-[#ff9966]">"</span> accompanied by one of the
-            following:
+            following you choose:
           </span>
 
           <div className="flex m-auto">
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                "gradient background font-semibold": recordingMode === "sign",
+                gradient: recordingMode === "sign",
               })}
             >
               <button
-                className="w-full h-full bg-white rounded-sm hover:bg-slate-100"
+                className={cn(
+                  "w-full h-full p-2 bg-white rounded-sm font-semibold ",
+                  recordingMode === "sign"
+                    ? "bg-orange-50"
+                    : "hover:bg-slate-100"
+                )}
                 onClick={() => setRecordingMode("sign")}
               >
                 Hold a sign with your address
               </button>
             </div>
+            <span className="txt self-center text-slate-400">OR</span>
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                "gradient background font-semibold": recordingMode === "phrase",
+                gradient: recordingMode === "phrase",
               })}
             >
               <button
-                className="w-full h-full bg-white rounded-sm hover:bg-slate-100"
+                className={cn(
+                  "w-full h-full p-2 bg-white rounded-sm font-semibold",
+                  recordingMode === "phrase"
+                    ? "bg-orange-50"
+                    : "hover:bg-slate-100"
+                )}
                 onClick={() => setRecordingMode("phrase")}
               >
                 Speak a phrase generated from your address
@@ -134,7 +145,7 @@ const VideoStep: React.FC = () => {
       )}
 
       {recordingMode === "sign" && (
-        <span className="txt text-center my-2 mx-12">
+        <span className="txt text-center my-8 mx-12">
           You must record yourself holding a sign with your address{" "}
           <strong>{account}</strong> and say the phrase{" "}
           <span className="text-[#ff9966]">"</span>
@@ -146,7 +157,7 @@ const VideoStep: React.FC = () => {
       )}
 
       {recordingMode === "phrase" && (
-        <span className="txt text-center my-2 mx-12">
+        <span className="txt text-center my-8 mx-12">
           You must record yourself saying the phrase{" "}
           <span className="text-[#ff9966]">"</span>
           <strong>

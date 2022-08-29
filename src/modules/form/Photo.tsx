@@ -31,11 +31,11 @@ const ExamplePic: React.FC<{ uri: string; wrong?: boolean }> = ({
   wrong,
 }) => (
   <div className="flex flex-col items-center">
-    <Image className="w-28 h-28 mb-2" uri={uri} />
+    <Image className="w-28 h-28 mb-1" uri={uri} />
     {wrong ? (
-      <CircleCancel className="w-4 h-4 fill-red-500" />
+      <CircleCancel className="w-6 h-6 fill-red-500" />
     ) : (
-      <CircleTick className="w-4 h-4 fill-green-500" />
+      <CircleTick className="w-6 h-6 fill-green-500" />
     )}
   </div>
 );
@@ -124,8 +124,8 @@ const Photo: React.FC = () => {
 
       {!showCamera && !originalPhoto && !photo && (
         <div className="flex flex-col items-center">
-          <div className="w-full flex justify-around pb-8">
-            <div className="w-fit flex flex-col items-center">
+          <div className="w-full flex flex-col sm:flex-row pb-8">
+            <div className="w-fit m-auto flex flex-col items-center">
               <span className="txt pb-2">Face the camera</span>
               <div className="grid grid-cols-2 gap-2">
                 <ExamplePic uri={FrontFacingImage} />
@@ -133,7 +133,7 @@ const Photo: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-fit flex flex-col items-center">
+            <div className="w-fit m-auto flex flex-col items-center">
               <span className="txt pb-2">No filters</span>
               <div className="w-fit grid grid-cols-1">
                 <ExamplePic uri={BWImage} wrong={true} />
@@ -145,7 +145,7 @@ const Photo: React.FC = () => {
             <span className="txt pb-2">
               All facial features must be visible
             </span>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <ExamplePic uri={HijabImage} />
               <ExamplePic uri={NiqabImage} wrong={true} />
               <ExamplePic uri={GlassesImage} />

@@ -1,5 +1,4 @@
 import Field from "components/Field";
-import { BigNumber } from "ethers";
 import useWeb3 from "hooks/useWeb3";
 import { useFormContext } from "./context";
 

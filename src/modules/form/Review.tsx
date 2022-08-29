@@ -86,16 +86,17 @@ const Review: React.FC<ReviewProps> = () => {
 
       <span className="txt pb-8">
         Check the uploaded files and make sure they are according to the rules:
-        <ol className="list-decimal ml-8">
+        <ul className="list-disc ml-8">
           <li>
             Photo must be facing forward, without any covering that might hide
             facial features
           </li>
           <li>
-            No filters, heavy makeup or adornments that might obscure the face
+            No filters, heavy makeup or adornments that might obscure the face,
+            hats are okay
           </li>
-          <li>Hats are okay</li>
-        </ol>
+          <li>Make sure the video follows the rules</li>
+        </ul>
       </span>
 
       {photo && video && (
