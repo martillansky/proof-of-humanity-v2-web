@@ -1,3 +1,5 @@
+import { RequestsQueryItem } from "api/types";
+
 export const LoadingFallback = () => (
   <div className="p-2 h-full flex flex-col items-center bg-white">
     <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-slate-200 rounded-full" />
@@ -5,9 +7,12 @@ export const LoadingFallback = () => (
   </div>
 );
 
-export const ErrorFallback = () => (
-  <div className="p-2 h-full flex flex-col items-center bg-white">
-    <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-slate-200 rounded-full" />
-    <span className="font-bold">Some error occurred...</span>
+export const ErrorFallback: React.FC<{ request: RequestsQueryItem }> = ({
+  request,
+}) => (
+  <div className="animate-pulse p-2 h-full flex flex-col items-center bg-white">
+    <div className="mx-auto mb-2 h-32 w-32 bg-slate-200 rounded-full" />
+    <span className="font-semibold">{request.claimer?.name}</span>
+    <span>Some error occurred...</span>
   </div>
 );

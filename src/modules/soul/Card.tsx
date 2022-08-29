@@ -1,4 +1,5 @@
 import { SoulInterface } from "api/souls";
+import { BigNumber } from "ethers";
 import { HTMLAttributes } from "react";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
@@ -14,7 +15,7 @@ const SoulCard: React.FC<SoulCardProps> = ({ soul, ...props }) => (
     <div className="absolute left-8 -top-8 w-32 h-32 px-6 pt-5 rounded-full border-2 bg-white shadow">
       <ProofOfHumanityLogo />
     </div>
-    <strong>{soul.id}</strong>
+    <strong>Soul ID: {BigNumber.from(soul.id).toString()}</strong>
     <div>{soul.claimed ? `Claimed` : `Not claimed`}</div>
     <div className="px-2 py-1 bg-blue-500 text-white font-bold rounded-full">
       {soul.nbPendingRequests}

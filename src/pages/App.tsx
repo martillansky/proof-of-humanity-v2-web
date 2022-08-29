@@ -19,6 +19,7 @@ const App: React.FC = () => (
       <Route path="request/:soul/:index/:chain" element={<Request />} />
       <Route path="profile/:address" element={<Profile />} />
       <Route path="claim" element={<Claim />} />
+      <Route path="claim/:soul" element={<Claim />} />
       <Route path="soul/:address" element={<Soul />} />
       <Route path="*" element={<h1>Page not found</h1>} />
     </Route>

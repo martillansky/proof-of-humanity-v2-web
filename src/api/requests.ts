@@ -3,16 +3,14 @@ import { isAddress } from "@ethersproject/address";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { RequestsQuery } from "generated/graphql";
 import { RequestStatus, REQUEST_STATUS } from "constants/requests";
+import { RequestsQueryItem } from "./types";
 
-type requestResultType = ArrayElement<RequestsQuery["requests"]>;
-
-export interface RequestInterface extends requestResultType {
+export interface RequestInterface extends RequestsQueryItem {
   chainID: ChainId;
 }
 
-const normalizeRequests = (requestData: Record<ChainId, requestResultType[]>) =>
+const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
   Object.keys(requestData)
     .reduce<RequestInterface[]>(
       (acc, chainID) => [
@@ -33,7 +31,7 @@ const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce(
 
 const cursorAtom = atom(0);
 const chainStacksAtom =
-  atom<Record<number, requestResultType[]>>(initialChainStacks);
+  atom<Record<number, RequestsQueryItem[]>>(initialChainStacks);
 const normalizedRequestsAtom = atom<RequestInterface[]>((get) =>
   normalizeRequests(get(chainStacksAtom))
 );

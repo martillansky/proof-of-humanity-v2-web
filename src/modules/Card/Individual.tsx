@@ -12,7 +12,6 @@ import { ErrorFallback, LoadingFallback } from "./misc";
 import Content from "./Content";
 
 const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
-  console.log("|||||||", { request });
   const status = useMemo(
     () => queryToStatus(request.status, request.registration),
     [request]
@@ -29,7 +28,7 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
         <div
           className={cn("w-full h-1", `bg-${STATUS_TO_COLOR[request.status]}`)}
         />
-        <div className="p-2 flex justify-center items-center">
+        <div className="p-2 centered font-semibold">
           <span className={`text-${STATUS_TO_COLOR[request.status]}`}>
             {camelToTitle(status)}
           </span>
@@ -43,7 +42,7 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
       </div>
 
       <ErrorBoundary
-        fallback={<ErrorFallback />}
+        fallback={<ErrorFallback request={request} />}
         resetSwitch={request.evidence[0]?.URI}
       >
         <Suspense fallback={<LoadingFallback />}>

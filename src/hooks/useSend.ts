@@ -42,7 +42,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         setState({ status: "Success", receipt });
         toast.success("Transaction sent");
       } catch (err) {
-        console.error(err.message);
+        console.error({ err });
         setState({ status: "Error", error: err.message });
         toast.error("Transaction rejected");
       }
