@@ -3,7 +3,7 @@ import { NetworkConnector } from "@web3-react/network-connector";
 import {
   FALLBACK_CHAIN,
   RPC_ENDPOINTS,
-  SUPPORTED_CHAIN_IDS,
+  WATCH_CHAIN_IDS,
 } from "constants/chains";
 
 export const network = new NetworkConnector({
@@ -12,5 +12,5 @@ export const network = new NetworkConnector({
 });
 
 export const injected = new InjectedConnector({
-  supportedChainIds: SUPPORTED_CHAIN_IDS,
+  supportedChainIds: WATCH_CHAIN_IDS,
 });

@@ -17,6 +17,7 @@ export const CHAIN_ID_TO_NAME = {
   [ChainId.RINKEBY]: "Rinkeby",
 };
 
+export const WATCH_CHAIN_IDS = [ChainId.MAINNET, ChainId.RINKEBY];
 export const SUPPORTED_CHAIN_IDS = [ChainId.RINKEBY];
 export const FALLBACK_CHAIN = ChainId.RINKEBY;
 

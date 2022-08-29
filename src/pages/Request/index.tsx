@@ -67,6 +67,10 @@ const Request: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  const fullName = registration.firstName
+    ? `${registration.firstName} ${registration.lastName}`
+    : registration.name;
+
   return (
     <div
       className="mt-8 mb-16 w-11/12
@@ -93,9 +97,7 @@ const Request: React.FC = () => {
         <div className="pt-8 md:pb-48 px-8 md:w-2/5 flex flex-col background items-center">
           <Image uri={ipfs(registration.photo)} rounded previewed />
 
-          <span className="font-bold">
-            {registration.firstName} {registration.lastName}
-          </span>
+          <span className="font-bold">{fullName}</span>
           <span className="mb-4">{registration.bio}</span>
           <Label>
             Soul: <strong>{soul}</strong>
@@ -182,9 +184,7 @@ const Request: React.FC = () => {
         </div>
 
         <div className="w-full px-4 flex flex-col">
-          <span className="mt-8 ml-8 text-xl font-semibold">
-            {registration.firstName} {registration.lastName}
-          </span>
+          <span className="mt-8 ml-8 text-xl font-semibold">{fullName}</span>
           <div className="flex mb-4">
             <Identicon address={request.requester} />
             <ALink

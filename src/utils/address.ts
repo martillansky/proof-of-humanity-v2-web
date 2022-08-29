@@ -27,7 +27,7 @@ export const phraseFromAddress = (
   if (!account) return;
   const address = account.slice(2);
   const words = base2048.encode(Buffer.from(address, "hex"));
-  return words.split(" ").slice(0, count).join(" ");
+  return words.split(" ").slice(0, count).join(" ").toUpperCase();
 };
 
 export const explorerLink = (address: string, chainId: number) =>

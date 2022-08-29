@@ -1,11 +1,14 @@
 import ALink from "components/ALink";
+import { FALLBACK_CHAIN } from "constants/chains";
+import useChangeChain from "hooks/useChangeChain";
 import useWeb3 from "hooks/useWeb3";
 import SubmissionForm from "modules/form";
 import React from "react";
 import { injected } from "utils/connectors";
 
 const Claim: React.FC = () => {
-  const { account, activate } = useWeb3();
+  const { account, active, activate } = useWeb3();
+  const changeChain = useChangeChain();
 
   return (
     <div
@@ -15,7 +18,7 @@ const Claim: React.FC = () => {
                  flex flex-col
                  border rounded bg-white shadow"
     >
-      {account ? (
+      {active ? (
         <SubmissionForm />
       ) : (
         <>
@@ -33,10 +36,21 @@ const Claim: React.FC = () => {
             You don't have a wallet connected to the website
           </span>
 
-          <button className="btn-main my-8" onClick={() => activate(injected)}>
-            Connect wallet
-          </button>
-
+          {account ? (
+            <button
+              className="btn-main my-8"
+              onClick={() => changeChain(FALLBACK_CHAIN)}
+            >
+              Switch to supported chain
+            </button>
+          ) : (
+            <button
+              className="btn-main my-8"
+              onClick={() => activate(injected)}
+            >
+              Connect wallet
+            </button>
+          )}
           <span className="txt">
             Don't have a wallet? Click{" "}
             <ALink

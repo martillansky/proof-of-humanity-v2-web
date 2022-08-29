@@ -1,7 +1,6 @@
 import { IS_MOBILE } from "constants/media";
 import React, { useState } from "react";
 import ReactWebcam from "react-webcam";
-import { loadFFMPEG } from "utils/media";
 import cn from "classnames";
 
 import FlipCameraIcon from "assets/svg/FlipCameraMajor.svg";
@@ -11,6 +10,8 @@ import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
 import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
 import PlayIcon from "assets/svg/PlayMajor.svg";
 import PauseIcon from "assets/svg/PauseMajor.svg";
+import useWeb3 from "hooks/useWeb3";
+import { phraseFromAddress } from "utils/address";
 
 interface CameraButtonInterface {
   className?: string;
@@ -29,7 +30,7 @@ export const CameraButton: React.FC<CameraButtonInterface> = ({
     className={cn(
       "btn-main rounded-full absolute",
       secondary
-        ? "w-12 h-12 opacity-60"
+        ? "w-12 h-12 opacity-70"
         : "w-16 h-16 outline outline-2 outline-offset-2 outline-[#ff9966]",
       className
     )}
@@ -45,17 +46,20 @@ interface WebcamProps {
   toggleFullscreen: () => void;
   action: () => void;
   video?: boolean;
+  overlay?: "phrase" | "sign";
   loadCamera: React.Dispatch<React.SetStateAction<ReactWebcam | null>>;
 }
 
 const Webcam: React.FC<WebcamProps> = ({
   video = false,
+  overlay,
   loadCamera,
   action,
   recording,
   fullscreen,
   toggleFullscreen,
 }) => {
+  const { account } = useWeb3();
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentCamera, setCurrentCamera] = useState("");
   const [cameraPermission, setCameraPermission] = useState(true);
@@ -69,7 +73,7 @@ const Webcam: React.FC<WebcamProps> = ({
   const onUserMedia = (mediaStream: MediaStream) => {
     if (devices.length !== 0) return;
 
-    if (video) loadFFMPEG();
+    // if (video) loadFFMPEG();
 
     navigator.mediaDevices.enumerateDevices().then((videoDevices) => {
       setDevices(videoDevices.filter((dev) => dev.kind === "videoinput"));
@@ -108,7 +112,7 @@ const Webcam: React.FC<WebcamProps> = ({
   return (
     <div className="relative">
       <ReactWebcam
-        className="w-full h-full"
+        className="w-full h-full bg-red-500/50"
         ref={loadCamera}
         mirrored={mirrored}
         screenshotFormat={"image/jpeg"}
@@ -132,15 +136,34 @@ const Webcam: React.FC<WebcamProps> = ({
         onUserMediaError={onUserMediaError}
       />
 
+      {recording && overlay && (
+        <div
+          className="absolute
+                     top-0 left-0
+                     w-full h-full
+                     centered
+                     bg-black opacity-70 select-none
+                     font-semibold text-white text-center
+                     text-xl sm:text-3xl md:text-3xl lg:text-4xl"
+        >
+          I CERTIFY I AM A REAL HUMAN AND I AM NOT ALREADY REGISTERED IN THIS
+          REGISTRY
+          {overlay === "phrase" &&
+            `. MY CONFIRMATION PHRASE IS ${phraseFromAddress(account)}`}
+        </div>
+      )}
+
       {recording ? (
-        <span
-          className="absolute top-6 right-6
-                     h-8 w-8 inline-flex
-                     bg-red-500 rounded-full
-                     before:h-full before:w-full
-                     before:animate-ping
-                     before:bg-red-400/80 before:rounded-full"
-        />
+        <>
+          <span
+            className="absolute top-6 right-6
+                       h-8 w-8 inline-flex
+                       bg-red-500 rounded-full
+                       before:h-full before:w-full
+                       before:animate-ping
+                       before:bg-red-400/80 before:rounded-full"
+          />
+        </>
       ) : (
         <>
           {IS_MOBILE && devices.length > 1 && (

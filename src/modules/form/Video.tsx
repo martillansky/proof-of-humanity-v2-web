@@ -8,7 +8,6 @@ import ReactWebcam from "react-webcam";
 import Uploader from "components/Uploader";
 import Webcam from "components/Webcam";
 import { phraseFromAddress } from "utils/address";
-import { videoSanitizer } from "utils/media";
 import cn from "classnames";
 
 import UploadIcon from "assets/svg/UploadMajor.svg";
@@ -25,10 +24,6 @@ const VideoStep: React.FC = () => {
     state: { video },
     dispatch,
   } = useFormContext();
-  // const [video, setVideo] = useState<{
-  //   uri: string;
-  //   buffer: Buffer;
-  // } | null>(null);
 
   const fullscreenRef = useRef(null);
   const { isFullscreen, setFullscreen, toggleFullscreen } =
@@ -37,12 +32,9 @@ const VideoStep: React.FC = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [camera, setCamera] = useState<ReactWebcam | null>(null);
   const [recording, setRecording] = useState(false);
-  // const [recordedVideo, setRecordedVideo] = useState<BlobPart[]>([]);
   const [recordingMode, setRecordingMode] = useState<"phrase" | "sign" | null>(
     null
   );
-  // const [duration, setDuration] = useState(0);
-  // const [file, setFile] = useState<Blob | null>(null);
 
   const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
 
@@ -55,23 +47,10 @@ const VideoStep: React.FC = () => {
 
     mediaRecorder.ondataavailable = async ({ data }) => {
       const newlyRecorded = ([] as BlobPart[]).concat(data);
-      // setRecordedVideo(newlyRecorded);
       const blob = new Blob(newlyRecorded, {
         type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
       });
-      // setDuration(await getBlobDuration(blob));
-      // setVideoUri(URL.createObjectURL(blob));
-      // setFile(blob);
 
-      // const vid = await videoSanitizer(Buffer.from(await data.arrayBuffer()));
-
-      // const uri = URL.createObjectURL(
-      //   new Blob([vid], {
-      //     type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
-      //   })
-      // );
-
-      // console.log({ vid, uri });
       dispatch({
         type: "VIDEO",
         payload: {
@@ -102,34 +81,8 @@ const VideoStep: React.FC = () => {
     setShowCamera(false);
     setRecording(false);
     dispatch({ type: "DELETE_VIDEO" });
-    // setRecordedVideo([]);
-    // setFile(null);
     setRecordingMode(null);
   };
-
-  // const uploadVideo = async () => {
-  //   if (!file) return;
-  //   if (videoUri) setVideoUri("");
-
-  //   advance();
-
-  //   const buffer = Buffer.from(await file.arrayBuffer());
-
-  //   try {
-  //     const uri = await videoSanitizer(buffer, () => {}, mirrored, duration);
-  //     if (!uri) throw new Error("Could not sanitize video");
-  //     setVideoUri(uri);
-  //   } catch (err) {
-  //     console.error("There was an error parsing your video, please try again");
-
-  //     setCameraEnabled(true);
-  //     setRecording(false);
-  //     setRecordedVideo([]);
-  //     setVideoUri("");
-  //     setFile(null);
-  //     setMirrored(false);
-  //   }
-  // };
 
   return (
     <>
@@ -151,7 +104,7 @@ const VideoStep: React.FC = () => {
             following:
           </span>
 
-          <div className="flex">
+          <div className="flex m-auto">
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
                 "gradient background font-semibold": recordingMode === "sign",
@@ -180,15 +133,33 @@ const VideoStep: React.FC = () => {
         </>
       )}
 
-      {recordingMode === "phrase" && (
-        <span className="txt my-2">
-          Confirmation phrase: <strong>{phraseFromAddress(account)}</strong>
+      {recordingMode === "sign" && (
+        <span className="txt text-center my-2 mx-12">
+          You must record yourself holding a sign with your address{" "}
+          <strong>{account}</strong> and say the phrase{" "}
+          <span className="text-[#ff9966]">"</span>
+          <strong>
+            I certify I am a real human and not registered in this registry
+          </strong>
+          <span className="text-[#ff9966]">"</span>
         </span>
       )}
 
-      {recordingMode === "sign" && (
-        <span className="txt my-2">
-          Hold sign with your address: <strong>{account}</strong>
+      {recordingMode === "phrase" && (
+        <span className="txt text-center my-2 mx-12">
+          You must record yourself saying the phrase{" "}
+          <span className="text-[#ff9966]">"</span>
+          <strong>
+            I certify I am a real human and not registered in this registry. My
+            confirmation phrase is <strong>{phraseFromAddress(account)}</strong>
+          </strong>
+          <span className="text-[#ff9966]">"</span>
+        </span>
+      )}
+
+      {showCamera && (
+        <span className="txt text-center mb-4">
+          The phrase will appear on screen when you start recording.
         </span>
       )}
 
@@ -219,21 +190,11 @@ const VideoStep: React.FC = () => {
                 )
                   return console.error("Video dimensions are too small");
 
-                // const buffer = await videoSanitizer(
-                //   Buffer.from(await blob.arrayBuffer())
-                // );
-
-                // setFile(blob);
                 setRecording(false);
                 dispatch({
                   type: "VIDEO",
                   payload: { uri, content: await blob.arrayBuffer() },
                 });
-                // setVideo({
-                //   uri,
-                //   buffer: Buffer.from(await blob.arrayBuffer()),
-                // });
-                // setDuration(duration);
               });
             }}
           >
@@ -264,10 +225,11 @@ const VideoStep: React.FC = () => {
         </div>
       )}
 
-      {showCamera && (
+      {showCamera && recordingMode && (
         <div tabIndex={0} ref={fullscreenRef}>
           <Webcam
             video
+            overlay={recordingMode}
             recording={recording}
             action={recording ? stopRecording : startRecording}
             fullscreen={isFullscreen}

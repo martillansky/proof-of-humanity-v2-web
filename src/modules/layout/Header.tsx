@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ALink from "components/ALink";
 import Popover from "components/Popover";
@@ -7,19 +7,14 @@ import { useWeb3React } from "@web3-react/core";
 import { injected } from "utils/connectors";
 import { shortenAddress } from "utils/address";
 import { Web3Provider } from "@ethersproject/providers";
-import { RPCMethod, Web3ErrorCode } from "constants/web3";
-import {
-  ChainId,
-  CHAIN_ID_TO_NAME,
-  CHAIN_SETTING,
-  SUPPORTED_CHAIN_IDS,
-} from "constants/chains";
-import { hexValue } from "ethers/lib/utils";
+import { CHAIN_ID_TO_NAME, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import useChangeChain from "hooks/useChangeChain";
 
 const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 
 const Header: React.FC = () => {
   const { account, activate, library, chainId } = useWeb3React<Web3Provider>();
+  const changeChain = useChangeChain();
   const [ens, setENS] = useState<string | null>(null);
 
   const getENS = async () => {
@@ -30,22 +25,6 @@ const Header: React.FC = () => {
   useEffect(() => {
     getENS();
   }, [account]);
-
-  const switchChain = useCallback(
-    (desiredChainId: number) => {
-      if (!library) return;
-
-      try {
-        library.send(RPCMethod.SWITCH_CHAIN, [
-          { chainId: hexValue(desiredChainId) },
-        ]);
-      } catch (err) {
-        if (err && err.code === Web3ErrorCode.CHAIN_NOT_ADDED)
-          library.send(RPCMethod.ADD_CHAIN, [CHAIN_SETTING[desiredChainId]]);
-      }
-    },
-    [library]
-  );
 
   return (
     <nav
@@ -72,8 +51,7 @@ const Header: React.FC = () => {
         <Link to="/">Requests</Link>
         <Link to="/souls">Souls</Link>
         {account && <Link to={`/soul/${account}`}>Soul</Link>}
-        <Link to="/claim">Claim</Link>
-        {/* <ALink href="https://pools.proofofhumanity.id/">Pools</ALink> */}
+        {account && <Link to="/claim">Claim</Link>}
       </div>
 
       <div
@@ -88,7 +66,9 @@ const Header: React.FC = () => {
                          rounded
                          text-black text-sm"
             >
-              {CHAIN_ID_TO_NAME[chainId || ChainId.RINKEBY]}
+              {SUPPORTED_CHAIN_IDS.find((c) => c === chainId)
+                ? CHAIN_ID_TO_NAME[chainId!]
+                : "SWITCH"}
             </button>
           }
         >
@@ -97,7 +77,7 @@ const Header: React.FC = () => {
               <button
                 key={chainId}
                 className="cursor-pointer"
-                onClick={() => switchChain(chainId)}
+                onClick={() => changeChain(chainId)}
               >
                 {CHAIN_ID_TO_NAME[chainId]}
               </button>
