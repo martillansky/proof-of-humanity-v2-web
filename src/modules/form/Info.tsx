@@ -15,6 +15,8 @@ const Info: React.FC = () => {
 
   if (!account) return null;
 
+  console.log("|||||||||", soulId, !name, !tookNotice);
+
   return (
     <>
       <div className="w-full my-4 flex flex-col text-2xl font-extralight">
@@ -37,7 +39,7 @@ const Info: React.FC = () => {
         disabled
         label="Soul you claim"
         placeholder="ID of the soul you want to claim"
-        value={soulId || BigNumber.from(account).toString()}
+        value={soulId}
         onChange={(e) => dispatch({ type: "SOUL_ID", payload: e.target.value })}
       />
       <Field

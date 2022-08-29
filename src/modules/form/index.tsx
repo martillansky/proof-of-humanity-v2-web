@@ -11,18 +11,18 @@ import {
   isBigNumberish,
   BigNumber,
 } from "@ethersproject/bignumber/lib/bignumber";
+import useWeb3 from "hooks/useWeb3";
 
 const STEPS_LIST = ["Info", "Photo", "Video", "Review"];
 
 const Form: React.FC = () => {
   const { soul } = useParams();
+  const { account } = useWeb3();
   const nav = useNavigate();
 
   const [tookNotice, setTookNotice] = useState(false);
   const [state, dispatch] = useReducer(submissionReducer, emptySubmission);
   const [step, setStep] = useState(3);
-
-  useEffect(() => {}, [soul]);
 
   useEffect(() => {
     if (soul && BigNumber.from(soul).isZero()) nav("/claim");
@@ -42,7 +42,10 @@ const Form: React.FC = () => {
 
       <FormContext.Provider
         value={{
-          state: { ...state, soulId: soul || "" },
+          state: {
+            ...state,
+            soulId: soul || BigNumber.from(account).toString(),
+          },
           dispatch,
           setStep,
           advance: () => setStep((s) => Math.min(s + 1, STEPS_LIST.length - 1)),
