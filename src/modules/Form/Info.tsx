@@ -1,3 +1,4 @@
+import Field from "components/Field";
 import useWeb3 from "hooks/useWeb3";
 import { useFormContext } from "./context";
 
@@ -10,6 +11,8 @@ const Info: React.FC = () => {
     state: { soulId, name, bio },
     dispatch,
   } = useFormContext();
+
+  if (!account) return null;
 
   return (
     <>
@@ -28,42 +31,25 @@ const Info: React.FC = () => {
         of yourself talking.
       </span>
 
-      <legend className="inp-title">Connected wallet</legend>
-      <div className="bordered">
-        <div className="inp">{account}</div>
-      </div>
-
-      <legend className="inp-title mt-8">Soul you claim</legend>
-      <div className="bordered">
-        <input
-          className="inp placeholder:text-orange-500/40"
-          placeholder="ID of the soul you want to claim"
-          value={soulId}
-          onChange={(e) =>
-            dispatch({ type: "SOUL_ID", payload: e.target.value })
-          }
-        />
-      </div>
-
-      <legend className="inp-title mt-8">Display Name</legend>
-      <div className="bordered">
-        <input
-          className="inp placeholder:text-orange-500/40"
-          placeholder="name by which you are known"
-          value={name}
-          onChange={(e) => dispatch({ type: "NAME", payload: e.target.value })}
-        />
-      </div>
-
-      <legend className="inp-title mt-8">Short bio</legend>
-      <div className="bordered">
-        <input
-          className="inp placeholder:text-orange-500/40"
-          placeholder="short bio (ex: cypherpunk, smart contract developer)"
-          value={bio}
-          onChange={(e) => dispatch({ type: "BIO", payload: e.target.value })}
-        />
-      </div>
+      <Field label="Connected wallet" value={account} disabled />
+      <Field
+        label="Soul you claim"
+        placeholder="ID of the soul you want to claim"
+        value={soulId}
+        onChange={(e) => dispatch({ type: "SOUL_ID", payload: e.target.value })}
+      />
+      <Field
+        label="Display Name"
+        placeholder="name by which you are known"
+        value={name}
+        onChange={(e) => dispatch({ type: "NAME", payload: e.target.value })}
+      />
+      <Field
+        label="Short bio"
+        placeholder="short bio (ex: cypherpunk, smart contract developer)"
+        value={bio}
+        onChange={(e) => dispatch({ type: "BIO", payload: e.target.value })}
+      />
 
       <div className="mt-8 mb-16 flex items-center cursor-pointer">
         <input

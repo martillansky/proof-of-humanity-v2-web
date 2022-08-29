@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import PlusIcon from "assets/svg/PlusMinor.svg";
+import MinusIcon from "assets/svg/MinusMinor.svg";
 
 interface AccordionProps {
   title: string;
@@ -9,13 +11,13 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex flex-col border rounded shadow">
+    <div className="flex flex-col text-black">
       <div
-        className="p-4 flex justify-between overflow-hidden text--500 font-bold cursor-pointer"
+        className="p-4 flex justify-between overflow-hidden border bg-white font-bold cursor-pointer shadow rounded-sm"
         onClick={() => setOpen((o) => !o)}
       >
         <span>{title}</span>
-        <span className="text-xl">+</span>
+        {open ? <MinusIcon className="w-6" /> : <PlusIcon className="w-6" />}
       </div>
       {open && children}
     </div>

@@ -7,6 +7,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
     orderDirection: desc
   ) {
     id
+    realIndex
     status
     registration
     creationTime

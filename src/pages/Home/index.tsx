@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { requestsAtom } from "api/requests";
 import useDebounce from "hooks/useDebounce";
-import CardList, { LoadingCardList } from "modules/Card/List";
+import CardList, { LoadingCardList } from "modules/card/List";
 import { camelToTitle } from "utils/case";
 import { statusFilters, RequestStatus } from "constants/requests";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";

@@ -1,4 +1,4 @@
-import Card from ".";
+import Card from "./Individual";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import cn from "classnames";
 import { RequestInterface } from "api/requests";

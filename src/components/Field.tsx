@@ -1,19 +1,42 @@
-import React from "react";
+import cn from "classnames";
+import React, { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import Label from "./Label";
 
-type FieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
-  React.InputHTMLAttributes<HTMLInputElement> & {
+type FieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> &
+  InputHTMLAttributes<HTMLInputElement> & {
     textarea?: boolean;
     label?: string;
   };
 
-const Field: React.FC<FieldProps> = ({ label, textarea = false, ...props }) => (
+const Field: React.FC<FieldProps> = ({
+  label,
+  textarea = false,
+  className,
+  ...props
+}) => (
   <div className="w-full flex flex-col">
-    {label && <span className="mt-4 mb-2 text-lg">{label}</span>}
-    {textarea ? (
-      <textarea className="p-2 border rounded" {...props} />
-    ) : (
-      <input className="p-2 border rounded" {...props} />
-    )}
+    {label && <Label>{label}</Label>}
+    <div className="w-full bordered">
+      {textarea ? (
+        <textarea
+          className={cn(
+            "block w-full px-4 py-2 border-none background rounded-sm transition ease-in-out font-semibold",
+            "focus:ring-0",
+            className
+          )}
+          {...props}
+        />
+      ) : (
+        <input
+          className={cn(
+            "block w-full px-4 py-2 border-none background rounded-sm font-semibold",
+            "focus:ring-0 focus:border-2 focus:border-blue-500",
+            className
+          )}
+          {...props}
+        />
+      )}
+    </div>
   </div>
 );
 

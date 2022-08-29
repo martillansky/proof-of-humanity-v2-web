@@ -1,6 +1,6 @@
 import ALink from "components/ALink";
 import useWeb3 from "hooks/useWeb3";
-import SubmissionForm from "modules/Form";
+import SubmissionForm from "modules/form";
 import React from "react";
 import { injected } from "utils/connectors";
 
@@ -19,21 +19,25 @@ const Claim: React.FC = () => {
         <SubmissionForm />
       ) : (
         <>
-          <span className="text-3xl font-bold mb-4">
-            Create your Proof of Humanity profile
-          </span>
-          <span className="font-semibold">
+          <div className="w-full my-4 flex flex-col text-2xl font-extralight">
+            <span>Create your</span>
+            <span>
+              <strong className="font-semibold uppercase">
+                Proof of Humanity
+              </strong>{" "}
+              Profile
+            </span>
+            <div className="divider mt-4 w-2/3" />
+          </div>
+          <span className="txt">
             You don't have a wallet connected to the website
           </span>
 
-          <button
-            className="m-4 px-8 py-2 bg-orange-500 text-white rounded-full shadow"
-            onClick={() => activate(injected)}
-          >
+          <button className="btn-main my-8" onClick={() => activate(injected)}>
             Connect wallet
           </button>
 
-          <span>
+          <span className="txt">
             Don't have a wallet? Click{" "}
             <ALink
               className="text-blue-500"

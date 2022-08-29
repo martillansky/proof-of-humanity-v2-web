@@ -151,3 +151,14 @@ export const bufferFrom = (
     ? Buffer.from(value, encoding)
     : Buffer.from(value);
 };
+
+export function romanize(n: number): string {
+  if (n < 1) return "";
+  if (n >= 40) return `XL${romanize(n - 40)}`;
+  if (n >= 10) return `X${romanize(n - 10)}`;
+  if (n >= 9) return `IX${romanize(n - 9)}`;
+  if (n >= 5) return `V${romanize(n - 5)}`;
+  if (n >= 4) return `IV${romanize(n - 4)}`;
+  if (n >= 1) return `I${romanize(n - 1)}`;
+  return "";
+}

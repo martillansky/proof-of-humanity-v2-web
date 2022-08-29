@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                    justify-items-center
                    font-bold whitespace-nowrap"
       >
-        <Link to="/requests">Requests</Link>
+        <Link to="/">Requests</Link>
         <Link to="/souls">Souls</Link>
         {account && <Link to={`/soul/${account}`}>Soul</Link>}
         <Link to="/claim">Claim</Link>

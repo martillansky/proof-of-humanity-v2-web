@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Layout from "modules/Layout";
+import Layout from "modules/layout";
 import Home from "./Home";
 import Profile from "./Profile";
 import Soul from "./Soul";
@@ -14,7 +14,7 @@ const App: React.FC = () => (
   <Routes>
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
-      <Route path="requests" element={<Home />} />
+      {/* <Route path="requests" element={<Home />} /> */}
       <Route path="souls" element={<Souls />} />
       <Route path="request/:soul/:index/:chain" element={<Request />} />
       <Route path="profile/:address" element={<Profile />} />

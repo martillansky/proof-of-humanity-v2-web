@@ -1,5 +1,7 @@
 import { Zero } from "@ethersproject/constants";
+import Field from "components/Field";
 import Image from "components/Image";
+import Label from "components/Label";
 import Video from "components/Video";
 import { BigNumber } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
@@ -21,14 +23,13 @@ const Review: React.FC<ReviewProps> = () => {
     setStep,
     state: { name, bio, photo, video },
   } = useFormContext();
-  const [selfFunded, setSelfFunded] = useState<BigNumber>(Zero);
-
   const [claimSoul] = useClaimSoul();
   const totalCost = useRequestTotalCost();
+  const [selfFunded, setSelfFunded] = useState<BigNumber>(totalCost || Zero);
 
   const [estimatedGasFees, estimationError] = useGasFees(
     "claimSoul(string,string)",
-    [name, "ipfs/randomhashtoestimategasfees"]
+    [name, "ipfs/randomhashtoestimategasfees/evidence.json"]
   );
 
   const balance = useBalance();
@@ -100,36 +101,30 @@ const Review: React.FC<ReviewProps> = () => {
       )}
 
       <div className="w-full flex flex-col">
-        <legend className="inp-title">Name</legend>
-        <div className="bordered">
-          <div className="inp">{name || ""}</div>
-        </div>
+        <Field label="Name" value={name || ""} disabled />
+        <Field label="Account" value={account || ""} disabled />
 
-        <legend className="inp-title mt-8">Account</legend>
-        <div className="bordered">
-          <div className="inp">{account}</div>
-        </div>
-
-        <div className="inp-title flex items-center mt-8">
-          <legend>Initial deposit</legend>
-          {balance && (
-            <span className="ml-8 text-black">
-              Your balance: <strong>{formatEth(balance)} ETH</strong>
-            </span>
-          )}
-          {estimatedGasFees && (
-            <span className="ml-8 text-black">
-              Estimated gas fees:{" "}
-              <strong>{formatEth(estimatedGasFees)} ETH</strong>
-            </span>
-          )}
-        </div>
+        <Label>
+          <div className="flex items-center">
+            Initial deposit
+            {balance && (
+              <span className="ml-8 text-black">
+                Your balance: <strong>{formatEth(balance)} ETH</strong>
+              </span>
+            )}
+            {estimatedGasFees && (
+              <span className="ml-8 text-black">
+                Estimated gas fees:{" "}
+                <strong>{formatEth(estimatedGasFees)} ETH</strong>
+              </span>
+            )}
+          </div>
+        </Label>
         <div className="txt flex flex-col mb-16">
           <div className="inline-flex items-center">
             <div className="bordered w-48 mr-2">
-              <input
-                className="inp text-right"
-                placeholder="0"
+              <Field
+                className="text-right"
                 value={formatEther(selfFunded)}
                 onChange={(event) =>
                   setSelfFunded(parseEther(event.target.value))

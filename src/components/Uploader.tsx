@@ -5,7 +5,6 @@ interface UploaderProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDrop"> {
   onDrop: <T extends File>(acceptedFiles: T[]) => void;
   type: "all" | "video" | "image";
-  label?: string;
   disabled?: boolean;
 }
 
@@ -17,7 +16,6 @@ const MEDIA_TYPES = {
 const Uploader: React.FC<UploaderProps> = ({
   onDrop,
   type,
-  label,
   children,
   disabled,
   ...props
@@ -37,7 +35,6 @@ const Uploader: React.FC<UploaderProps> = ({
 
   return (
     <div className="flex flex-col cursor-pointer">
-      {label && <span className="mt-4 mb-2 text-lg">{label}</span>}
       <div {...props} {...getRootProps()}>
         <input {...getInputProps()} />
         {children}
