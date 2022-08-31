@@ -132,7 +132,7 @@ const VideoStep: React.FC = () => {
                 className={cn(
                   "w-full h-full p-2 bg-white rounded-sm font-semibold",
                   recordingMode === "phrase"
-                    ? "bg-orange-50"
+                    ? "bg-blend-overlay opacity-90"
                     : "hover:bg-slate-100"
                 )}
                 onClick={() => setRecordingMode("phrase")}

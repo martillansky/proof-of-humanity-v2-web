@@ -2,13 +2,15 @@ import { Status } from "generated/graphql";
 
 export const REQUEST_STATUS = {
   all: { filter: {} },
-  vouching: { filter: { status: "Vouching" } },
-  resolvingClaim: { filter: { status: "Resolving", registration: true } },
-  resolvingRevokal: { filter: { status: "Resolving", registration: false } },
-  disputedClaim: { filter: { status: "Disputed", registration: true } },
-  disputedRevokal: { filter: { status: "Disputed", registration: false } },
-  resolvedClaim: { filter: { status: "Resolved", registration: true } },
-  resolvedRevokal: { filter: { status: "Resolved", registration: false } },
+  vouching: { filter: { status: Status.Vouching } },
+  resolvingClaim: { filter: { status: Status.Resolving, registration: true } },
+  resolvingRevokal: {
+    filter: { status: Status.Resolving, registration: false },
+  },
+  disputedClaim: { filter: { status: Status.Disputed, registration: true } },
+  disputedRevokal: { filter: { status: Status.Disputed, registration: false } },
+  resolvedClaim: { filter: { status: Status.Resolved, registration: true } },
+  resolvedRevokal: { filter: { status: Status.Resolved, registration: false } },
 } as const;
 
 export type RequestStatus = keyof typeof REQUEST_STATUS;

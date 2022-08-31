@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { isAddress } from "@ethersproject/address";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
 import { SOULS_DISPLAY_BATCH } from "constants/misc";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
@@ -78,11 +77,7 @@ export const soulsAtom = atom(
         displayedForChain + SOULS_DISPLAY_BATCH >= chainStacks[chainID].length
       ) {
         const where = {
-          ...(searchQuery
-            ? isAddress(searchQuery)
-              ? { id: searchQuery }
-              : { name_contains: searchQuery }
-            : undefined),
+          ...(searchQuery ? { id: searchQuery } : undefined),
         };
 
         fetchChainIds.push(chainID);

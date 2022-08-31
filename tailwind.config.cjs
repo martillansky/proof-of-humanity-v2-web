@@ -9,7 +9,16 @@ module.exports = {
         resolving: "#5fd35f",
         disputed: "#dd47eb",
         resolved: "#3858fa",
-        black: "#26140B",
+        dark: "#26140B",
+        shade: {
+          50: "#fffcfa",
+          100: "#fffaf5",
+          200: "#fff7f0",
+          300: "#fff5eb",
+          400: "#fff0e0",
+          500: "#ffe0c2",
+          600: "#ffD6ad",
+        },
       },
       // keyframes: {
       //   progress: {

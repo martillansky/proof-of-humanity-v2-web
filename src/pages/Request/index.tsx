@@ -5,7 +5,7 @@ import useIPFS from "hooks/useIPFS";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import { ipfs } from "utils/ipfs";
 import { useRequest } from "api/useRequest";
-import { ChainId } from "constants/chains";
+import { ChainId, CHAIN_ID_TO_NAME, CHAIN_LOGO } from "constants/chains";
 import { useMemo } from "react";
 import EvidenceSection from "modules/evidence/Section";
 import {
@@ -30,9 +30,14 @@ import { explorerLink, shortenAddress } from "utils/address";
 import Video from "components/Video";
 import { STATUS_TO_COLOR } from "constants/misc";
 import cn from "classnames";
+import { decodeId, encodeId } from "utils/identifier";
+import { Status } from "generated/graphql";
 
 const Request: React.FC = () => {
-  const { soul, index, chain } = useParams();
+  const { soul, index, chain, old } = useParams();
+
+  const isV1 = old === "v1";
+  const soulId = encodeId(soul!);
   const chainId = useMemo<ChainId | undefined>(
     () => chain && ChainId[chain.toUpperCase()],
     [chain]
@@ -44,7 +49,7 @@ const Request: React.FC = () => {
       () =>
         keccak256(
           concat([
-            BigNumber.from(soul).toHexString(),
+            BigNumber.from(decodeId(soul!)).toHexString(),
             BigNumber.from(index).toHexString(),
           ])
         ),
@@ -71,6 +76,8 @@ const Request: React.FC = () => {
     ? `${registration.firstName} ${registration.lastName}`
     : registration.name;
 
+  const ChainLogo = CHAIN_LOGO[chainId];
+
   return (
     <div
       className="mt-8 mb-16 w-11/12
@@ -79,7 +86,7 @@ const Request: React.FC = () => {
                  mx-auto flex flex-col justify-center"
     >
       <div className="p-4 border flex justify-between rounded shadow bg-white">
-        <span>Request</span>
+        <span className="flex font-semibold">Request</span>
         <div className="flex items-center">
           <span className={`text-${STATUS_TO_COLOR[request.status]}`}>
             {request.status}
@@ -99,84 +106,123 @@ const Request: React.FC = () => {
 
           <span className="font-bold">{fullName}</span>
           <span className="mb-4">{registration.bio}</span>
-          <Label>
-            Soul: <strong>{soul}</strong>
-          </Label>
+          <div className="mb-8 flex flex-col items-center font-semibold text-green-500">
+            <span>Soul:</span>
+            <strong>{soul}</strong>
+          </div>
 
-          <Label>
-            Vouches:{" "}
-            <strong>
-              {request.claimer?.vouchesReceived.length} /{" "}
-              {requiredVouches?.toNumber()}
-            </strong>
-          </Label>
-          <button
-            className="btn-main mb-2"
-            onClick={async () => {
-              console.log(request.requester, request.soul.id);
-              await addVouch(request.requester, request.soul.id);
-            }}
-          >
-            Vouch
-          </button>
+          {isV1 ? (
+            <>
+              <ALink
+                href={`https://app.proofofhumanity.id/profile/${soulId}`}
+                className="text-center font-semibold text-blue-500"
+              >
+                This is a profile registered on the old contract. Check it out
+                there.
+              </ALink>
+            </>
+          ) : (
+            <>
+              <Label>
+                Vouches:{" "}
+                <strong>
+                  {request.claimer?.vouchesReceived.length} /{" "}
+                  {requiredVouches?.toNumber()}
+                </strong>
+              </Label>
 
-          {totalCost && (
-            <Modal
-              trigger={
-                <button
-                  className="btn-main mb-2"
-                  onClick={async () => {
-                    console.log(request.requester, request.soul.id);
-                    await addVouch(request.requester, request.soul.id);
-                  }}
-                >
-                  Fund request
-                </button>
-              }
-            >
-              <div className="flex flex-col">
-                <div className="w-full p-4 flex justify-center rounded font-bold">
-                  {totalCost && formatEth(totalCost)} ETH Deposit
-                </div>
-                <Field label="Amount" value={formatEth(totalCost)} />
-                <button
-                  onClick={async () =>
-                    await fundRequest(request.requester, { value: totalCost })
-                  }
-                  className="btn-main mt-12"
-                >
-                  Fund
-                </button>
-              </div>
-            </Modal>
+              {request.status == Status.Vouching && (
+                <>
+                  <button
+                    className="btn-main mb-2"
+                    onClick={async () => {
+                      console.log(request.requester, request.soul.id);
+                      await addVouch(request.requester, request.soul.id);
+                    }}
+                  >
+                    Vouch
+                  </button>
+
+                  {totalCost && (
+                    <Modal
+                      trigger={
+                        <button
+                          className="btn-main mb-2"
+                          onClick={async () => {
+                            console.log(request.requester, request.soul.id);
+                            await addVouch(request.requester, request.soul.id);
+                          }}
+                        >
+                          Fund request
+                        </button>
+                      }
+                    >
+                      <div className="flex flex-col">
+                        <div className="w-full p-4 flex justify-center rounded font-bold">
+                          {totalCost && formatEth(totalCost)} ETH Deposit
+                        </div>
+                        <Field label="Amount" value={formatEth(totalCost)} />
+                        <button
+                          onClick={async () =>
+                            await fundRequest(request.requester, {
+                              value: totalCost,
+                            })
+                          }
+                          className="btn-main mt-12"
+                        >
+                          Fund
+                        </button>
+                      </div>
+                    </Modal>
+                  )}
+
+                  {request.claimer &&
+                    requiredVouches &&
+                    request.claimer.vouchesReceived.length >=
+                      requiredVouches!.toNumber() && (
+                      <button
+                        className="btn-main mb-2"
+                        onClick={async () =>
+                          await advanceState(
+                            request.requester,
+                            request.claimer!.vouchesReceived.map(
+                              (v) => v.from.id
+                            ),
+                            []
+                          )
+                        }
+                      >
+                        Advance state
+                      </button>
+                    )}
+                </>
+              )}
+
+              {request.status == Status.Resolving && (
+                <>
+                  <button
+                    className="btn-main mb-2"
+                    onClick={async () => await executeRequest(soul, index)}
+                  >
+                    Execute request
+                  </button>
+
+                  <Label>
+                    Challenge period end:{" "}
+                    {challengePeriodDuration && (
+                      <TimeAgo
+                        time={challengePeriodDuration
+                          .add(request.lastStatusChange as BigNumber)
+                          .toNumber()}
+                      />
+                    )}
+                  </Label>
+
+                  <Challenge request={request} />
+                </>
+              )}
+            </>
           )}
-
-          <button
-            className="btn-main mb-2"
-            onClick={async () => await advanceState(request.requester, [], [])}
-          >
-            Advance state
-          </button>
-
-          <button
-            className="btn-main mb-2"
-            onClick={async () => await executeRequest(soul, index)}
-          >
-            Execute request
-          </button>
-
-          <Label>
-            Challenge period end:{" "}
-            {challengePeriodDuration && (
-              <TimeAgo
-                time={challengePeriodDuration
-                  .add(request.lastStatusChange as BigNumber)
-                  .toNumber()}
-              />
-            )}
-          </Label>
-
-          <Challenge request={request} />
 
           <Label>
             Last status change: <TimeAgo time={request.lastStatusChange} />
@@ -184,7 +230,13 @@ const Request: React.FC = () => {
         </div>
 
         <div className="w-full px-4 flex flex-col">
-          <span className="mt-8 ml-8 text-xl font-semibold">{fullName}</span>
+          <div className="mt-4 flex justify-between font-semibold">
+            <span className="ml-8 text-xl">{fullName}</span>
+            <span className="flex">
+              <ChainLogo className="w-6 h-6 mr-2" />
+              {CHAIN_ID_TO_NAME[chainId]}
+            </span>
+          </div>
           <div className="flex mb-4">
             <Identicon address={request.requester} />
             <ALink
@@ -201,7 +253,7 @@ const Request: React.FC = () => {
 
       <EvidenceSection
         chainId={chainId}
-        soulId={soul}
+        soulId={soulId}
         requestIndex={index}
         request={request}
       />

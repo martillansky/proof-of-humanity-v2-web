@@ -1,15 +1,15 @@
 import { Suspense, useMemo } from "react";
 import ErrorBoundary from "components/ErrorBoundary";
 import { camelToTitle } from "utils/case";
-import { CHAIN_ID_TO_NAME } from "constants/chains";
+import { ChainId, CHAIN_ID_TO_NAME } from "constants/chains";
 import { queryToStatus } from "constants/requests";
 import { Link } from "react-router-dom";
 import { RequestInterface } from "api/requests";
 import cn from "classnames";
-import { BigNumber } from "ethers";
 import { STATUS_TO_COLOR } from "constants/misc";
 import { ErrorFallback, LoadingFallback } from "./misc";
 import Content from "./Content";
+import { encodeId } from "utils/identifier";
 
 const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
   const status = useMemo(
@@ -17,12 +17,16 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
     [request]
   );
 
+  console.log("old", ChainId[request.chainID], request.old);
+
   return (
     <Link
-      to={`/request/${BigNumber.from(request.soul.id)}/${
-        request.realIndex
-      }/${CHAIN_ID_TO_NAME[request.chainID].toLowerCase()}`}
-      className="h-72 rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
+      to={`/request/${CHAIN_ID_TO_NAME[
+        request.chainID
+      ].toLowerCase()}/${encodeId(request.soul.id)}/${request.index}${
+        request.old ? "/v1" : ""
+      }`}
+      className="rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
       <div className="justify-between bg-slate-100 font-light">
         <div

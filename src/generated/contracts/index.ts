@@ -3,6 +3,8 @@
 /* eslint-disable */
 export type { KlerosLiquid } from "./KlerosLiquid";
 export type { ProofOfHumanity } from "./ProofOfHumanity";
+export type { ProofOfHumanityOld } from "./ProofOfHumanityOld";
 export * as factories from "./factories";
 export { KlerosLiquid__factory } from "./factories/KlerosLiquid__factory";
 export { ProofOfHumanity__factory } from "./factories/ProofOfHumanity__factory";
+export { ProofOfHumanityOld__factory } from "./factories/ProofOfHumanityOld__factory";

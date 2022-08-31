@@ -1,8 +1,12 @@
-import { hexValue } from "ethers/lib/utils";
+import { chainSetting } from "utils/misc";
+import EthereumLogo from "../assets/svg/ethereum.svg";
+import GnosisLogo from "../assets/svg/gnosis.svg";
+import TestnetLogo from "../assets/svg/SandboxMajor.svg";
 
 export enum ChainId {
   MAINNET = 1,
   RINKEBY = 4,
+  GNOSIS = 100,
 }
 
 const INFURA_KEY = process.env.INFURA_KEY;
@@ -10,30 +14,41 @@ const INFURA_KEY = process.env.INFURA_KEY;
 export const RPC_ENDPOINTS: { [key in ChainId]: string } = {
   [ChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
   [ChainId.RINKEBY]: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
+  [ChainId.GNOSIS]: `https://rpc.gnosischain.com/`,
 };
 
-export const CHAIN_ID_TO_NAME = {
-  [ChainId.MAINNET]: "mainnet",
+export const CHAIN_ID_TO_NAME: { [key in ChainId]: string } = {
+  [ChainId.MAINNET]: "Mainnet",
   [ChainId.RINKEBY]: "Rinkeby",
+  [ChainId.GNOSIS]: "Gnosis",
 };
 
-export const WATCH_CHAIN_IDS = [ChainId.MAINNET, ChainId.RINKEBY];
-export const SUPPORTED_CHAIN_IDS = [ChainId.RINKEBY];
-export const FALLBACK_CHAIN = ChainId.RINKEBY;
+export const CHAIN_LOGO: {
+  [key in ChainId]: React.FC<React.SVGAttributes<SVGElement>>;
+} = {
+  [ChainId.MAINNET]: EthereumLogo,
+  [ChainId.RINKEBY]: TestnetLogo,
+  [ChainId.GNOSIS]: GnosisLogo,
+};
+
+export const EXPLORER_URL: { [key in ChainId]: string } = {
+  [ChainId.MAINNET]: "https://etherscan.io",
+  [ChainId.RINKEBY]: "https://rinkeby.etherscan.io",
+  [ChainId.GNOSIS]: "https://gnosisscan.io",
+};
+
+export const NATIVE_CURRENCY: { [key in ChainId]: string } = {
+  [ChainId.MAINNET]: "ETH",
+  [ChainId.RINKEBY]: "ETH",
+  [ChainId.GNOSIS]: "xDAI",
+};
 
 export const CHAIN_SETTING = {
-  [ChainId.MAINNET]: {
-    chainId: hexValue(ChainId.MAINNET),
-    chainName: CHAIN_ID_TO_NAME[ChainId.MAINNET],
-    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-    rpcUrls: [RPC_ENDPOINTS[ChainId.MAINNET]],
-    blockExplorerUrls: ["https://etherscan.io"],
-  },
-  [ChainId.RINKEBY]: {
-    chainId: hexValue(ChainId.RINKEBY),
-    chainName: CHAIN_ID_TO_NAME[ChainId.RINKEBY],
-    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-    rpcUrls: [RPC_ENDPOINTS[ChainId.RINKEBY]],
-    blockExplorerUrls: ["https://rinkeby.etherscan.io"],
-  },
+  ...chainSetting(ChainId.MAINNET),
+  ...chainSetting(ChainId.RINKEBY),
+  ...chainSetting(ChainId.GNOSIS),
 };
+
+export const FALLBACK_CHAIN = ChainId.RINKEBY;
+
+export const SUPPORTED_CHAIN_IDS = [ChainId.RINKEBY, ChainId.MAINNET];

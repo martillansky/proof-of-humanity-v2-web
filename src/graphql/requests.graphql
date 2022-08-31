@@ -7,21 +7,21 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
     orderDirection: desc
   ) {
     id
-    realIndex
+    index
     status
     registration
     creationTime
     requester
     claimer {
+      id
       name
     }
     soul {
       id
-      name
       nbRequests
       claimed
     }
-    evidence {
+    evidence(orderBy: creationTime) {
       URI
     }
   }

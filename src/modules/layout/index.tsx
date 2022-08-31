@@ -3,7 +3,7 @@ import Footer from "./Footer";
 import Header from "./Header";
 
 const Layout = () => (
-  <div className="min-h-screen flex-col background">
+  <div className="min-h-screen flex-col bg-shade-50">
     <Header />
     <Outlet />
     <Footer />

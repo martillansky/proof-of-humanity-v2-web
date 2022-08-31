@@ -29,22 +29,14 @@
     @apply h-0.5 w-full gradient rounded;
   }
 
-  .inp-title {
-    @apply mb-2 text-[#ff9966] text-sm font-semibold uppercase;
-  }
-
-  .inp {
-    @apply w-full px-4 py-2 background rounded-sm font-semibold;
-  }
-
   .checkbox {
-    @apply w-4 h-4 border-2 border-[#ff9966] rounded-sm background
+    @apply w-4 h-4 border-2 border-[#ff9966] rounded-sm bg-shade-100
          checked:text-[#ff9966]
            focus:ring-2 focus:ring-offset-1 focus:ring-[#ff9966]/60;
   }
 
   .radio {
-    @apply w-4 h-4 border-2 border-[#ff9966] rounded-full background
+    @apply w-4 h-4 border-2 border-[#ff9966] rounded-full bg-shade-100
          checked:text-[#ff9966]
            focus:ring-2 focus:ring-offset-2 focus:ring-[#ff9966]/60;
   }
@@ -78,10 +70,6 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-  }
-
-  .background {
-    background: #fffbf7;
   }
 
   .gradient {

@@ -81,7 +81,7 @@ const Souls: React.FC = () => {
             {(close) => (
               <>
                 <div className="backdrop" onClick={close} />
-                <div className="fixed absolute-centered bordered w-1/5 z-30">
+                <div className="fixed absolute-centered bordered w-2/5 z-30">
                   <SoulWidget soul={soul} />
                 </div>
               </>

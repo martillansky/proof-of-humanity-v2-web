@@ -1,10 +1,7 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { NetworkConnector } from "@web3-react/network-connector";
-import {
-  FALLBACK_CHAIN,
-  RPC_ENDPOINTS,
-  WATCH_CHAIN_IDS,
-} from "constants/chains";
+import { ChainId, FALLBACK_CHAIN, RPC_ENDPOINTS } from "constants/chains";
+import { isNumber } from "lodash";
 
 export const network = new NetworkConnector({
   urls: RPC_ENDPOINTS,
@@ -12,5 +9,7 @@ export const network = new NetworkConnector({
 });
 
 export const injected = new InjectedConnector({
-  supportedChainIds: WATCH_CHAIN_IDS,
+  supportedChainIds: Object.keys(ChainId)
+    .map((c) => Number(c))
+    .filter((c) => isNumber(c)),
 });

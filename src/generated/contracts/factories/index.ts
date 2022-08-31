@@ -3,3 +3,4 @@
 /* eslint-disable */
 export { KlerosLiquid__factory } from "./KlerosLiquid__factory";
 export { ProofOfHumanity__factory } from "./ProofOfHumanity__factory";
+export { ProofOfHumanityOld__factory } from "./ProofOfHumanityOld__factory";

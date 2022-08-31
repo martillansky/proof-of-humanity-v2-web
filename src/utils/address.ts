@@ -1,5 +1,5 @@
 import { getAddress } from "@ethersproject/address";
-import { CHAIN_SETTING } from "constants/chains";
+import { EXPLORER_URL } from "constants/chains";
 import { base2048 } from "./misc";
 
 export function isAddress(value: any): string | false {
@@ -31,4 +31,4 @@ export const phraseFromAddress = (
 };
 
 export const explorerLink = (address: string, chainId: number) =>
-  `${CHAIN_SETTING[chainId].blockExplorerUrls[0]}/address/${address}`;
+  `${EXPLORER_URL[chainId]}/address/${address}`;

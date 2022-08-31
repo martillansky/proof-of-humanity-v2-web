@@ -241,7 +241,6 @@ export type Claimer = {
   id: Scalars['Bytes'];
   lastRequestTime: Scalars['BigInt'];
   name?: Maybe<Scalars['String']>;
-  nbVouchesReceived: Scalars['BigInt'];
   soul?: Maybe<Soul>;
   targetSoul?: Maybe<Soul>;
   vouches: Array<Vouch>;
@@ -332,14 +331,6 @@ export type Claimer_Filter = {
   name_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   name_starts_with?: InputMaybe<Scalars['String']>;
   name_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  nbVouchesReceived?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_gt?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_gte?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  nbVouchesReceived_lt?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_lte?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_not?: InputMaybe<Scalars['BigInt']>;
-  nbVouchesReceived_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   soul_?: InputMaybe<Soul_Filter>;
   targetSoul?: InputMaybe<Scalars['String']>;
   targetSoul_?: InputMaybe<Soul_Filter>;
@@ -362,7 +353,13 @@ export type Claimer_Filter = {
   targetSoul_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   targetSoul_starts_with?: InputMaybe<Scalars['String']>;
   targetSoul_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  vouchesReceived?: InputMaybe<Array<Scalars['String']>>;
   vouchesReceived_?: InputMaybe<Vouch_Filter>;
+  vouchesReceived_contains?: InputMaybe<Array<Scalars['String']>>;
+  vouchesReceived_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
+  vouchesReceived_not?: InputMaybe<Array<Scalars['String']>>;
+  vouchesReceived_not_contains?: InputMaybe<Array<Scalars['String']>>;
+  vouchesReceived_not_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
   vouches_?: InputMaybe<Vouch_Filter>;
 };
 
@@ -373,7 +370,6 @@ export enum Claimer_OrderBy {
   Id = 'id',
   LastRequestTime = 'lastRequestTime',
   Name = 'name',
-  NbVouchesReceived = 'nbVouchesReceived',
   Soul = 'soul',
   TargetSoul = 'targetSoul',
   Vouches = 'vouches',
@@ -535,10 +531,7 @@ export type Contribution = {
   forChallenger: Scalars['BigInt'];
   forRequester: Scalars['BigInt'];
   id: Scalars['Bytes'];
-  requestIndex: Scalars['BigInt'];
-  requestResolved: Scalars['Boolean'];
   round: Round;
-  roundIndex: Scalars['BigInt'];
 };
 
 export type Contribution_Filter = {
@@ -572,27 +565,7 @@ export type Contribution_Filter = {
   id_not?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  requestIndex?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_gt?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_gte?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  requestIndex_lt?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_lte?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_not?: InputMaybe<Scalars['BigInt']>;
-  requestIndex_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  requestResolved?: InputMaybe<Scalars['Boolean']>;
-  requestResolved_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  requestResolved_not?: InputMaybe<Scalars['Boolean']>;
-  requestResolved_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   round?: InputMaybe<Scalars['String']>;
-  roundIndex?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_gt?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_gte?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  roundIndex_lt?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_lte?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_not?: InputMaybe<Scalars['BigInt']>;
-  roundIndex_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   round_?: InputMaybe<Round_Filter>;
   round_contains?: InputMaybe<Scalars['String']>;
   round_contains_nocase?: InputMaybe<Scalars['String']>;
@@ -620,10 +593,7 @@ export enum Contribution_OrderBy {
   ForChallenger = 'forChallenger',
   ForRequester = 'forRequester',
   Id = 'id',
-  RequestIndex = 'requestIndex',
-  RequestResolved = 'requestResolved',
-  Round = 'round',
-  RoundIndex = 'roundIndex'
+  Round = 'round'
 }
 
 export type Counter = {
@@ -1087,11 +1057,11 @@ export type Request = {
   currentReason: Reason;
   evidence: Array<Evidence>;
   id: Scalars['Bytes'];
+  index: Scalars['BigInt'];
   lastProcessedVouchIndex: Scalars['BigInt'];
   lastStatusChange: Scalars['BigInt'];
   nbChallenges: Scalars['BigInt'];
   nbEvidence: Scalars['BigInt'];
-  realIndex: Scalars['BigInt'];
   registration: Scalars['Boolean'];
   requester: Scalars['Bytes'];
   requesterLost: Scalars['Boolean'];
@@ -1100,7 +1070,6 @@ export type Request = {
   status: Status;
   ultimateChallenger?: Maybe<Scalars['Bytes']>;
   usedReasons: Array<Reason>;
-  vouchReleaseReady: Scalars['Boolean'];
   vouches: Array<Vouch>;
 };
 
@@ -1184,6 +1153,14 @@ export type Request_Filter = {
   id_not?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  index?: InputMaybe<Scalars['BigInt']>;
+  index_gt?: InputMaybe<Scalars['BigInt']>;
+  index_gte?: InputMaybe<Scalars['BigInt']>;
+  index_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  index_lt?: InputMaybe<Scalars['BigInt']>;
+  index_lte?: InputMaybe<Scalars['BigInt']>;
+  index_not?: InputMaybe<Scalars['BigInt']>;
+  index_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   lastProcessedVouchIndex?: InputMaybe<Scalars['BigInt']>;
   lastProcessedVouchIndex_gt?: InputMaybe<Scalars['BigInt']>;
   lastProcessedVouchIndex_gte?: InputMaybe<Scalars['BigInt']>;
@@ -1216,14 +1193,6 @@ export type Request_Filter = {
   nbEvidence_lte?: InputMaybe<Scalars['BigInt']>;
   nbEvidence_not?: InputMaybe<Scalars['BigInt']>;
   nbEvidence_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  realIndex?: InputMaybe<Scalars['BigInt']>;
-  realIndex_gt?: InputMaybe<Scalars['BigInt']>;
-  realIndex_gte?: InputMaybe<Scalars['BigInt']>;
-  realIndex_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  realIndex_lt?: InputMaybe<Scalars['BigInt']>;
-  realIndex_lte?: InputMaybe<Scalars['BigInt']>;
-  realIndex_not?: InputMaybe<Scalars['BigInt']>;
-  realIndex_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   registration?: InputMaybe<Scalars['Boolean']>;
   registration_in?: InputMaybe<Array<Scalars['Boolean']>>;
   registration_not?: InputMaybe<Scalars['Boolean']>;
@@ -1283,11 +1252,13 @@ export type Request_Filter = {
   usedReasons_not?: InputMaybe<Array<Reason>>;
   usedReasons_not_contains?: InputMaybe<Array<Reason>>;
   usedReasons_not_contains_nocase?: InputMaybe<Array<Reason>>;
-  vouchReleaseReady?: InputMaybe<Scalars['Boolean']>;
-  vouchReleaseReady_in?: InputMaybe<Array<Scalars['Boolean']>>;
-  vouchReleaseReady_not?: InputMaybe<Scalars['Boolean']>;
-  vouchReleaseReady_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  vouches?: InputMaybe<Array<Scalars['String']>>;
   vouches_?: InputMaybe<Vouch_Filter>;
+  vouches_contains?: InputMaybe<Array<Scalars['String']>>;
+  vouches_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
+  vouches_not?: InputMaybe<Array<Scalars['String']>>;
+  vouches_not_contains?: InputMaybe<Array<Scalars['String']>>;
+  vouches_not_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export enum Request_OrderBy {
@@ -1299,11 +1270,11 @@ export enum Request_OrderBy {
   CurrentReason = 'currentReason',
   Evidence = 'evidence',
   Id = 'id',
+  Index = 'index',
   LastProcessedVouchIndex = 'lastProcessedVouchIndex',
   LastStatusChange = 'lastStatusChange',
   NbChallenges = 'nbChallenges',
   NbEvidence = 'nbEvidence',
-  RealIndex = 'realIndex',
   Registration = 'registration',
   Requester = 'requester',
   RequesterLost = 'requesterLost',
@@ -1312,7 +1283,6 @@ export enum Request_OrderBy {
   Status = 'status',
   UltimateChallenger = 'ultimateChallenger',
   UsedReasons = 'usedReasons',
-  VouchReleaseReady = 'vouchReleaseReady',
   Vouches = 'vouches'
 }
 
@@ -1439,7 +1409,6 @@ export type Soul = {
   claimers: Array<Claimer>;
   expirationTime: Scalars['BigInt'];
   id: Scalars['Bytes'];
-  name?: Maybe<Scalars['String']>;
   nbPendingRequests: Scalars['BigInt'];
   nbRequests: Scalars['BigInt'];
   owner?: Maybe<Claimer>;
@@ -1489,26 +1458,6 @@ export type Soul_Filter = {
   id_not?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  name?: InputMaybe<Scalars['String']>;
-  name_contains?: InputMaybe<Scalars['String']>;
-  name_contains_nocase?: InputMaybe<Scalars['String']>;
-  name_ends_with?: InputMaybe<Scalars['String']>;
-  name_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  name_gt?: InputMaybe<Scalars['String']>;
-  name_gte?: InputMaybe<Scalars['String']>;
-  name_in?: InputMaybe<Array<Scalars['String']>>;
-  name_lt?: InputMaybe<Scalars['String']>;
-  name_lte?: InputMaybe<Scalars['String']>;
-  name_not?: InputMaybe<Scalars['String']>;
-  name_not_contains?: InputMaybe<Scalars['String']>;
-  name_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  name_not_ends_with?: InputMaybe<Scalars['String']>;
-  name_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  name_not_in?: InputMaybe<Array<Scalars['String']>>;
-  name_not_starts_with?: InputMaybe<Scalars['String']>;
-  name_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  name_starts_with?: InputMaybe<Scalars['String']>;
-  name_starts_with_nocase?: InputMaybe<Scalars['String']>;
   nbPendingRequests?: InputMaybe<Scalars['BigInt']>;
   nbPendingRequests_gt?: InputMaybe<Scalars['BigInt']>;
   nbPendingRequests_gte?: InputMaybe<Scalars['BigInt']>;
@@ -1583,7 +1532,6 @@ export enum Soul_OrderBy {
   Claimers = 'claimers',
   ExpirationTime = 'expirationTime',
   Id = 'id',
-  Name = 'name',
   NbPendingRequests = 'nbPendingRequests',
   NbRequests = 'nbRequests',
   Owner = 'owner',
@@ -1836,7 +1784,6 @@ export type Vouch = {
   for: Claimer;
   from: Claimer;
   id: Scalars['Bytes'];
-  processedFor?: Maybe<Request>;
   soul: Soul;
 };
 
@@ -1891,27 +1838,6 @@ export type Vouch_Filter = {
   id_not?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  processedFor?: InputMaybe<Scalars['String']>;
-  processedFor_?: InputMaybe<Request_Filter>;
-  processedFor_contains?: InputMaybe<Scalars['String']>;
-  processedFor_contains_nocase?: InputMaybe<Scalars['String']>;
-  processedFor_ends_with?: InputMaybe<Scalars['String']>;
-  processedFor_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  processedFor_gt?: InputMaybe<Scalars['String']>;
-  processedFor_gte?: InputMaybe<Scalars['String']>;
-  processedFor_in?: InputMaybe<Array<Scalars['String']>>;
-  processedFor_lt?: InputMaybe<Scalars['String']>;
-  processedFor_lte?: InputMaybe<Scalars['String']>;
-  processedFor_not?: InputMaybe<Scalars['String']>;
-  processedFor_not_contains?: InputMaybe<Scalars['String']>;
-  processedFor_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  processedFor_not_ends_with?: InputMaybe<Scalars['String']>;
-  processedFor_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  processedFor_not_in?: InputMaybe<Array<Scalars['String']>>;
-  processedFor_not_starts_with?: InputMaybe<Scalars['String']>;
-  processedFor_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  processedFor_starts_with?: InputMaybe<Scalars['String']>;
-  processedFor_starts_with_nocase?: InputMaybe<Scalars['String']>;
   soul?: InputMaybe<Scalars['String']>;
   soul_?: InputMaybe<Soul_Filter>;
   soul_contains?: InputMaybe<Scalars['String']>;
@@ -1939,7 +1865,6 @@ export enum Vouch_OrderBy {
   For = 'for',
   From = 'from',
   Id = 'id',
-  ProcessedFor = 'processedFor',
   Soul = 'soul'
 }
 
@@ -1977,17 +1902,12 @@ export enum _SubgraphErrorPolicy_ {
   Deny = 'deny'
 }
 
-export type CounterQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CounterQuery = { __typename?: 'Query', counter?: { __typename?: 'Counter', vouching: any, pendingClaims: any, challengedClaims: any, registered: any, pendingRevokals: any, challengedRevokal: any, removed: any, expired: any } | null };
-
 export type RequestQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, realIndex: any, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, soul: { __typename?: 'Soul', id: any, claimed: boolean }, claimer?: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any }, soul: { __typename?: 'Soul', id: any } }> } | null, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }> } | null };
+export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, index: any, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, soul: { __typename?: 'Soul', id: any, claimed: boolean }, claimer?: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any }, soul: { __typename?: 'Soul', id: any } }> } | null, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }> } | null };
 
 export type RequestsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -1996,7 +1916,7 @@ export type RequestsQueryVariables = Exact<{
 }>;
 
 
-export type RequestsQuery = { __typename?: 'Query', requests: Array<{ __typename?: 'Request', id: any, realIndex: any, status: Status, registration: boolean, creationTime: any, requester: any, claimer?: { __typename?: 'Claimer', name?: string | null } | null, soul: { __typename?: 'Soul', id: any, name?: string | null, nbRequests: any, claimed: boolean }, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> };
+export type RequestsQuery = { __typename?: 'Query', requests: Array<{ __typename?: 'Request', id: any, index: any, status: Status, registration: boolean, creationTime: any, requester: any, claimer?: { __typename?: 'Claimer', id: any, name?: string | null } | null, soul: { __typename?: 'Soul', id: any, nbRequests: any, claimed: boolean }, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> };
 
 export type SoulsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -2005,28 +1925,14 @@ export type SoulsQueryVariables = Exact<{
 }>;
 
 
-export type SoulsQuery = { __typename?: 'Query', souls: Array<{ __typename?: 'Soul', id: any, name?: string | null, claimed: boolean, nbPendingRequests: any, owner?: { __typename?: 'Claimer', id: any, name?: string | null } | null, requests: Array<{ __typename?: 'Request', id: any, status: Status }> }> };
+export type SoulsQuery = { __typename?: 'Query', souls: Array<{ __typename?: 'Soul', id: any, claimed: boolean, expirationTime: any, nbPendingRequests: any, owner?: { __typename?: 'Claimer', id: any, name?: string | null } | null, requests: Array<{ __typename?: 'Request', id: any, status: Status }> }> };
 
 
-export const CounterDocument = gql`
-    query Counter {
-  counter(id: 0) {
-    vouching
-    pendingClaims
-    challengedClaims
-    registered
-    pendingRevokals
-    challengedRevokal
-    removed
-    expired
-  }
-}
-    `;
 export const RequestDocument = gql`
     query Request($id: ID!) {
   request(id: $id) {
     status
-    realIndex
+    index
     registration
     requester
     creationTime
@@ -2081,21 +1987,21 @@ export const RequestsDocument = gql`
     orderDirection: desc
   ) {
     id
-    realIndex
+    index
     status
     registration
     creationTime
     requester
     claimer {
+      id
       name
     }
     soul {
       id
-      name
       nbRequests
       claimed
     }
-    evidence {
+    evidence(orderBy: creationTime) {
       URI
     }
   }
@@ -2105,12 +2011,12 @@ export const SoulsDocument = gql`
     query Souls($skip: Int, $first: Int, $where: Soul_filter) {
   souls(first: $first, skip: $skip, where: $where) {
     id
-    name
+    claimed
+    expirationTime
     owner {
       id
       name
     }
-    claimed
     nbPendingRequests
     requests(where: {status_not: Resolved}) {
       id
@@ -2127,9 +2033,6 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    Counter(variables?: CounterQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CounterQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CounterQuery>(CounterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Counter', 'query');
-    },
     Request(variables: RequestQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RequestQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<RequestQuery>(RequestDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Request', 'query');
     },

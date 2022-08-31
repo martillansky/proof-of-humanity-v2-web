@@ -1,5 +1,4 @@
 import { atom } from "jotai";
-import { isAddress } from "@ethersproject/address";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
@@ -7,6 +6,7 @@ import { RequestStatus, REQUEST_STATUS } from "constants/requests";
 import { RequestsQueryItem } from "./types";
 
 export interface RequestInterface extends RequestsQueryItem {
+  old: boolean;
   chainID: ChainId;
 }
 
@@ -17,6 +17,7 @@ const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
         ...acc,
         ...requestData[Number(chainID) as ChainId].map((request) => ({
           ...request,
+          old: Number(chainID) === ChainId.MAINNET,
           chainID: Number(chainID),
         })),
       ],
@@ -91,11 +92,7 @@ export const requestsAtom = atom(
         const statusFilter = REQUEST_STATUS[status].filter;
         const where = {
           ...statusFilter,
-          ...(searchQuery
-            ? isAddress(searchQuery)
-              ? { id: searchQuery }
-              : { name_contains: searchQuery }
-            : undefined),
+          ...(searchQuery ? { claimer_: { name_contains: searchQuery } } : {}),
         };
 
         fetchChainIds.push(chainID);

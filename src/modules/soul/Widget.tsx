@@ -1,10 +1,9 @@
 import { SoulInterface } from "api/souls";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
-import { BigNumber } from "ethers";
 import useWeb3 from "hooks/useWeb3";
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { shortenAddress } from "utils/address";
+import { encodeId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
 interface SoulWidgetProps {
@@ -13,8 +12,6 @@ interface SoulWidgetProps {
 
 const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
   const { account } = useWeb3();
-
-  const soulId = useMemo(() => BigNumber.from(soul.id).toString(), [soul.id]);
 
   return (
     <div className="px-8 pb-8 flex flex-col justify-center items-center rounded bg-white">
@@ -25,7 +22,7 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
       </div>
       <div className="w-full flex flex-col items-center">
         <div className="mt-20">
-          Soul ID: <strong>{soulId}</strong>
+          Soul ID: <strong>{encodeId(soul.id)}</strong>
           <div>{soul.claimed ? `Claimed` : `Not claimed`}</div>
           {soul.claimed && <div>Owner: {shortenAddress(soul.owner!.id)}</div>}
         </div>
@@ -36,7 +33,7 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
           {soul.nbPendingRequests} pending requests
         </div>
         <div className="mb-8">Claimed</div>
-        <Link className="btn-main" to={`/claim/${soulId}`}>
+        <Link className="btn-main" to={`/claim/${encodeId(soul.id)}`}>
           Claim this soul
         </Link>
         {soul.claimed && account && account === soul.owner!.id && (

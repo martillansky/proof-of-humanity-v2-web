@@ -1,5 +1,12 @@
+import {
+  ChainId,
+  CHAIN_ID_TO_NAME,
+  EXPLORER_URL,
+  NATIVE_CURRENCY,
+  RPC_ENDPOINTS,
+} from "constants/chains";
 import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils";
+import { formatEther, hexValue } from "ethers/lib/utils";
 import ABC2048 from "./base2048/words";
 
 export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
@@ -162,3 +169,27 @@ export function romanize(n: number): string {
   if (n >= 1) return `I${romanize(n - 1)}`;
   return "";
 }
+
+interface ChainSetting {
+  chainId: string;
+  chainName: string;
+  nativeCurrency: { name: string; symbol: string; decimals: 18 };
+  rpcUrls: [string];
+  blockExplorerUrls: [string];
+}
+
+export const chainSetting = <C extends ChainId>(
+  chain: C
+): Record<C, ChainSetting> => ({
+  [chain]: {
+    chainId: hexValue(chain),
+    chainName: CHAIN_ID_TO_NAME[chain],
+    nativeCurrency: {
+      name: NATIVE_CURRENCY[chain],
+      symbol: NATIVE_CURRENCY[chain],
+      decimals: 18,
+    },
+    rpcUrls: [RPC_ENDPOINTS[chain]],
+    blockExplorerUrls: [EXPLORER_URL[chain]],
+  } as ChainSetting,
+});

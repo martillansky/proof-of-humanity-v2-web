@@ -1,12 +1,12 @@
 query Souls($skip: Int, $first: Int, $where: Soul_filter) {
-  souls(first: $first, skip: $skip, where: $where) {
+  souls(first: $first, skip: $skip, where: $where, orderBy: ) {
     id
-    name
+    claimed
+    expirationTime
     owner {
       id
       name
     }
-    claimed
     nbPendingRequests
     requests(where: { status_not: Resolved }) {
       id

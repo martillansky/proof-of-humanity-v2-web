@@ -8,11 +8,12 @@ import { ChainId } from "constants/chains";
 import { BigNumberish } from "ethers";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
 import React, { useState } from "react";
+import { decodeId } from "utils/identifier";
 import { uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
 
 interface EvidenceProps {
-  soulId: BigNumberish;
+  soulId: string;
   requestIndex: BigNumberish;
   chainId: ChainId;
   request: RequestQueryItem;
@@ -45,7 +46,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
       "evidence.json"
     );
 
-    await submitEvidence(soulId, requestIndex, evidenceUri);
+    await submitEvidence(decodeId(soulId), requestIndex, evidenceUri);
   };
 
   return (
