@@ -1,7 +1,7 @@
-import { getSdk } from "generated/graphql";
 import { GraphQLClient } from "graphql-request";
-import { SUBGRAPH_ENDPOINTS } from "constants/subgraph";
 import { SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { SUBGRAPH_ENDPOINTS } from "constants/subgraph";
+import { getSdk } from "generated/graphql";
 
 export type sdkReturnType = ReturnType<typeof getSdk>;
 export type queryType = keyof sdkReturnType;
@@ -18,7 +18,7 @@ export const sdk = SUPPORTED_CHAIN_IDS.reduce(
   {} as Record<number, sdkReturnType>
 );
 
-type MULTIPLE_ENTITIES_QUERY = "Counter" | "Requests" | "Souls";
+type MULTIPLE_ENTITIES_QUERY = "Requests" | "Souls";
 type SINGLE_ENTITY_QUERY = "Request";
 
 export const queryFetchSingle = async <Q extends SINGLE_ENTITY_QUERY>(
@@ -35,9 +35,7 @@ export const queryFetch = async <Q extends MULTIPLE_ENTITIES_QUERY>(
 ): Promise<ReturnType<sdkReturnType[Q]>> =>
   await sdk[fetchChainId][query](...((params as any) || []));
 
-export const queryFetchAllChains = async <
-  Q extends "Counter" | "Requests" | "Souls"
->(
+export const queryFetchAllChains = async <Q extends "Requests" | "Souls">(
   query: Q,
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<queryReturnType<Q>> => {

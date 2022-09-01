@@ -1,30 +1,28 @@
 import React, { useRef, useState } from "react";
+import Cropper from "react-easy-crop";
+import type { Area, Point } from "react-easy-crop/types";
 import ReactWebcam from "react-webcam";
+import BWImage from "assets/images/b&w.jpg";
+import FrontFacingImage from "assets/images/front-facing.jpg";
+import GlassesImage from "assets/images/glasses.jpg";
+import HijabImage from "assets/images/hijab.jpg";
+import NiqabImage from "assets/images/niqab.jpg";
+import NotFrontFacingImage from "assets/images/not-front-facing.jpg";
+import SunglassesImage from "assets/images/sunglasses.jpg";
+import CameraIcon from "assets/svg/CameraMajor.svg";
+import CircleCancel from "assets/svg/CircleCancelMinor.svg";
+import CircleTick from "assets/svg/CircleTickMinor.svg";
+import CheckmarkIcon from "assets/svg/MobileAcceptMajor.svg";
+import ResetIcon from "assets/svg/ResetMinor.svg";
+import ZoomIcon from "assets/svg/SearchMajor.svg";
+import UploadIcon from "assets/svg/UploadMajor.svg";
+import Image from "components/Image";
+import Uploader from "components/Uploader";
+import Webcam from "components/Webcam";
 import useFullscreen from "hooks/useFullscreen";
 import { getCroppedPhoto, sanitizeImage } from "utils/media";
 import { base64ToUint8Array } from "utils/misc";
-import Uploader from "components/Uploader";
-import Cropper from "react-easy-crop";
-import Image from "components/Image";
-import Webcam from "components/Webcam";
 import { useFormContext } from "./context";
-import type { Area, Point } from "react-easy-crop/types";
-
-import FrontFacingImage from "assets/images/front-facing.jpg";
-import NotFrontFacingImage from "assets/images/not-front-facing.jpg";
-import GlassesImage from "assets/images/glasses.jpg";
-import SunglassesImage from "assets/images/sunglasses.jpg";
-import HijabImage from "assets/images/hijab.jpg";
-import NiqabImage from "assets/images/niqab.jpg";
-import BWImage from "assets/images/b&w.jpg";
-
-import CircleTick from "assets/svg/CircleTickMinor.svg";
-import CircleCancel from "assets/svg/CircleCancelMinor.svg";
-import UploadIcon from "assets/svg/UploadMajor.svg";
-import CameraIcon from "assets/svg/CameraMajor.svg";
-import ResetIcon from "assets/svg/ResetMinor.svg";
-import ZoomIcon from "assets/svg/SearchMajor.svg";
-import CheckmarkIcon from "assets/svg/MobileAcceptMajor.svg";
 
 const ExamplePic: React.FC<{ uri: string; wrong?: boolean }> = ({
   uri,

@@ -1,7 +1,7 @@
-import Card from "./Individual";
-import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import cn from "classnames";
 import { RequestInterface } from "api/requests";
+import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
+import Card from "./Individual";
 
 const CardList: React.FC<{ requests: RequestInterface[] }> = ({ requests }) => (
   <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">

@@ -1,16 +1,16 @@
+import { useState } from "react";
+import { RequestQueryItem } from "api/types";
+import Field from "components/Field";
+import Label from "components/Label";
 import Modal from "components/Modal";
 import { Reason } from "constants/enum";
 import {
   useArbitrationCost,
   useChallengeRequest,
 } from "hooks/useProofOfHumanity";
-import { useState } from "react";
 import { uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
-import Field from "components/Field";
-import Label from "components/Label";
 import ReasonCard from "./ReasonCard";
-import { RequestQueryItem } from "api/types";
 
 interface ChallengeInterface {
   request: RequestQueryItem;
@@ -36,7 +36,7 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
       "evidence.json"
     );
 
-    challengeRequest(request.soul.id, request.realIndex, reason, evidenceUri, {
+    challengeRequest(request.soul.id, request.index, reason, evidenceUri, {
       value: arbitrationCost,
     });
   };

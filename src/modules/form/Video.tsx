@@ -1,19 +1,18 @@
-import useFullscreen from "hooks/useFullscreen";
-import React, { useRef, useState } from "react";
-import getBlobDuration from "get-blob-duration";
-import useWeb3 from "hooks/useWeb3";
-import { IS_IOS } from "constants/media";
-import { useFormContext } from "./context";
-import ReactWebcam from "react-webcam";
-import Uploader from "components/Uploader";
-import Webcam from "components/Webcam";
-import { phraseFromAddress } from "utils/address";
 import cn from "classnames";
-
-import UploadIcon from "assets/svg/UploadMajor.svg";
+import getBlobDuration from "get-blob-duration";
+import React, { useRef, useState } from "react";
+import ReactWebcam from "react-webcam";
 import CameraIcon from "assets/svg/CameraMajor.svg";
 import ResetIcon from "assets/svg/ResetMinor.svg";
+import UploadIcon from "assets/svg/UploadMajor.svg";
+import Uploader from "components/Uploader";
 import Video from "components/Video";
+import Webcam from "components/Webcam";
+import { IS_IOS } from "constants/media";
+import useFullscreen from "hooks/useFullscreen";
+import useWeb3 from "hooks/useWeb3";
+import { phraseFromAddress } from "utils/address";
+import { useFormContext } from "./context";
 
 const MIN_DIMS = { width: 352, height: 352 };
 

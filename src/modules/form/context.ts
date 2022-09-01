@@ -1,6 +1,6 @@
 import { SetStateAction } from "jotai";
-import { createContext, Dispatch, useContext } from "react";
-import { emptySubmission, SubmissionAction, SubmissionInfo } from "./reducer";
+import { Dispatch, createContext, useContext } from "react";
+import { SubmissionAction, SubmissionInfo, emptySubmission } from "./reducer";
 
 interface FormContextValues {
   state: SubmissionInfo;

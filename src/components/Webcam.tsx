@@ -1,15 +1,14 @@
-import { IS_MOBILE } from "constants/media";
+import cn from "classnames";
 import React, { useState } from "react";
 import ReactWebcam from "react-webcam";
-import cn from "classnames";
-
 import FlipCameraIcon from "assets/svg/FlipCameraMajor.svg";
 import MaximizeIcon from "assets/svg/MaximizeMinor.svg";
 import MinimizeIcon from "assets/svg/MinimizeMinor.svg";
-import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
-import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
-import PlayIcon from "assets/svg/PlayMajor.svg";
 import PauseIcon from "assets/svg/PauseMajor.svg";
+import PlayIcon from "assets/svg/PlayMajor.svg";
+import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
+import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
+import { IS_MOBILE } from "constants/media";
 import useWeb3 from "hooks/useWeb3";
 import { phraseFromAddress } from "utils/address";
 

@@ -1,17 +1,17 @@
-import Steps from "components/Steps";
+import {
+  BigNumber,
+  isBigNumberish,
+} from "@ethersproject/bignumber/lib/bignumber";
 import React, { useEffect, useReducer, useState } from "react";
-import FormContext from "./context";
-import { emptySubmission, submissionReducer } from "./reducer";
+import { useNavigate, useParams } from "react-router-dom";
+import Steps from "components/Steps";
+import useWeb3 from "hooks/useWeb3";
 import InfoStep from "./Info";
 import PhotoStep from "./Photo";
 import ReviewStep from "./Review";
 import VideoStep from "./Video";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  isBigNumberish,
-  BigNumber,
-} from "@ethersproject/bignumber/lib/bignumber";
-import useWeb3 from "hooks/useWeb3";
+import FormContext from "./context";
+import { emptySubmission, submissionReducer } from "./reducer";
 
 const STEPS_LIST = ["Info", "Photo", "Video", "Review"];
 

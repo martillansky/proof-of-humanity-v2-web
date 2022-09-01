@@ -1,12 +1,12 @@
+import { BigNumber } from "ethers";
+import { formatEther, hexValue } from "ethers/lib/utils";
 import {
-  ChainId,
   CHAIN_ID_TO_NAME,
+  ChainId,
   EXPLORER_URL,
   NATIVE_CURRENCY,
   RPC_ENDPOINTS,
 } from "constants/chains";
-import { BigNumber } from "ethers";
-import { formatEther, hexValue } from "ethers/lib/utils";
 import ABC2048 from "./base2048/words";
 
 export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {

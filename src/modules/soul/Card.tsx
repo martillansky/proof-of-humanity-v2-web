@@ -1,5 +1,5 @@
-import { SoulInterface } from "api/souls";
 import { HTMLAttributes } from "react";
+import { SoulInterface } from "api/souls";
 import { encodeId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 

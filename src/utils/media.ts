@@ -1,8 +1,8 @@
+import { FFmpeg, createFFmpeg } from "@ffmpeg/ffmpeg";
 import Jimp from "jimp";
-import { concatenateBuffers, randomString } from "./misc";
-import { createFFmpeg, FFmpeg } from "@ffmpeg/ffmpeg";
-import { on } from "./events";
 import { Area } from "react-easy-crop";
+import { on } from "./events";
+import { concatenateBuffers, randomString } from "./misc";
 
 function exifRemoved(buffer: Uint8Array) {
   const dv = new DataView(buffer.buffer);

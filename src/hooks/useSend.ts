@@ -36,11 +36,12 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         );
 
         setState({ status: "Mining" });
+        toast.info("Mining transaction...");
 
         const receipt = await transaction.wait();
 
         setState({ status: "Success", receipt });
-        toast.success("Transaction sent");
+        toast.success("Transaction mined");
       } catch (err) {
         console.error({ err });
         setState({ status: "Error", error: err.message });

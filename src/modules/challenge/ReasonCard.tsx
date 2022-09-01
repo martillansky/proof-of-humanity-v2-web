@@ -1,8 +1,8 @@
 import cn from "classnames";
+import DeceasedImage from "assets/images/deceased.png";
 import DoesNotExistImage from "assets/images/does-not-exist.png";
 import DuplicateImage from "assets/images/duplicate.png";
 import IncorrectSubmissionImage from "assets/images/incorrect-submission.png";
-import DeceasedImage from "assets/images/deceased.png";
 import { Reason } from "constants/enum";
 
 const reasonToImage = {

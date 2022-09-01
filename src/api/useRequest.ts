@@ -1,5 +1,5 @@
-import { RequestQuery } from "generated/graphql";
 import { useEffect, useState } from "react";
+import { RequestQuery } from "generated/graphql";
 import { queryFetchSingle } from ".";
 
 interface RequestHookInterface {

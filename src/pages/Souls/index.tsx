@@ -1,18 +1,18 @@
+import { useAtom } from "jotai";
+import React, { useEffect, useState } from "react";
+import Popup from "reactjs-popup";
 import { soulsAtom } from "api/souls";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
 import {
-  ChainId,
   CHAIN_ID_TO_NAME,
+  ChainId,
   SUPPORTED_CHAIN_IDS,
 } from "constants/chains";
 import { SOULS_DISPLAY_BATCH } from "constants/misc";
 import useDebounce from "hooks/useDebounce";
-import { useAtom } from "jotai";
 import SoulCard from "modules/soul/Card";
 import SoulWidget from "modules/soul/Widget";
-import React, { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
 import { camelToTitle } from "utils/case";
 
 const Souls: React.FC = () => {

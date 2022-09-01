@@ -1,8 +1,8 @@
 import { Web3Provider } from "@ethersproject/providers";
-import { createWeb3ReactRoot, Web3ReactProvider } from "@web3-react/core";
+import { Web3ReactProvider, createWeb3ReactRoot } from "@web3-react/core";
+import { ReactNode } from "react";
 import { useConnect } from "hooks/useConnect";
 import useWeb3 from "hooks/useWeb3";
-import { ReactNode } from "react";
 
 const getLibrary = (provider: any): Web3Provider =>
   new Web3Provider(

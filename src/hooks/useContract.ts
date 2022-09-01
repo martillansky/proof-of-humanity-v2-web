@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { ABI, Contracts, CONTRACT_ADDRESS } from "constants/contracts";
 import { BaseContract, Contract, ContractInterface } from "ethers";
 import { useMemo } from "react";
+import { ABI, CONTRACT_ADDRESS, Contracts } from "constants/contracts";
 import useWeb3 from "./useWeb3";
 
 const getProviderOrSigner = (provider: JsonRpcProvider, account?: string) =>

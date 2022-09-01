@@ -1,8 +1,8 @@
-import { Web3ErrorCode } from "constants/web3";
 import { BigNumber } from "ethers";
-import { ProofOfHumanity } from "generated/contracts";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { Web3ErrorCode } from "constants/web3";
+import { ProofOfHumanity } from "generated/contracts";
 import useProofOfHumanity from "./useProofOfHumanity";
 
 export const useGasFees = <F extends keyof ProofOfHumanity["callStatic"]>(

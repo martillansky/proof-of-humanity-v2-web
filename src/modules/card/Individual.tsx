@@ -1,15 +1,15 @@
+import cn from "classnames";
 import { Suspense, useMemo } from "react";
-import ErrorBoundary from "components/ErrorBoundary";
-import { camelToTitle } from "utils/case";
-import { ChainId, CHAIN_ID_TO_NAME } from "constants/chains";
-import { queryToStatus } from "constants/requests";
 import { Link } from "react-router-dom";
 import { RequestInterface } from "api/requests";
-import cn from "classnames";
+import ErrorBoundary from "components/ErrorBoundary";
+import { CHAIN_ID_TO_NAME, ChainId } from "constants/chains";
 import { STATUS_TO_COLOR } from "constants/misc";
-import { ErrorFallback, LoadingFallback } from "./misc";
-import Content from "./Content";
+import { queryToStatus } from "constants/requests";
+import { camelToTitle } from "utils/case";
 import { encodeId } from "utils/identifier";
+import Content from "./Content";
+import { ErrorFallback, LoadingFallback } from "./misc";
 
 const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
   const status = useMemo(

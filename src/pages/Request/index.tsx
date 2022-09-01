@@ -1,13 +1,22 @@
-import Image from "components/Image";
-import Challenge from "modules/challenge";
-import { useParams } from "react-router-dom";
-import useIPFS from "hooks/useIPFS";
-import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
-import { ipfs } from "utils/ipfs";
-import { useRequest } from "api/useRequest";
-import { ChainId, CHAIN_ID_TO_NAME, CHAIN_LOGO } from "constants/chains";
+import cn from "classnames";
+import { BigNumber } from "ethers";
+import { concat, keccak256 } from "ethers/lib/utils";
 import { useMemo } from "react";
-import EvidenceSection from "modules/evidence/Section";
+import { useParams } from "react-router-dom";
+import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
+import { useRequest } from "api/useRequest";
+import ALink from "components/ALink";
+import Field from "components/Field";
+import Identicon from "components/Identicon";
+import Image from "components/Image";
+import Label from "components/Label";
+import Modal from "components/Modal";
+import TimeAgo from "components/TimeAgo";
+import Video from "components/Video";
+import { CHAIN_ID_TO_NAME, CHAIN_LOGO, ChainId } from "constants/chains";
+import { STATUS_TO_COLOR } from "constants/misc";
+import { Status } from "generated/graphql";
+import useIPFS from "hooks/useIPFS";
 import {
   useAddVouch,
   useAdvanceState,
@@ -17,27 +26,17 @@ import {
   useRequestTotalCost,
   useRequiredNumberOfVouches,
 } from "hooks/useProofOfHumanity";
-import { BigNumber } from "ethers";
-import TimeAgo from "components/TimeAgo";
-import Modal from "components/Modal";
-import { formatEth } from "utils/misc";
-import { concat, keccak256 } from "ethers/lib/utils";
-import Field from "components/Field";
-import Label from "components/Label";
-import Identicon from "components/Identicon";
-import ALink from "components/ALink";
+import Challenge from "modules/challenge";
+import EvidenceSection from "modules/evidence/Section";
 import { explorerLink, shortenAddress } from "utils/address";
-import Video from "components/Video";
-import { STATUS_TO_COLOR } from "constants/misc";
-import cn from "classnames";
-import { decodeId, encodeId } from "utils/identifier";
-import { Status } from "generated/graphql";
+import { decodeId } from "utils/identifier";
+import { ipfs } from "utils/ipfs";
+import { formatEth } from "utils/misc";
 
 const Request: React.FC = () => {
   const { soul, index, chain, old } = useParams();
 
   const isV1 = old === "v1";
-  const soulId = encodeId(soul!);
   const chainId = useMemo<ChainId | undefined>(
     () => chain && ChainId[chain.toUpperCase()],
     [chain]
@@ -114,7 +113,7 @@ const Request: React.FC = () => {
           {isV1 ? (
             <>
               <ALink
-                href={`https://app.proofofhumanity.id/profile/${soulId}`}
+                href={`https://app.proofofhumanity.id/profile/${request.soul.id}`}
                 className="text-center font-semibold text-blue-500"
               >
                 This is a profile registered on the old contract. Check it out
@@ -123,22 +122,21 @@ const Request: React.FC = () => {
             </>
           ) : (
             <>
-              <Label>
-                Vouches:{" "}
-                <strong>
-                  {request.claimer?.vouchesReceived.length} /{" "}
-                  {requiredVouches?.toNumber()}
-                </strong>
-              </Label>
-
               {request.status == Status.Vouching && (
                 <>
+                  <Label>
+                    Vouches:{" "}
+                    <strong>
+                      {request.claimer?.vouchesReceived.length} /{" "}
+                      {requiredVouches?.toNumber()}
+                    </strong>
+                  </Label>
+
                   <button
                     className="btn-main mb-2"
-                    onClick={async () => {
-                      console.log(request.requester, request.soul.id);
-                      await addVouch(request.requester, request.soul.id);
-                    }}
+                    onClick={async () =>
+                      await addVouch(request.requester, request.soul.id)
+                    }
                   >
                     Vouch
                   </button>
@@ -148,10 +146,9 @@ const Request: React.FC = () => {
                       trigger={
                         <button
                           className="btn-main mb-2"
-                          onClick={async () => {
-                            console.log(request.requester, request.soul.id);
-                            await addVouch(request.requester, request.soul.id);
-                          }}
+                          onClick={async () =>
+                            await addVouch(request.requester, request.soul.id)
+                          }
                         >
                           Fund request
                         </button>
@@ -202,7 +199,9 @@ const Request: React.FC = () => {
                 <>
                   <button
                     className="btn-main mb-2"
-                    onClick={async () => await executeRequest(soul, index)}
+                    onClick={async () =>
+                      await executeRequest(request.soul.id, index)
+                    }
                   >
                     Execute request
                   </button>
@@ -253,7 +252,7 @@ const Request: React.FC = () => {
 
       <EvidenceSection
         chainId={chainId}
-        soulId={soulId}
+        soulId={request.soul.id}
         requestIndex={index}
         request={request}
       />

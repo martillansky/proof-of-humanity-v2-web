@@ -1,3 +1,5 @@
+import { RequestQueryItem } from "api/types";
+import AttachmentIcon from "assets/svg/AttachmentMajor.svg";
 import ALink from "components/ALink";
 import Identicon from "components/Identicon";
 import TimeAgo from "components/TimeAgo";
@@ -5,9 +7,7 @@ import { ChainId } from "constants/chains";
 import useIPFS from "hooks/useIPFS";
 import { explorerLink, shortenAddress } from "utils/address";
 import { ipfs } from "utils/ipfs";
-import AttachmentIcon from "assets/svg/AttachmentMajor.svg";
 import { romanize } from "utils/misc";
-import { RequestQueryItem } from "api/types";
 
 interface EvidenceItemInterface {
   index: number;

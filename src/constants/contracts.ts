@@ -1,7 +1,7 @@
-import ProofOfHumanityABI from "../assets/contracts/ProofOfHumanity.json";
-import KlerosLiquidABI from "../assets/contracts/KlerosLiquid.json";
-import { ChainId } from "./chains";
 import { ContractInterface } from "ethers";
+import KlerosLiquidABI from "../assets/contracts/KlerosLiquid.json";
+import ProofOfHumanityABI from "../assets/contracts/ProofOfHumanity.json";
+import { ChainId } from "./chains";
 
 export enum Contracts {
   PROOF_OF_HUMANITY,

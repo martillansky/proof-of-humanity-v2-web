@@ -1,14 +1,14 @@
+import { Web3Provider } from "@ethersproject/providers";
+import { useWeb3React } from "@web3-react/core";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ALink from "components/ALink";
 import Popover from "components/Popover";
-import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
-import { useWeb3React } from "@web3-react/core";
-import { injected } from "utils/connectors";
-import { shortenAddress } from "utils/address";
-import { Web3Provider } from "@ethersproject/providers";
 import { CHAIN_ID_TO_NAME, SUPPORTED_CHAIN_IDS } from "constants/chains";
 import useChangeChain from "hooks/useChangeChain";
+import { shortenAddress } from "utils/address";
+import { injected } from "utils/connectors";
+import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
 const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 

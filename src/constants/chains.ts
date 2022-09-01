@@ -1,7 +1,7 @@
 import { chainSetting } from "utils/misc";
+import TestnetLogo from "../assets/svg/SandboxMajor.svg";
 import EthereumLogo from "../assets/svg/ethereum.svg";
 import GnosisLogo from "../assets/svg/gnosis.svg";
-import TestnetLogo from "../assets/svg/SandboxMajor.svg";
 
 export enum ChainId {
   MAINNET = 1,

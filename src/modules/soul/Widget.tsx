@@ -1,7 +1,7 @@
+import { Link } from "react-router-dom";
 import { SoulInterface } from "api/souls";
 import { CHAIN_ID_TO_NAME } from "constants/chains";
 import useWeb3 from "hooks/useWeb3";
-import { Link } from "react-router-dom";
 import { shortenAddress } from "utils/address";
 import { encodeId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";

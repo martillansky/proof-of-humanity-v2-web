@@ -1,4 +1,4 @@
-import type { PopupProps, PopupActions } from "reactjs-popup/dist/types";
+import type { PopupActions, PopupProps } from "reactjs-popup/dist/types";
 
 declare module "reactjs-popup" {
   const Popup: React.ForwardRefExoticComponent<

@@ -1,8 +1,8 @@
 import { atom } from "jotai";
-import { queryFetch, queryReturnType, sdkReturnType } from ".";
-import { SOULS_DISPLAY_BATCH } from "constants/misc";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { SOULS_DISPLAY_BATCH } from "constants/misc";
 import { SoulsQuery } from "generated/graphql";
+import { queryFetch, queryReturnType, sdkReturnType } from ".";
 
 type soulResultType = ArrayElement<SoulsQuery["souls"]>;
 

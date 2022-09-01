@@ -1,15 +1,15 @@
 import { Zero } from "@ethersproject/constants";
+import { formatEther } from "ethers/lib/utils";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import Field from "components/Field";
 import Image from "components/Image";
 import Label from "components/Label";
 import Video from "components/Video";
-import { formatEther } from "ethers/lib/utils";
 import useBalance from "hooks/useBalance";
 import { useGasFees } from "hooks/useGasFees";
 import { useClaimSoul, useRequestTotalCost } from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 import { useFormContext } from "./context";

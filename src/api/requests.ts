@@ -1,8 +1,8 @@
 import { atom } from "jotai";
-import { queryFetch, queryReturnType, sdkReturnType } from ".";
-import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { RequestStatus, REQUEST_STATUS } from "constants/requests";
+import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
+import { REQUEST_STATUS, RequestStatus } from "constants/requests";
+import { queryFetch, queryReturnType, sdkReturnType } from ".";
 import { RequestsQueryItem } from "./types";
 
 export interface RequestInterface extends RequestsQueryItem {

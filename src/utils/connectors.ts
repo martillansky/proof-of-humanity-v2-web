@@ -1,7 +1,7 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { NetworkConnector } from "@web3-react/network-connector";
-import { ChainId, FALLBACK_CHAIN, RPC_ENDPOINTS } from "constants/chains";
 import { isNumber } from "lodash";
+import { ChainId, FALLBACK_CHAIN, RPC_ENDPOINTS } from "constants/chains";
 
 export const network = new NetworkConnector({
   urls: RPC_ENDPOINTS,

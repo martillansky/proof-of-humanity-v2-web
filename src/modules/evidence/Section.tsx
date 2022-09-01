@@ -1,3 +1,5 @@
+import { BigNumberish } from "ethers";
+import React, { useState } from "react";
 import { RequestQueryItem } from "api/types";
 import Accordion from "components/Accordion";
 import Field from "components/Field";
@@ -5,9 +7,7 @@ import Label from "components/Label";
 import Modal from "components/Modal";
 import Uploader from "components/Uploader";
 import { ChainId } from "constants/chains";
-import { BigNumberish } from "ethers";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
-import React, { useState } from "react";
 import { decodeId } from "utils/identifier";
 import { uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";

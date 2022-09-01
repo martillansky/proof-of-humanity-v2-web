@@ -1,12 +1,11 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Layout from "modules/layout";
+import Claim from "./Claim";
 import Home from "./Home";
+import Request from "./Request";
 import Soul from "./Soul";
 import Souls from "./Souls";
-import Request from "./Request";
-import Claim from "./Claim";
-
 import "./style.pcss";
 
 const App: React.FC = () => (

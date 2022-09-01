@@ -1,9 +1,9 @@
+import React from "react";
 import ALink from "components/ALink";
 import { FALLBACK_CHAIN } from "constants/chains";
 import useChangeChain from "hooks/useChangeChain";
 import useWeb3 from "hooks/useWeb3";
 import SubmissionForm from "modules/form";
-import React from "react";
 import { injected } from "utils/connectors";
 
 const Claim: React.FC = () => {
