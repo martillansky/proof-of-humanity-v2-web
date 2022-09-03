@@ -4,7 +4,7 @@ import { Area } from "react-easy-crop";
 import { on } from "./events";
 import { concatenateBuffers, randomString } from "./misc";
 
-function exifRemoved(buffer: Uint8Array) {
+const exifRemoved = async (buffer: Uint8Array) => {
   const dv = new DataView(buffer.buffer);
   const formatTag = dv.getUint16(0);
   if (formatTag === 0xffd8) {
@@ -35,9 +35,9 @@ function exifRemoved(buffer: Uint8Array) {
   }
 
   return buffer;
-}
+};
 
-async function isGrayscale(image: Jimp) {
+const isGrayscale = async (image: Jimp) => {
   let red = 0;
   let green = 0;
   let blue = 0;
@@ -55,26 +55,21 @@ async function isGrayscale(image: Jimp) {
   );
 
   return red === green && green === blue;
-}
+};
 
-export async function sanitizeImage(buffer: Buffer) {
-  try {
-    const image = await Jimp.read(buffer);
-    const { bitmap } = image;
+export const sanitizeImage = async (buffer: Buffer) => {
+  const image = await Jimp.read(buffer);
+  const { bitmap } = image;
 
-    if (await isGrayscale(image)) throw new Error("Image is grayscale");
+  if (await isGrayscale(image)) throw new Error("Image is grayscale!");
 
-    return exifRemoved(
-      await image
-        .quality(95)
-        .resize(Math.min(bitmap.width, 1080), Math.min(bitmap.height, 1080))
-        .getBufferAsync(Jimp.MIME_JPEG)
-    );
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
+  return exifRemoved(
+    await image
+      .quality(95)
+      .resize(Math.min(bitmap.width, 1080), Math.min(bitmap.height, 1080))
+      .getBufferAsync(Jimp.MIME_JPEG)
+  );
+};
 
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {

@@ -10,6 +10,7 @@ import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
 import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
 import { IS_MOBILE } from "constants/media";
 import useWeb3 from "hooks/useWeb3";
+import { VideoType } from "modules/form/reducer";
 import { phraseFromAddress } from "utils/address";
 
 interface CameraButtonInterface {
@@ -45,7 +46,7 @@ interface WebcamProps {
   toggleFullscreen: () => void;
   action: () => void;
   video?: boolean;
-  overlay?: "phrase" | "sign";
+  overlay?: VideoType;
   loadCamera: React.Dispatch<React.SetStateAction<ReactWebcam | null>>;
 }
 
@@ -147,8 +148,9 @@ const Webcam: React.FC<WebcamProps> = ({
         >
           I CERTIFY I AM A REAL HUMAN AND I AM NOT ALREADY REGISTERED IN THIS
           REGISTRY
-          {overlay === "phrase" &&
-            `. MY CONFIRMATION PHRASE IS ${phraseFromAddress(account)}`}
+          {overlay === VideoType.PHRASE && (
+            <>. MY CONFIRMATION PHRASE IS {phraseFromAddress(account)}</>
+          )}
         </div>
       )}
 

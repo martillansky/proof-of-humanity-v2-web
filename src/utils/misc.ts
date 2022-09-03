@@ -1,12 +1,6 @@
 import { BigNumber } from "ethers";
 import { formatEther, hexValue } from "ethers/lib/utils";
-import {
-  CHAIN_ID_TO_NAME,
-  ChainId,
-  EXPLORER_URL,
-  NATIVE_CURRENCY,
-  RPC_ENDPOINTS,
-} from "constants/chains";
+import { CHAIN, ChainId } from "constants/chains";
 import ABC2048 from "./base2048/words";
 
 export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
@@ -183,13 +177,13 @@ export const chainSetting = <C extends ChainId>(
 ): Record<C, ChainSetting> => ({
   [chain]: {
     chainId: hexValue(chain),
-    chainName: CHAIN_ID_TO_NAME[chain],
+    chainName: CHAIN[chain].NAME,
     nativeCurrency: {
-      name: NATIVE_CURRENCY[chain],
-      symbol: NATIVE_CURRENCY[chain],
+      name: CHAIN[chain].CURRENCY,
+      symbol: CHAIN[chain].CURRENCY,
       decimals: 18,
     },
-    rpcUrls: [RPC_ENDPOINTS[chain]],
-    blockExplorerUrls: [EXPLORER_URL[chain]],
+    rpcUrls: [CHAIN[chain].RPC],
+    blockExplorerUrls: [CHAIN[chain].EXPLORER],
   } as ChainSetting,
 });

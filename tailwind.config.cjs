@@ -20,19 +20,23 @@ module.exports = {
           600: "#ffD6ad",
         },
       },
-      // keyframes: {
-      //   progress: {
-      //     "0%": { transform: "scaleX(1)" },
-      //     "100%": { transform: "scaleX(0)" },
-      //   },
-      // },
+      animation: {
+        flip: "flip 5s linear infinite",
+      },
+      keyframes: {
+        flip: {
+          "0%, 100%": { transform: "rotateY(0deg)" },
+          "50%": { transform: "rotateY(360deg)" },
+        },
+        // progress: {
+        //   "0%": { transform: "scaleX(1)" },
+        //   "100%": { transform: "scaleX(0)" },
+        // },
+      },
       fontFamily: {
         sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
       },
     },
-    // animation: {
-    //   progress: "progress linear 1 forwards",
-    // },
   },
   plugins: [require("@tailwindcss/forms")],
   safelist: [

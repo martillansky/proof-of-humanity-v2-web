@@ -3,7 +3,7 @@ import { Suspense, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { RequestInterface } from "api/requests";
 import ErrorBoundary from "components/ErrorBoundary";
-import { CHAIN_ID_TO_NAME, ChainId } from "constants/chains";
+import { CHAIN } from "constants/chains";
 import { STATUS_TO_COLOR } from "constants/misc";
 import { queryToStatus } from "constants/requests";
 import { camelToTitle } from "utils/case";
@@ -17,15 +17,11 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
     [request]
   );
 
-  console.log("old", ChainId[request.chainID], request.old);
-
   return (
     <Link
-      to={`/request/${CHAIN_ID_TO_NAME[
-        request.chainID
-      ].toLowerCase()}/${encodeId(request.soul.id)}/${request.index}${
-        request.old ? "/v1" : ""
-      }`}
+      to={`/request/${CHAIN[request.chainID].NAME.toLowerCase()}/${encodeId(
+        request.soul.id
+      )}/${request.index}${request.old ? "/v1" : ""}`}
       className="rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
       <div className="justify-between bg-slate-100 font-light">

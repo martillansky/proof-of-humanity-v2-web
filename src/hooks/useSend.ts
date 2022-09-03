@@ -11,6 +11,13 @@ interface State {
 
 type StateReducer = (s: State, a: State) => State;
 
+// type txEvents = {
+//   onPending?: () => void;
+//   onConfirm?: (tx?: ContractTransaction) => void;
+//   onMined?: (receipt?: TransactionReceipt) => void;
+//   onError?: () => void;
+// };
+
 const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   contract: C | null,
   method: F
@@ -25,11 +32,11 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   const send = useCallback(
     async (...params: Parameters<C[F]>) => {
       try {
-        console.log({ contract, state });
         if (!contract) return;
 
         setState({ status: "Pending", receipt: null, error: null });
         toast.info("Sending transaction");
+        // if (onPending) onPending();
 
         const transaction: ContractTransaction = await contract[method](
           ...params
@@ -37,15 +44,18 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
 
         setState({ status: "Mining" });
         toast.info("Mining transaction...");
+        // if (onConfirm) onConfirm();
 
         const receipt = await transaction.wait();
 
         setState({ status: "Success", receipt });
         toast.success("Transaction mined");
+        // if (onMined) onMined();
       } catch (err) {
         console.error({ err });
         setState({ status: "Error", error: err.message });
         toast.error("Transaction rejected");
+        // if (onError) onError();
       }
     },
     [contract, method]

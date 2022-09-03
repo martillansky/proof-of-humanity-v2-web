@@ -11,36 +11,40 @@ export enum ChainId {
 
 const INFURA_KEY = process.env.INFURA_KEY;
 
-export const RPC_ENDPOINTS: { [key in ChainId]: string } = {
+export const RPC_ENDPOINT: { [key in ChainId]: string } = {
   [ChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
   [ChainId.RINKEBY]: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
-  [ChainId.GNOSIS]: `https://rpc.gnosischain.com/`,
+  [ChainId.GNOSIS]: "https://rpc.gnosischain.com/",
 };
+
+export const CHAIN = {
+  [ChainId.MAINNET]: {
+    NAME: "Mainnet",
+    Logo: EthereumLogo,
+    RPC: RPC_ENDPOINT[ChainId.MAINNET],
+    EXPLORER: "https://etherscan.io",
+    CURRENCY: "ETH",
+  },
+  [ChainId.RINKEBY]: {
+    NAME: "Rinkeby",
+    Logo: TestnetLogo,
+    RPC: RPC_ENDPOINT[ChainId.RINKEBY],
+    EXPLORER: "https://rinkeby.etherscan.io",
+    CURRENCY: "ETH",
+  },
+  [ChainId.GNOSIS]: {
+    NAME: "Gnosis",
+    Logo: GnosisLogo,
+    RPC: RPC_ENDPOINT[ChainId.GNOSIS],
+    EXPLORER: "https://gnosisscan.io",
+    CURRENCY: "xDAI",
+  },
+} as const;
 
 export const CHAIN_ID_TO_NAME: { [key in ChainId]: string } = {
   [ChainId.MAINNET]: "Mainnet",
   [ChainId.RINKEBY]: "Rinkeby",
   [ChainId.GNOSIS]: "Gnosis",
-};
-
-export const CHAIN_LOGO: {
-  [key in ChainId]: React.FC<React.SVGAttributes<SVGElement>>;
-} = {
-  [ChainId.MAINNET]: EthereumLogo,
-  [ChainId.RINKEBY]: TestnetLogo,
-  [ChainId.GNOSIS]: GnosisLogo,
-};
-
-export const EXPLORER_URL: { [key in ChainId]: string } = {
-  [ChainId.MAINNET]: "https://etherscan.io",
-  [ChainId.RINKEBY]: "https://rinkeby.etherscan.io",
-  [ChainId.GNOSIS]: "https://gnosisscan.io",
-};
-
-export const NATIVE_CURRENCY: { [key in ChainId]: string } = {
-  [ChainId.MAINNET]: "ETH",
-  [ChainId.RINKEBY]: "ETH",
-  [ChainId.GNOSIS]: "xDAI",
 };
 
 export const CHAIN_SETTING = {
@@ -51,4 +55,7 @@ export const CHAIN_SETTING = {
 
 export const FALLBACK_CHAIN = ChainId.RINKEBY;
 
-export const SUPPORTED_CHAIN_IDS = [ChainId.RINKEBY, ChainId.MAINNET];
+export const SUPPORTED_CHAIN_IDS = [
+  ChainId.RINKEBY,
+  // ChainId.MAINNET
+];

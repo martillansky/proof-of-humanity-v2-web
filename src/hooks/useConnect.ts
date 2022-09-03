@@ -1,5 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
+import { FALLBACK_CHAIN } from "constants/chains";
 import { injected, network } from "utils/connectors";
 
 export function useConnect() {
@@ -27,7 +28,7 @@ export function useConnect() {
 
   useEffect(() => {
     if (tried && !networkActive && !networkError && !active)
-      activateNetwork(network);
+      activateNetwork(network(FALLBACK_CHAIN));
   }, [tried, networkActive, networkError, activateNetwork, active]);
 
   useEffect((): any => {

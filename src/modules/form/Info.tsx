@@ -14,8 +14,6 @@ const Info: React.FC = () => {
 
   if (!account) return null;
 
-  console.log("|||||||||", soulId, !name, !tookNotice);
-
   return (
     <>
       <div className="w-full my-4 flex flex-col text-2xl font-extralight">

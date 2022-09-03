@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ALink from "components/ALink";
 import Popover from "components/Popover";
-import { CHAIN_ID_TO_NAME, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
 import useChangeChain from "hooks/useChangeChain";
 import { shortenAddress } from "utils/address";
 import { injected } from "utils/connectors";
@@ -67,19 +67,19 @@ const Header: React.FC = () => {
                          text-black text-sm"
             >
               {SUPPORTED_CHAIN_IDS.find((c) => c === chainId)
-                ? CHAIN_ID_TO_NAME[chainId!]
+                ? CHAIN[chainId as ChainId].NAME
                 : "SWITCH"}
             </button>
           }
         >
           <div className="flex flex-col">
-            {DISPLAYED_CHAINS.map((chainId) => (
+            {DISPLAYED_CHAINS.map((chainId: ChainId) => (
               <button
                 key={chainId}
                 className="cursor-pointer"
                 onClick={() => changeChain(chainId)}
               >
-                {CHAIN_ID_TO_NAME[chainId]}
+                {CHAIN[chainId].NAME}
               </button>
             ))}
           </div>

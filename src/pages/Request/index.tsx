@@ -13,7 +13,7 @@ import Label from "components/Label";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
-import { CHAIN_ID_TO_NAME, CHAIN_LOGO, ChainId } from "constants/chains";
+import { CHAIN, ChainId } from "constants/chains";
 import { STATUS_TO_COLOR } from "constants/misc";
 import { Status } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
@@ -71,11 +71,15 @@ const Request: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  const ChainLogo = CHAIN[chainId].Logo;
+
   const fullName = registration.firstName
     ? `${registration.firstName} ${registration.lastName}`
     : registration.name;
-
-  const ChainLogo = CHAIN_LOGO[chainId];
+  const funded = request.challenges[0].rounds[0].requesterFunds;
+  const challengePeriodEnd =
+    challengePeriodDuration &&
+    challengePeriodDuration.add(request.lastStatusChange).toNumber();
 
   return (
     <div
@@ -142,6 +146,17 @@ const Request: React.FC = () => {
                   </button>
 
                   {totalCost && (
+                    <>
+                      <span className="font-semibold">
+                        Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
+                      </span>
+                      <span>
+                        Fully funded: {totalCost.eq(funded) ? "Yes" : "No"}
+                      </span>
+                    </>
+                  )}
+
+                  {totalCost && !totalCost.eq(funded) && (
                     <Modal
                       trigger={
                         <button
@@ -195,13 +210,14 @@ const Request: React.FC = () => {
                 </>
               )}
 
-              {request.status == Status.Resolving && (
+              {request.status == Status.Resolving && challengePeriodEnd && (
                 <>
                   <button
                     className="btn-main mb-2"
                     onClick={async () =>
                       await executeRequest(request.soul.id, index)
                     }
+                    disabled={challengePeriodEnd > Date.now() / 1000}
                   >
                     Execute request
                   </button>
@@ -209,11 +225,7 @@ const Request: React.FC = () => {
                   <Label>
                     Challenge period end:{" "}
                     {challengePeriodDuration && (
-                      <TimeAgo
-                        time={challengePeriodDuration
-                          .add(request.lastStatusChange as BigNumber)
-                          .toNumber()}
-                      />
+                      <TimeAgo time={challengePeriodEnd} />
                     )}
                   </Label>
 
@@ -233,7 +245,7 @@ const Request: React.FC = () => {
             <span className="ml-8 text-xl">{fullName}</span>
             <span className="flex">
               <ChainLogo className="w-6 h-6 mr-2" />
-              {CHAIN_ID_TO_NAME[chainId]}
+              {CHAIN[chainId].NAME}
             </span>
           </div>
           <div className="flex mb-4">

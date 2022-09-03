@@ -4,11 +4,7 @@ import Popup from "reactjs-popup";
 import { soulsAtom } from "api/souls";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
-import {
-  CHAIN_ID_TO_NAME,
-  ChainId,
-  SUPPORTED_CHAIN_IDS,
-} from "constants/chains";
+import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
 import { SOULS_DISPLAY_BATCH } from "constants/misc";
 import useDebounce from "hooks/useDebounce";
 import SoulCard from "modules/soul/Card";
@@ -56,7 +52,7 @@ const Souls: React.FC = () => {
         />
         <Dropdown
           title={camelToTitle(
-            chainFilter === "all" ? "all" : CHAIN_ID_TO_NAME[chainFilter]
+            chainFilter === "all" ? "all" : CHAIN[chainFilter].NAME
           )}
         >
           <DropdownItem
@@ -69,7 +65,7 @@ const Souls: React.FC = () => {
               key={chainID}
               selected={chainFilter === chainID}
               onSelect={() => setChainFilter(chainID)}
-              name={CHAIN_ID_TO_NAME[chainID]}
+              name={CHAIN[chainID].NAME}
             />
           ))}
         </Dropdown>

@@ -5,6 +5,7 @@ import Identicon from "components/Identicon";
 import TimeAgo from "components/TimeAgo";
 import { ChainId } from "constants/chains";
 import useIPFS from "hooks/useIPFS";
+import { EvidenceFile } from "types/docs";
 import { explorerLink, shortenAddress } from "utils/address";
 import { ipfs } from "utils/ipfs";
 import { romanize } from "utils/misc";
@@ -20,7 +21,7 @@ const EvidenceItem: React.FC<EvidenceItemInterface> = ({
   chainId,
   evidence,
 }) => {
-  const [evidenceFile] = useIPFS<Evidence>(evidence.URI);
+  const [evidenceFile] = useIPFS<EvidenceFile>(evidence.URI);
 
   return (
     <div className="mt-4 flex flex-col">

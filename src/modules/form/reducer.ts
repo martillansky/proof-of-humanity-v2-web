@@ -1,17 +1,25 @@
+export enum VideoType {
+  PHRASE = "phrase",
+  SIGN = "sign",
+}
+
 export interface SubmissionInfo {
+  language: "en";
   soulId: string;
   name: string;
   bio: string;
   photo: { uri: string; content: ArrayBufferLike } | null;
   video: { uri: string; content: ArrayBufferLike } | null;
+  videoType: VideoType | null;
 }
 
 export type SubmissionAction =
   | { type: "SOUL_ID"; payload: string }
   | { type: "NAME"; payload: string }
   | { type: "BIO"; payload: string }
-  | { type: "PHOTO"; payload: { uri: string; content: ArrayBufferLike } | null }
-  | { type: "VIDEO"; payload: { uri: string; content: ArrayBufferLike } | null }
+  | { type: "PHOTO"; payload: { uri: string; content: ArrayBufferLike } }
+  | { type: "VIDEO"; payload: { uri: string; content: ArrayBufferLike } }
+  | { type: "VIDEO_MODE"; payload: VideoType }
   | { type: "DELETE_PHOTO" }
   | { type: "DELETE_VIDEO" };
 
@@ -21,11 +29,13 @@ export type SubmissionReducer = (
 ) => SubmissionAction;
 
 export const emptySubmission: SubmissionInfo = {
+  language: "en",
   soulId: "",
   name: "",
   bio: "",
   photo: null,
   video: null,
+  videoType: null,
 };
 
 export const submissionReducer = (
@@ -43,10 +53,12 @@ export const submissionReducer = (
       return { ...state, photo: action.payload };
     case "VIDEO":
       return { ...state, video: action.payload };
+    case "VIDEO_MODE":
+      return { ...state, videoType: action.payload };
     case "DELETE_PHOTO":
       return { ...state, photo: null };
     case "DELETE_VIDEO":
-      return { ...state, video: null };
+      return { ...state, video: null, videoType: null };
     default:
       return state;
   }

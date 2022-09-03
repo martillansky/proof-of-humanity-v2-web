@@ -3,11 +3,7 @@ import React, { useEffect, useState } from "react";
 import { requestsAtom } from "api/requests";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
-import {
-  CHAIN_ID_TO_NAME,
-  ChainId,
-  SUPPORTED_CHAIN_IDS,
-} from "constants/chains";
+import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { RequestStatus, statusFilters } from "constants/requests";
 import useDebounce from "hooks/useDebounce";
@@ -71,7 +67,7 @@ const Home: React.FC = () => {
         </Dropdown>
         <Dropdown
           title={camelToTitle(
-            chainFilter === "all" ? "all" : CHAIN_ID_TO_NAME[chainFilter]
+            chainFilter === "all" ? "all" : CHAIN[chainFilter].NAME
           )}
         >
           <DropdownItem
@@ -84,7 +80,7 @@ const Home: React.FC = () => {
               key={chainID}
               selected={chainFilter === chainID}
               onSelect={() => setChainFilter(chainID)}
-              name={CHAIN_ID_TO_NAME[chainID]}
+              name={CHAIN[chainID].NAME}
             />
           ))}
         </Dropdown>

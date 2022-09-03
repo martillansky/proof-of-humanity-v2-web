@@ -8,7 +8,7 @@ import Modal from "components/Modal";
 import Uploader from "components/Uploader";
 import { ChainId } from "constants/chains";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
-import { decodeId } from "utils/identifier";
+import { EvidenceFile } from "types/docs";
 import { uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
 
@@ -32,7 +32,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
   const [file, setFile] = useState<File | null>(null);
 
   const submit = async () => {
-    const evidence: Evidence = { name: title, description };
+    const evidence: EvidenceFile = { name: title, description };
 
     if (file) {
       evidence.fileURI = await uploadToIPFS(
@@ -46,7 +46,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
       "evidence.json"
     );
 
-    await submitEvidence(decodeId(soulId), requestIndex, evidenceUri);
+    await submitEvidence(soulId, requestIndex, evidenceUri);
   };
 
   return (
@@ -89,7 +89,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
         </div>
       </Modal>
 
-      {request.evidence.map((evidence, i) => (
+      {request.evidence.reverse().map((evidence, i) => (
         <EvidenceItem
           key={evidence.id}
           index={i}

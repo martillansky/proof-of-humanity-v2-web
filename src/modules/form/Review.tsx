@@ -1,15 +1,18 @@
 import { Zero } from "@ethersproject/constants";
-import { formatEther } from "ethers/lib/utils";
+import { formatEther, parseEther } from "ethers/lib/utils";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import POHLogoWhite from "assets/svg/poh-logo-white.svg";
 import Field from "components/Field";
 import Image from "components/Image";
 import Label from "components/Label";
 import Video from "components/Video";
 import useBalance from "hooks/useBalance";
 import { useGasFees } from "hooks/useGasFees";
+import { useLoading } from "hooks/useLoading";
 import { useClaimSoul, useRequestTotalCost } from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
+import { EvidenceFile, RegistrationFile } from "types/docs";
 import { uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 import { useFormContext } from "./context";
@@ -20,30 +23,28 @@ const Review: React.FC<ReviewProps> = () => {
   const { account } = useWeb3();
   const {
     setStep,
-    state: { soulId, name, bio, photo, video },
+    state: { soulId, name, bio, photo, video, videoType },
   } = useFormContext();
+  const loading = useLoading();
   const [claimSoul] = useClaimSoul();
   const totalCost = useRequestTotalCost();
   const [selfFunded, setSelfFunded] = useState<number>(
     parseFloat(formatEther(totalCost || Zero))
   );
-
   const [estimatedGasFees, estimationError] = useGasFees(
     "claimSoul(string,string)",
     [name, "ipfs/randomhashtoestimategasfees/evidence.json"]
   );
-
   const [ipfsUri, setIpfsUri] = useState<string>();
-
   const balance = useBalance();
 
   useEffect(() => {
     if (!name) setStep(0);
   }, []);
 
-  // useEffect(() => {
-  //   if (totalCost) setSelfFunded(totalCost);
-  // }, [totalCost]);
+  useEffect(() => {
+    if (totalCost) setSelfFunded(parseFloat(formatEther(totalCost || Zero)));
+  }, [totalCost]);
 
   const submit = async () => {
     if (estimationError) {
@@ -55,18 +56,28 @@ const Review: React.FC<ReviewProps> = () => {
 
     let uri = ipfsUri;
     if (!uri) {
+      loading.start("Uploading media to IPFS");
+
       const [photoUri, videoUri] = await Promise.all([
         uploadToIPFS(photo.content),
         uploadToIPFS(video.content),
       ]);
 
+      loading.start("Uploading evidence files to IPFS");
+
       const fileURI = await uploadToIPFS(
-        JSON.stringify({ name, bio, photo: photoUri, video: videoUri }),
+        JSON.stringify({
+          name,
+          bio,
+          videoType: videoType || undefined,
+          photo: photoUri,
+          video: videoUri,
+        } as RegistrationFile),
         "file.json"
       );
 
       const evidenceUri = await uploadToIPFS(
-        JSON.stringify({ fileURI, name: "Registration" }),
+        JSON.stringify({ fileURI, name: "Registration" } as EvidenceFile),
         "registration.json"
       );
 
@@ -74,7 +85,14 @@ const Review: React.FC<ReviewProps> = () => {
       setIpfsUri(evidenceUri);
     }
 
-    if (soulId) await claimSoul(soulId, uri, name);
+    loading.start("Executing");
+
+    if (soulId)
+      await claimSoul(soulId, uri, name, {
+        value: parseEther(selfFunded.toString()),
+      });
+
+    loading.stop();
   };
 
   return (
@@ -164,9 +182,16 @@ const Review: React.FC<ReviewProps> = () => {
         </div>
       </div>
 
-      <button className="btn-main" onClick={submit}>
-        Submit
-      </button>
+      {loading.active ? (
+        <button className="btn-main">
+          <POHLogoWhite className="w-6 h-6 animate-flip fill-white" />
+          {loading.message}...
+        </button>
+      ) : (
+        <button className="btn-main" onClick={submit}>
+          Submit
+        </button>
+      )}
     </>
   );
 };

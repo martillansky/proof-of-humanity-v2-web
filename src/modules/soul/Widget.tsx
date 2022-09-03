@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SoulInterface } from "api/souls";
-import { CHAIN_ID_TO_NAME } from "constants/chains";
+import { CHAIN } from "constants/chains";
 import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
 import { encodeId } from "utils/identifier";
@@ -27,7 +27,7 @@ const SoulWidget: React.FC<SoulWidgetProps> = ({ soul }) => {
           {soul.claimed && <div>Owner: {shortenAddress(soul.owner!.id)}</div>}
         </div>
         <div>
-          Home chain: <strong>{CHAIN_ID_TO_NAME[soul.chainID]}</strong>
+          Home chain: <strong>{CHAIN[soul.chainID].NAME}</strong>
         </div>
         <div className="px-2 py-1 bg-blue-500 text-white font-bold rounded-full">
           {soul.nbPendingRequests} pending requests

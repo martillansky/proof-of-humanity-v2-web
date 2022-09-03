@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop/types";
+import { toast } from "react-toastify";
 import ReactWebcam from "react-webcam";
 import BWImage from "assets/images/b&w.jpg";
 import FrontFacingImage from "assets/images/front-facing.jpg";
@@ -16,10 +17,12 @@ import CheckmarkIcon from "assets/svg/MobileAcceptMajor.svg";
 import ResetIcon from "assets/svg/ResetMinor.svg";
 import ZoomIcon from "assets/svg/SearchMajor.svg";
 import UploadIcon from "assets/svg/UploadMajor.svg";
+import POHLogoWhite from "assets/svg/poh-logo-white.svg";
 import Image from "components/Image";
 import Uploader from "components/Uploader";
 import Webcam from "components/Webcam";
 import useFullscreen from "hooks/useFullscreen";
+import { useLoading } from "hooks/useLoading";
 import { getCroppedPhoto, sanitizeImage } from "utils/media";
 import { base64ToUint8Array } from "utils/misc";
 import { useFormContext } from "./context";
@@ -61,25 +64,37 @@ const Photo: React.FC = () => {
   const [maxZoom, setMaxZoom] = useState(3);
   const [zoom, setZoom] = useState(1);
 
+  const loading = useLoading();
+
   const onCrop = async () => {
     if (!cropPixels || !originalPhoto) return;
     if (cropPixels.width < 256 || cropPixels.height < 256)
       return console.error("Size error");
 
+    loading.start("Cropping photo");
+
     const cropped = await getCroppedPhoto(originalPhoto.uri, cropPixels);
     if (!cropped) return;
 
-    const sanitized = await sanitizeImage(
-      Buffer.from(base64ToUint8Array(cropped.split(",")[1]))
-    );
+    try {
+      const sanitized = await sanitizeImage(
+        Buffer.from(base64ToUint8Array(cropped.split(",")[1]))
+      );
 
-    dispatch({
-      type: "PHOTO",
-      payload: {
-        content: sanitized,
-        uri: URL.createObjectURL(new Blob([sanitized], { type: "image/jpeg" })),
-      },
-    });
+      dispatch({
+        type: "PHOTO",
+        payload: {
+          content: sanitized,
+          uri: URL.createObjectURL(
+            new Blob([sanitized], { type: "image/jpeg" })
+          ),
+        },
+      });
+    } catch (err) {
+      toast.error(err.message);
+    }
+
+    loading.stop();
   };
 
   const takePhoto = async () => {
@@ -105,6 +120,7 @@ const Photo: React.FC = () => {
     setZoom(1);
     setCrop({ x: 0, y: 0 });
     setCropPixels(null);
+    loading.stop();
   };
 
   return (
@@ -244,10 +260,17 @@ const Photo: React.FC = () => {
             />
           </div>
 
-          <button className="btn-main" onClick={onCrop}>
-            <CheckmarkIcon className="w-6 h-6 mr-2 fill-white" />
-            Ready
-          </button>
+          {loading.active ? (
+            <button className="btn-main">
+              <POHLogoWhite className="w-6 h-6 animate-flip fill-white" />
+              {loading.message}...
+            </button>
+          ) : (
+            <button className="btn-main" onClick={onCrop}>
+              <CheckmarkIcon className="w-6 h-6 mr-2 fill-white" />
+              Ready
+            </button>
+          )}
         </>
       )}
 
@@ -263,7 +286,7 @@ const Photo: React.FC = () => {
       {(showCamera || !!originalPhoto || !!photo) && (
         <button
           className="centered mt-4 text-[#ff9966] font-semibold text-lg uppercase"
-          onClick={() => retakePhoto()}
+          onClick={retakePhoto}
         >
           <ResetIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
           {showCamera ? "Return" : "Retake"}

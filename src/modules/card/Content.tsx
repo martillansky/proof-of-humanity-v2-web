@@ -1,7 +1,7 @@
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import { RequestInterface } from "api/requests";
 import Image from "components/Image";
-import { CHAIN_LOGO } from "constants/chains";
+import { CHAIN } from "constants/chains";
 import useIPFS from "hooks/useIPFS";
 import { shortenAddress } from "utils/address";
 import { ipfs } from "utils/ipfs";
@@ -16,7 +16,7 @@ const Content: React.FC<{ request: RequestInterface }> = ({ request }) => {
     suspense: true,
   });
 
-  const ChainLogo = CHAIN_LOGO[request.chainID];
+  const ChainLogo = CHAIN[request.chainID].Logo;
 
   return (
     <div className="p-2 h-full flex flex-col items-center bg-white">

@@ -13,6 +13,7 @@ import useFullscreen from "hooks/useFullscreen";
 import useWeb3 from "hooks/useWeb3";
 import { phraseFromAddress } from "utils/address";
 import { useFormContext } from "./context";
+import { VideoType } from "./reducer";
 
 const MIN_DIMS = { width: 352, height: 352 };
 
@@ -20,7 +21,7 @@ const VideoStep: React.FC = () => {
   const { account } = useWeb3();
   const {
     advance,
-    state: { video },
+    state: { video, videoType },
     dispatch,
   } = useFormContext();
 
@@ -31,9 +32,6 @@ const VideoStep: React.FC = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [camera, setCamera] = useState<ReactWebcam | null>(null);
   const [recording, setRecording] = useState(false);
-  const [recordingMode, setRecordingMode] = useState<"phrase" | "sign" | null>(
-    null
-  );
 
   const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
 
@@ -80,7 +78,6 @@ const VideoStep: React.FC = () => {
     setShowCamera(false);
     setRecording(false);
     dispatch({ type: "DELETE_VIDEO" });
-    setRecordingMode(null);
   };
 
   return (
@@ -106,17 +103,19 @@ const VideoStep: React.FC = () => {
           <div className="flex m-auto">
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                gradient: recordingMode === "sign",
+                gradient: videoType === VideoType.SIGN,
               })}
             >
               <button
                 className={cn(
                   "w-full h-full p-2 bg-white rounded-sm font-semibold ",
-                  recordingMode === "sign"
+                  videoType === VideoType.SIGN
                     ? "bg-orange-50"
                     : "hover:bg-slate-100"
                 )}
-                onClick={() => setRecordingMode("sign")}
+                onClick={() =>
+                  dispatch({ type: "VIDEO_MODE", payload: VideoType.SIGN })
+                }
               >
                 Hold a sign with your address
               </button>
@@ -124,17 +123,19 @@ const VideoStep: React.FC = () => {
             <span className="txt self-center text-slate-400">OR</span>
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                gradient: recordingMode === "phrase",
+                gradient: videoType === VideoType.PHRASE,
               })}
             >
               <button
                 className={cn(
                   "w-full h-full p-2 bg-white rounded-sm font-semibold",
-                  recordingMode === "phrase"
+                  videoType === VideoType.PHRASE
                     ? "bg-blend-overlay opacity-90"
                     : "hover:bg-slate-100"
                 )}
-                onClick={() => setRecordingMode("phrase")}
+                onClick={() =>
+                  dispatch({ type: "VIDEO_MODE", payload: VideoType.PHRASE })
+                }
               >
                 Speak a phrase generated from your address
               </button>
@@ -143,7 +144,7 @@ const VideoStep: React.FC = () => {
         </>
       )}
 
-      {recordingMode === "sign" && (
+      {videoType === VideoType.SIGN && (
         <span className="txt text-center my-8 mx-12">
           You must record yourself holding a sign with your address{" "}
           <strong>{account}</strong> and say the phrase{" "}
@@ -155,7 +156,7 @@ const VideoStep: React.FC = () => {
         </span>
       )}
 
-      {recordingMode === "phrase" && (
+      {videoType === VideoType.PHRASE && (
         <span className="txt text-center my-8 mx-12">
           You must record yourself saying the phrase{" "}
           <span className="text-[#ff9966]">"</span>
@@ -173,7 +174,7 @@ const VideoStep: React.FC = () => {
         </span>
       )}
 
-      {recordingMode && !showCamera && !video && (
+      {videoType && !showCamera && !video && (
         <div className="relative w-full mt-12 bordered grid grid-cols-2">
           <Uploader
             className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"
@@ -235,11 +236,11 @@ const VideoStep: React.FC = () => {
         </div>
       )}
 
-      {showCamera && recordingMode && (
+      {showCamera && videoType && (
         <div tabIndex={0} ref={fullscreenRef}>
           <Webcam
             video
-            overlay={recordingMode}
+            overlay={videoType}
             recording={recording}
             action={recording ? stopRecording : startRecording}
             fullscreen={isFullscreen}

@@ -1,5 +1,5 @@
 import { getAddress } from "@ethersproject/address";
-import { EXPLORER_URL } from "constants/chains";
+import { CHAIN, ChainId } from "constants/chains";
 import { base2048 } from "./misc";
 
 export function isAddress(value: any): string | false {
@@ -30,5 +30,5 @@ export const phraseFromAddress = (
   return words.split(" ").slice(0, count).join(" ").toUpperCase();
 };
 
-export const explorerLink = (address: string, chainId: number) =>
-  `${EXPLORER_URL[chainId]}/address/${address}`;
+export const explorerLink = (address: string, chainId: ChainId) =>
+  `${CHAIN[chainId].EXPLORER}/address/${address}`;
