@@ -8,20 +8,20 @@ export enum Contracts {
   KLEROS_LIQUID,
 }
 
-export const ABI: Record<Contracts, ContractInterface> = {
-  [Contracts.PROOF_OF_HUMANITY]: ProofOfHumanityABI,
-  [Contracts.KLEROS_LIQUID]: KlerosLiquidABI,
-};
-
-export const CONTRACT_ADDRESS: Record<Contracts, Record<ChainId, string>> = {
+export const CONTRACT: Record<
+  Contracts,
+  { ABI: ContractInterface } & Record<number, string>
+> = {
   [Contracts.PROOF_OF_HUMANITY]: {
-    [ChainId.RINKEBY]: "0x801C5D176A853c19e92A753aA43eab6c65797927",
-    [ChainId.MAINNET]: "0x801C5D176A853c19e92A753aA43eab6c65797927",
-    [ChainId.GNOSIS]: "0xC986062173bed7ee228FfBcaD22951856a625998",
+    ABI: ProofOfHumanityABI,
+    [ChainId.RINKEBY]: "0x6dCe2a3dE1436E7ffC61f2Dde6A944b4cF13EA3F",
+    // [ChainId.MAINNET]: "0x801C5D176A853c19e92A753aA43eab6c65797927",
+    [ChainId.GNOSIS]: "0x31B679253D53A18Eb793e023e7EFCed5160d7fD6",
   },
   [Contracts.KLEROS_LIQUID]: {
+    ABI: KlerosLiquidABI,
     [ChainId.RINKEBY]: "0x6e376E049BD375b53d31AFDc21415AeD360C1E70",
-    [ChainId.MAINNET]: "0x6e376E049BD375b53d31AFDc21415AeD360C1E70",
-    [ChainId.GNOSIS]: "0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002",
+    // [ChainId.MAINNET]: "0x6e376E049BD375b53d31AFDc21415AeD360C1E70",
+    [ChainId.GNOSIS]: "0x9de81cf9b4b46046c1a87fdc71ae55566919be64",
   },
 };

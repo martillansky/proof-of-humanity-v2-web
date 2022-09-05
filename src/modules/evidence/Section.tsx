@@ -6,32 +6,34 @@ import Field from "components/Field";
 import Label from "components/Label";
 import Modal from "components/Modal";
 import Uploader from "components/Uploader";
-import { ChainId } from "constants/chains";
+import useChangeChain from "hooks/useChangeChain";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
+import useSuggestedChain from "hooks/useSuggestedChain";
 import { EvidenceFile } from "types/docs";
 import { uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
 
 interface EvidenceProps {
-  soulId: string;
+  humanityId: string;
   requestIndex: BigNumberish;
-  chainId: ChainId;
   request: RequestQueryItem;
 }
 
 const EvidenceSection: React.FC<EvidenceProps> = ({
-  chainId,
   requestIndex,
-  soulId,
+  humanityId,
   request,
 }) => {
-  const [submitEvidence] = useSubmitEvidence();
-
+  const chainId = useSuggestedChain();
+  const submitEvidence = useSubmitEvidence();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const changeChain = useChangeChain();
 
   const submit = async () => {
+    if (await changeChain()) return;
+
     const evidence: EvidenceFile = { name: title, description };
 
     if (file) {
@@ -46,7 +48,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
       "evidence.json"
     );
 
-    await submitEvidence(soulId, requestIndex, evidenceUri);
+    await submitEvidence(humanityId, requestIndex, evidenceUri);
   };
 
   return (
@@ -93,7 +95,7 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
         <EvidenceItem
           key={evidence.id}
           index={i}
-          chainId={chainId}
+          chainId={chainId!}
           evidence={evidence}
         />
       ))}

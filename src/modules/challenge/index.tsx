@@ -17,7 +17,7 @@ interface ChallengeInterface {
 }
 
 const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
-  const [challengeRequest] = useChallengeRequest();
+  const challengeRequest = useChallengeRequest();
   const [justification, setJustification] = useState("");
   const [reason, setReason] = useState<Reason | null>(null);
 
@@ -36,7 +36,7 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
       "evidence.json"
     );
 
-    challengeRequest(request.soul.id, request.index, reason, evidenceUri, {
+    challengeRequest(request.humanity.id, request.index, reason, evidenceUri, {
       value: arbitrationCost,
     });
   };

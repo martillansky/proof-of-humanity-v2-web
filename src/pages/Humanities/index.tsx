@@ -1,30 +1,35 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
-import { soulsAtom } from "api/souls";
+import { humanitiesAtom } from "api/humanities";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
+import PageLoader from "components/PageLoader";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { SOULS_DISPLAY_BATCH } from "constants/misc";
+import { HUMANITIES_DISPLAY_BATCH } from "constants/misc";
 import useDebounce from "hooks/useDebounce";
-import SoulCard from "modules/soul/Card";
-import SoulWidget from "modules/soul/Widget";
+import { useLoading } from "hooks/useLoading";
+import HumanityCard from "modules/humanity/Card";
+import HumanityWidget from "modules/humanity/Widget";
 import { camelToTitle } from "utils/case";
 
-const Souls: React.FC = () => {
-  const [souls, loadSouls] = useAtom(soulsAtom);
+const Humanities: React.FC = () => {
+  const [humanities, loadHumanities] = useAtom(humanitiesAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const searchDebounced = useDebounce(searchQuery.trim());
   const [prevListLength, setPrevListLength] = useState(0);
   const [chainFilter, setChainFilter] = useState<ChainId | "all">("all");
+  const loading = useLoading();
 
   const updateSubmissions = async (loadContinued: boolean = false) => {
-    if (loadContinued) setPrevListLength(souls.length);
-    await loadSouls({
+    loading.start();
+    if (loadContinued) setPrevListLength(humanities.length);
+    await loadHumanities({
       searchQuery: searchDebounced,
       chain: chainFilter,
       loadContinued,
     });
+    loading.stop();
   };
 
   useEffect(() => {
@@ -32,10 +37,12 @@ const Souls: React.FC = () => {
   }, [searchDebounced, chainFilter]);
 
   const loadExhausted =
-    !souls.length || // No requests loaded
-    souls.length % SOULS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
-    prevListLength === souls.length; // Submissions loaded filled a batch but no more were loaded previously
+    !humanities.length || // No requests loaded
+    humanities.length % HUMANITIES_DISPLAY_BATCH || // Submissions loaded did not fill a batch
+    prevListLength === humanities.length; // Submissions loaded filled a batch but no more were loaded previously
   // TODO not perfect, maybe add this to a separate atom?
+
+  if (loading.active) return <PageLoader />;
 
   return (
     <div
@@ -72,17 +79,8 @@ const Souls: React.FC = () => {
       </div>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
-        {souls.map((soul) => (
-          <Popup modal key={soul.id} trigger={<SoulCard soul={soul} />}>
-            {(close) => (
-              <>
-                <div className="backdrop" onClick={close} />
-                <div className="fixed absolute-centered bordered w-2/5 z-30">
-                  <SoulWidget soul={soul} />
-                </div>
-              </>
-            )}
-          </Popup>
+        {humanities.map((humanity) => (
+          <HumanityCard humanity={humanity} />
         ))}
       </div>
 
@@ -98,4 +96,4 @@ const Souls: React.FC = () => {
   );
 };
 
-export default Souls;
+export default Humanities;

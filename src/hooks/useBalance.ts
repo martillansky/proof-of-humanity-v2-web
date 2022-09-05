@@ -1,15 +1,19 @@
-import { Web3Provider } from "@ethersproject/providers";
 import useSWR from "swr";
+import useKeepBlockDataLive from "./useKeepBlockDataLive";
 import useWeb3 from "./useWeb3";
 
-const useBalance = () => {
-  const { account, library } = useWeb3();
-  const { data } = useSWR(
-    account && library ? [library, account] : null,
-    async (lib: Web3Provider, account: string) => await lib.getBalance(account)
+const useBalance = (suspense = false) => {
+  const { account, provider, chainId } = useWeb3();
+
+  const result = useSWR(
+    account && !!provider ? ["ETHBalance", account, chainId] : null,
+    async (_: string, address: string) => await provider!.getBalance(address),
+    { suspense }
   );
 
-  return data;
+  useKeepBlockDataLive(result.mutate);
+
+  return result.data;
 };
 
 export default useBalance;

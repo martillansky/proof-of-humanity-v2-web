@@ -1,67 +1,67 @@
 import { TransactionReceipt } from "@ethersproject/providers";
 import { Contract, ContractTransaction } from "ethers";
-import { useCallback, useReducer } from "react";
+import { useCallback } from "react";
 import { toast } from "react-toastify";
+import useChangeChain from "./useChangeChain";
+import useSuggestedChain from "./useSuggestedChain";
 
-interface State {
-  status: "None" | "Pending" | "Mining" | "Success" | "Error";
-  receipt?: TransactionReceipt | null;
-  error?: string | null;
+interface TransactionEvents {
+  withToast?: boolean;
+  onPending?: () => void;
+  onConfirm?: (tx?: ContractTransaction) => void;
+  onMined?: (receipt?: TransactionReceipt) => void;
+  onError?: () => void;
 }
 
-type StateReducer = (s: State, a: State) => State;
-
-// type txEvents = {
-//   onPending?: () => void;
-//   onConfirm?: (tx?: ContractTransaction) => void;
-//   onMined?: (receipt?: TransactionReceipt) => void;
-//   onError?: () => void;
-// };
+type SendFunc<C extends Contract, F extends keyof C["callStatic"]> = (
+  ...params: Parameters<C[F]> | [...Parameters<C[F]>, ...[TransactionEvents]]
+) => Promise<void>;
 
 const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   contract: C | null,
   method: F
-  //TODO add keys to mutate after sending (use functions?)
-  //   mutateKeys: any[][]
-): [(...params: Parameters<C[F]>) => Promise<unknown>, State] => {
-  const [state, setState] = useReducer<StateReducer>(
-    (s, a) => ({ ...s, ...a }),
-    { status: "None", receipt: null, error: null }
-  );
+): SendFunc<C, F> => {
+  const changeChain = useChangeChain();
+  const suggestedChain = useSuggestedChain();
 
-  const send = useCallback(
-    async (...params: Parameters<C[F]>) => {
+  const send = useCallback<SendFunc<C, F>>(
+    async (...params) => {
+      if (suggestedChain && (await changeChain(suggestedChain!))) return;
+
+      const txEvents = params.at(-1) as TransactionEvents;
+      const {
+        withToast = true,
+        onConfirm,
+        onError,
+        onMined,
+        onPending,
+      } = txEvents;
       try {
         if (!contract) return;
 
-        setState({ status: "Pending", receipt: null, error: null });
-        toast.info("Sending transaction");
-        // if (onPending) onPending();
+        onPending && onPending();
+        withToast && toast.info("Sending transaction");
 
-        const transaction: ContractTransaction = await contract[method](
-          ...params
-        );
+        const tx: ContractTransaction = await contract[method](...params);
 
-        setState({ status: "Mining" });
-        toast.info("Mining transaction...");
-        // if (onConfirm) onConfirm();
+        onConfirm && onConfirm(tx);
+        withToast && toast.info("Mining transaction");
 
-        const receipt = await transaction.wait();
+        const receipt = await tx.wait();
 
-        setState({ status: "Success", receipt });
-        toast.success("Transaction mined");
-        // if (onMined) onMined();
+        onMined && onMined(receipt);
+        withToast && toast.success("Transaction mined");
       } catch (err) {
-        console.error({ err });
-        setState({ status: "Error", error: err.message });
-        toast.error("Transaction rejected");
-        // if (onError) onError();
+        console.error(err);
+
+        onError && onError();
+        withToast && toast.error("Transaction rejected");
       }
     },
     [contract, method]
   );
 
-  return [send, state];
+  return send;
 };
 
 export default useSend;

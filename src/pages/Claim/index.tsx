@@ -1,14 +1,15 @@
 import React from "react";
 import ALink from "components/ALink";
-import { FALLBACK_CHAIN } from "constants/chains";
+import { CHAIN_SETTING, FALLBACK_CHAIN } from "constants/chains";
 import useChangeChain from "hooks/useChangeChain";
+import useSuggestedChain from "hooks/useSuggestedChain";
 import useWeb3 from "hooks/useWeb3";
 import SubmissionForm from "modules/form";
-import { injected } from "utils/connectors";
 
 const Claim: React.FC = () => {
-  const { account, active, activate } = useWeb3();
+  const { account, isActive, connector } = useWeb3();
   const changeChain = useChangeChain();
+  const suggestedChain = useSuggestedChain();
 
   return (
     <div
@@ -18,7 +19,7 @@ const Claim: React.FC = () => {
                  flex flex-col
                  border rounded bg-white shadow"
     >
-      {active ? (
+      {account && isActive ? (
         <SubmissionForm />
       ) : (
         <>
@@ -46,7 +47,11 @@ const Claim: React.FC = () => {
           ) : (
             <button
               className="btn-main my-8"
-              onClick={() => activate(injected)}
+              onClick={() =>
+                connector.activate(
+                  suggestedChain && CHAIN_SETTING[suggestedChain]
+                )
+              }
             >
               Connect wallet
             </button>

@@ -5,7 +5,7 @@ export enum VideoType {
 
 export interface SubmissionInfo {
   language: "en";
-  soulId: string;
+  humanityId: string;
   name: string;
   bio: string;
   photo: { uri: string; content: ArrayBufferLike } | null;
@@ -30,7 +30,7 @@ export type SubmissionReducer = (
 
 export const emptySubmission: SubmissionInfo = {
   language: "en",
-  soulId: "",
+  humanityId: "",
   name: "",
   bio: "",
   photo: null,
@@ -44,7 +44,7 @@ export const submissionReducer = (
 ): SubmissionInfo => {
   switch (action.type) {
     case "SOUL_ID":
-      return { ...state, soulId: action.payload };
+      return { ...state, humanityId: action.payload };
     case "NAME":
       return { ...state, name: action.payload };
     case "BIO":

@@ -5,5 +5,6 @@ export const SUBGRAPH_ENDPOINTS = {
     "https://api.thegraph.com/subgraphs/name/andreimvp/poh-rinkeby",
   [ChainId.MAINNET]:
     "https://api.thegraph.com/subgraphs/name/andreimvp/poh-v1-in-v2-shoes",
-  [ChainId.GNOSIS]: "https://api.thegraph.com/subgraphs/name/andreimvp/poh-v2",
+  [ChainId.GNOSIS]:
+    "https://api.thegraph.com/subgraphs/name/andreimvp/poh-gnosis",
 };

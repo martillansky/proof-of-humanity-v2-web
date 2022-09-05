@@ -7,7 +7,7 @@ import { CHAIN } from "constants/chains";
 import { STATUS_TO_COLOR } from "constants/misc";
 import { queryToStatus } from "constants/requests";
 import { camelToTitle } from "utils/case";
-import { encodeId } from "utils/identifier";
+import { prettifyId } from "utils/identifier";
 import Content from "./Content";
 import { ErrorFallback, LoadingFallback } from "./misc";
 
@@ -19,8 +19,8 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
 
   return (
     <Link
-      to={`/request/${CHAIN[request.chainID].NAME.toLowerCase()}/${encodeId(
-        request.soul.id
+      to={`/request/${CHAIN[request.chainID].NAME.toLowerCase()}/${prettifyId(
+        request.humanity.id
       )}/${request.index}${request.old ? "/v1" : ""}`}
       className="rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >

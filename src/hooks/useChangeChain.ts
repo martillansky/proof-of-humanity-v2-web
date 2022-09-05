@@ -1,28 +1,22 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
-import { hexValue } from "ethers/lib/utils";
 import { useCallback } from "react";
-import { CHAIN_SETTING } from "constants/chains";
-import { RPCMethod, Web3ErrorCode } from "constants/web3";
+import { CHAIN_SETTING, ChainId } from "constants/chains";
+import useWeb3 from "./useWeb3";
 
 const useChangeChain = () => {
-  const { library } = useWeb3React<Web3Provider>();
+  const { chainId, account, connector } = useWeb3(false);
 
-  return useCallback(
-    (desiredChainId: number) => {
-      if (!library) return;
-
-      try {
-        library.send(RPCMethod.SWITCH_CHAIN, [
-          { chainId: hexValue(desiredChainId) },
-        ]);
-      } catch (err) {
-        if (err && err.code === Web3ErrorCode.CHAIN_NOT_ADDED)
-          library.send(RPCMethod.ADD_CHAIN, [CHAIN_SETTING[desiredChainId]]);
-      }
+  const changeChain = useCallback(
+    async (desiredChainId?: ChainId) => {
+      console.log(desiredChainId, account, desiredChainId === chainId);
+      if (!desiredChainId || (account && desiredChainId === chainId))
+        return false;
+      await connector.activate(CHAIN_SETTING[desiredChainId]);
+      return true;
     },
-    [library]
+    [chainId]
   );
+
+  return changeChain;
 };
 
 export default useChangeChain;

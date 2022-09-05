@@ -1,11 +1,10 @@
-import {
-  BigNumber,
-  isBigNumberish,
-} from "@ethersproject/bignumber/lib/bignumber";
+import { BigNumber } from "@ethersproject/bignumber/lib/bignumber";
+import { isBytesLike } from "ethers/lib/utils";
 import React, { useEffect, useReducer, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Steps from "components/Steps";
 import useWeb3 from "hooks/useWeb3";
+import { machinifyId, prettifyId } from "utils/identifier";
 import InfoStep from "./Info";
 import PhotoStep from "./Photo";
 import ReviewStep from "./Review";
@@ -16,7 +15,7 @@ import { emptySubmission, submissionReducer } from "./reducer";
 const STEPS_LIST = ["Info", "Photo", "Video", "Review"];
 
 const Form: React.FC = () => {
-  const { soul } = useParams();
+  const { humanity } = useParams();
   const { account } = useWeb3();
   const nav = useNavigate();
 
@@ -25,14 +24,15 @@ const Form: React.FC = () => {
   const [step, setStep] = useState(3);
 
   useEffect(() => {
-    if (soul && BigNumber.from(soul).isZero()) nav("/claim");
+    if (humanity && BigNumber.from(machinifyId(humanity)).isZero())
+      nav("/claim");
   }, []);
 
-  if (soul && !isBigNumberish(soul))
+  if (humanity && !isBytesLike(machinifyId(humanity)))
     return (
       <div className="m-auto flex flex-col text-center">
-        <span className="font-semibold">Invalid soul ID:</span>
-        <span className="text-6xl font-light text-[#ff9966]">{soul}</span>
+        <span className="font-semibold">Invalid humanity ID:</span>
+        <span className="text-6xl font-light text-[#ff9966]">{humanity}</span>
       </div>
     );
 
@@ -44,7 +44,7 @@ const Form: React.FC = () => {
         value={{
           state: {
             ...state,
-            soulId: soul || BigNumber.from(account).toString(),
+            humanityId: humanity ?? prettifyId(account!),
           },
           dispatch,
           setStep,

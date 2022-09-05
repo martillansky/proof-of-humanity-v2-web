@@ -3,24 +3,26 @@ import React, { useEffect, useState } from "react";
 import { requestsAtom } from "api/requests";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
+import PageLoader from "components/PageLoader";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { RequestStatus, statusFilters } from "constants/requests";
 import useDebounce from "hooks/useDebounce";
-import CardList, { LoadingCardList } from "modules/card/List";
+import { useLoading } from "hooks/useLoading";
+import CardList from "modules/card/List";
 import { camelToTitle } from "utils/case";
 
 const Home: React.FC = () => {
-  const [loading, setLoading] = useState(false);
   const [requests, loadRequests] = useAtom(requestsAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const searchDebounced = useDebounce(searchQuery.trim());
   const [prevListLength, setPrevListLength] = useState(0);
   const [statusFilter, setStatusFilter] = useState<RequestStatus>("all");
   const [chainFilter, setChainFilter] = useState<ChainId | "all">("all");
+  const loading = useLoading();
 
   const updateSubmissions = async (loadContinued: boolean = false) => {
-    setLoading(true);
+    loading.start();
     if (loadContinued) setPrevListLength(requests.length);
     await loadRequests({
       searchQuery: searchDebounced,
@@ -28,7 +30,7 @@ const Home: React.FC = () => {
       chain: chainFilter,
       loadContinued,
     });
-    setLoading(false);
+    loading.stop();
   };
 
   useEffect(() => {
@@ -86,12 +88,13 @@ const Home: React.FC = () => {
         </Dropdown>
       </div>
 
-      {loading && !requests.length ? (
-        <LoadingCardList />
+      {loading.active && !requests.length ? (
+        // <LoadingCardList />
+        <PageLoader />
       ) : (
         <CardList requests={requests} />
       )}
-      {!loading && !loadExhausted && (
+      {!loading.active && !loadExhausted && (
         <button
           className="mx-auto my-8 px-8 py-4 bg-amber-400 rounded-full text-white font-bold shadow-md shadow-orange-500/10"
           onClick={() => updateSubmissions(true)}

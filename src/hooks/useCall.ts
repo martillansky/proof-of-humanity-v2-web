@@ -15,9 +15,6 @@ const useCall = <C extends Contract, F extends keyof C["callStatic"]>(
   method: F,
   params: Parameters<C[F]> | null
 ): [AsyncReturnType<C[F]> | undefined, Omit<SWRResponse, "data">] => {
-  //TODO functions for keys on SWR (better error handling and could be more useful for abstraction)
-  //TODO option to mutate for every new block
-  //TODO mutate on window refocus?
   const { data, isValidating, mutate, error } = useSWR(
     contract && params !== null ? [contract.address, method, ...params] : null,
     call<C, F>(contract!)

@@ -1,54 +1,44 @@
-import { useWeb3React } from "@web3-react/core";
-import { useEffect, useState } from "react";
-import { FALLBACK_CHAIN } from "constants/chains";
-import { injected, network } from "utils/connectors";
+import { Connector } from "@web3-react/types";
+import { useCallback, useEffect } from "react";
+import { injected, network } from "./connectors";
+import useSuggestedChain from "./useSuggestedChain";
 
-export function useConnect() {
-  const [tried, setTried] = useState(false);
-  const { activate, active } = useWeb3React();
-  const {
-    active: networkActive,
-    error: networkError,
-    activate: activateNetwork,
-  } = useWeb3React("NETWORK");
+const connect = async (connector: Connector) => {
+  try {
+    if (connector.connectEagerly) return await connector.connectEagerly();
+    await connector.activate();
+  } catch (err) {
+    console.debug(`web3 connection error: ${err}`);
+  }
+};
 
-  const tryConnect = async () => {
-    const isAuthorized = await injected.isAuthorized();
-    if (isAuthorized) await activate(injected, undefined, true);
-    setTried(true);
-  };
+const { useChainId } = network.hooks;
+
+const useConnect = () => {
+  const suggestedChainId = useSuggestedChain();
+  const chainId = useChainId();
+
+  const syncChain = useCallback(
+    async (desiredChainId: number) => {
+      if (desiredChainId === chainId) return;
+      try {
+        await network.connector.activate(desiredChainId);
+      } catch (err) {
+        console.debug(err);
+      }
+    },
+    [suggestedChainId]
+  );
 
   useEffect(() => {
-    if (!active) tryConnect();
-  }, [activate, active]);
+    connect(network.connector);
+    connect(injected.connector);
+  }, []);
 
   useEffect(() => {
-    if (active) setTried(true);
-  }, [active]);
+    if (!suggestedChainId) return;
+    syncChain(suggestedChainId);
+  }, [suggestedChainId, chainId]);
+};
 
-  useEffect(() => {
-    if (tried && !networkActive && !networkError && !active)
-      activateNetwork(network(FALLBACK_CHAIN));
-  }, [tried, networkActive, networkError, activateNetwork, active]);
-
-  useEffect((): any => {
-    const { ethereum } = window as any;
-    if (ethereum && ethereum.on && !networkActive && !networkError) {
-      const handleChainChanged = () => activate(injected);
-      const handleAccountsChanged = (accounts: string[]) =>
-        accounts.length > 0 && activate(injected);
-
-      ethereum.on("chainChanged", handleChainChanged);
-      ethereum.on("accountsChanged", handleAccountsChanged);
-
-      return () => {
-        if (ethereum.removeListener) {
-          ethereum.removeListener("chainChanged", handleChainChanged);
-          ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        }
-      };
-    }
-  }, [active, networkError, tried, activate]);
-
-  return { tried, error: networkError };
-}
+export default useConnect;

@@ -1,21 +1,23 @@
 import { atom } from "jotai";
 import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { SOULS_DISPLAY_BATCH } from "constants/misc";
-import { SoulsQuery } from "generated/graphql";
+import { HUMANITIES_DISPLAY_BATCH } from "constants/misc";
+import { HumanitiesQuery } from "generated/graphql";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
 
-type soulResultType = ArrayElement<SoulsQuery["souls"]>;
+type humanityResultType = ArrayElement<HumanitiesQuery["humanities"]>;
 
-export interface SoulInterface extends soulResultType {
+export interface HumanityInterface extends humanityResultType {
   chainID: ChainId;
 }
 
-const normalizeSouls = (soulData: Record<ChainId, soulResultType[]>) =>
-  Object.keys(soulData).reduce<SoulInterface[]>(
+const normalizeHumanities = (
+  humanityData: Record<ChainId, humanityResultType[]>
+) =>
+  Object.keys(humanityData).reduce<HumanityInterface[]>(
     (acc, chainID) => [
       ...acc,
-      ...soulData[Number(chainID) as ChainId].map((soul) => ({
-        ...soul,
+      ...humanityData[Number(chainID) as ChainId].map((humanity) => ({
+        ...humanity,
         chainID: Number(chainID),
       })),
     ],
@@ -29,30 +31,34 @@ const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce(
 
 const cursorAtom = atom(0);
 const chainStacksAtom =
-  atom<Record<number, soulResultType[]>>(initialChainStacks);
-const normalizedSoulsAtom = atom<SoulInterface[]>((get) =>
-  normalizeSouls(get(chainStacksAtom))
+  atom<Record<number, humanityResultType[]>>(initialChainStacks);
+const normalizedHumanitiesAtom = atom<HumanityInterface[]>((get) =>
+  normalizeHumanities(get(chainStacksAtom))
 );
 
-interface SoulsFilters {
+interface HumanitiesFilters {
   searchQuery: string;
   loadContinued: boolean;
   chain: ChainId | "all";
 }
 
-export const soulsAtom = atom(
+export const humanitiesAtom = atom(
   (get) =>
-    get(normalizedSoulsAtom).slice(0, SOULS_DISPLAY_BATCH * get(cursorAtom)),
+    get(normalizedHumanitiesAtom).slice(
+      0,
+      HUMANITIES_DISPLAY_BATCH * get(cursorAtom)
+    ),
   async (
     get,
     set,
-    { searchQuery, loadContinued, chain: fromChain = "all" }: SoulsFilters
+    { searchQuery, loadContinued, chain: fromChain = "all" }: HumanitiesFilters
   ) => {
     let chainStacks = get(chainStacksAtom);
     let cursor = loadContinued ? get(cursorAtom) + 1 : 1;
 
     const fetchChainIds: number[] = [];
-    const fetchPromises: Promise<ReturnType<sdkReturnType["Souls"]>>[] = [];
+    const fetchPromises: Promise<ReturnType<sdkReturnType["Humanities"]>>[] =
+      [];
 
     chainStacks = SUPPORTED_CHAIN_IDS.reduce(
       (acc, chainID) => ({
@@ -68,13 +74,14 @@ export const soulsAtom = atom(
     for (const chainID of SUPPORTED_CHAIN_IDS) {
       if (fromChain !== "all" && fromChain !== chainID) continue;
 
-      const displayedForChain = get(soulsAtom).filter(
-        (soul) => soul.chainID === chainID
+      const displayedForChain = get(humanitiesAtom).filter(
+        (humanity) => humanity.chainID === chainID
       ).length;
 
       if (
         !loadContinued ||
-        displayedForChain + SOULS_DISPLAY_BATCH >= chainStacks[chainID].length
+        displayedForChain + HUMANITIES_DISPLAY_BATCH >=
+          chainStacks[chainID].length
       ) {
         const where = {
           ...(searchQuery ? { id: searchQuery } : undefined),
@@ -82,11 +89,11 @@ export const soulsAtom = atom(
 
         fetchChainIds.push(chainID);
         fetchPromises.push(
-          queryFetch(chainID, "Souls", {
-            first: SOULS_DISPLAY_BATCH * 4,
+          queryFetch(chainID, "Humanities", {
+            first: HUMANITIES_DISPLAY_BATCH * 4,
             skip: loadContinued
-              ? get(normalizedSoulsAtom).filter(
-                  (soul) => soul.chainID === chainID
+              ? get(normalizedHumanitiesAtom).filter(
+                  (humanity) => humanity.chainID === chainID
                 ).length
               : 0,
             where,
@@ -98,17 +105,16 @@ export const soulsAtom = atom(
     if (fetchChainIds.length) {
       const res = await Promise.all(fetchPromises);
 
-      const fetchedSouls = fetchChainIds.reduce<queryReturnType<"Souls">>(
-        (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
-        {}
-      );
+      const fetchedHumanities = fetchChainIds.reduce<
+        queryReturnType<"Humanities">
+      >((acc, chainID, i) => ({ ...acc, [chainID]: res[i] }), {});
 
       chainStacks = fetchChainIds.reduce(
         (acc, chainID) => ({
           ...acc,
           [chainID]: [
             ...(loadContinued ? chainStacks[chainID] : []),
-            ...fetchedSouls[chainID].souls,
+            ...fetchedHumanities[chainID].humanities,
           ],
         }),
         chainStacks

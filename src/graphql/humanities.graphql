@@ -1,5 +1,5 @@
-query Souls($skip: Int, $first: Int, $where: Soul_filter) {
-  souls(first: $first, skip: $skip, where: $where) {
+query Humanities($skip: Int, $first: Int, $where: Humanity_filter) {
+  humanities(first: $first, skip: $skip, where: $where) {
     id
     claimed
     expirationTime

@@ -1,30 +1,20 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
-import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ALink from "components/ALink";
 import Popover from "components/Popover";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { injected } from "hooks/connectors";
 import useChangeChain from "hooks/useChangeChain";
+import useConnect from "hooks/useConnect";
+import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
-import { injected } from "utils/connectors";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
 const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 
 const Header: React.FC = () => {
-  const { account, activate, library, chainId } = useWeb3React<Web3Provider>();
+  useConnect();
+  const { chainId, account, ENSName } = useWeb3(false);
   const changeChain = useChangeChain();
-  const [ens, setENS] = useState<string | null>(null);
-
-  const getENS = async () => {
-    if (!library || !account) return;
-    setENS(await library.lookupAddress(account));
-  };
-
-  useEffect(() => {
-    getENS();
-  }, [account]);
 
   return (
     <nav
@@ -49,8 +39,8 @@ const Header: React.FC = () => {
                    font-bold whitespace-nowrap"
       >
         <Link to="/">Requests</Link>
-        <Link to="/souls">Souls</Link>
-        {/* {account && <Link to={`/soul/${account}`}>Soul</Link>} */}
+        <Link to="/humanities">Humanities</Link>
+        {/* {account && <Link to={`/humanity/${account}`}>Humanity</Link>} */}
         {account && <Link to="/claim">Claim</Link>}
       </div>
 
@@ -89,9 +79,9 @@ const Header: React.FC = () => {
           className="mr-2 py-1 px-4
                      border border-white rounded
                      text-white text-sm"
-          onClick={() => activate(injected)}
+          onClick={() => injected.connector.activate()}
         >
-          {!!account ? (ens ? ens : shortenAddress(account)) : "Connect"}
+          {!!account ? ENSName ?? shortenAddress(account) : "Connect"}
         </button>
 
         <button

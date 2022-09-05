@@ -1,0 +1,19 @@
+query Humanity($id: ID!) {
+  humanity(id: $id) {
+    id
+    claimed
+    claimTime
+    expirationTime
+    owner {
+      id
+      name
+    }
+    nbPendingRequests
+    pendingRequests: requests(where: { status_not: Resolved }) {
+      id
+      status
+      registration
+      requester
+    }
+  }
+}

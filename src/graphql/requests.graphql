@@ -16,7 +16,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
       id
       name
     }
-    soul {
+    humanity {
       id
       nbRequests
       claimed

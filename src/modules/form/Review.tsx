@@ -10,9 +10,13 @@ import Video from "components/Video";
 import useBalance from "hooks/useBalance";
 import { useGasFees } from "hooks/useGasFees";
 import { useLoading } from "hooks/useLoading";
-import { useClaimSoul, useRequestTotalCost } from "hooks/useProofOfHumanity";
+import {
+  useClaimHumanity,
+  useRequestTotalCost,
+} from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
 import { EvidenceFile, RegistrationFile } from "types/docs";
+import { machinifyId } from "utils/identifier";
 import { uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 import { useFormContext } from "./context";
@@ -23,16 +27,16 @@ const Review: React.FC<ReviewProps> = () => {
   const { account } = useWeb3();
   const {
     setStep,
-    state: { soulId, name, bio, photo, video, videoType },
+    state: { humanityId, name, bio, photo, video, videoType },
   } = useFormContext();
   const loading = useLoading();
-  const [claimSoul] = useClaimSoul();
+  const claimHumanity = useClaimHumanity();
   const totalCost = useRequestTotalCost();
   const [selfFunded, setSelfFunded] = useState<number>(
     parseFloat(formatEther(totalCost || Zero))
   );
   const [estimatedGasFees, estimationError] = useGasFees(
-    "claimSoul(string,string)",
+    "claimHumanity(string,string)",
     [name, "ipfs/randomhashtoestimategasfees/evidence.json"]
   );
   const [ipfsUri, setIpfsUri] = useState<string>();
@@ -87,8 +91,8 @@ const Review: React.FC<ReviewProps> = () => {
 
     loading.start("Executing");
 
-    if (soulId)
-      await claimSoul(soulId, uri, name, {
+    if (humanityId)
+      await claimHumanity(machinifyId(humanityId), uri, name, {
         value: parseEther(selfFunded.toString()),
       });
 

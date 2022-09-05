@@ -8,7 +8,7 @@ const Info: React.FC = () => {
     advance,
     tookNotice,
     setTookNotice,
-    state: { soulId, name, bio },
+    state: { humanityId, name, bio },
     dispatch,
   } = useFormContext();
 
@@ -34,9 +34,9 @@ const Info: React.FC = () => {
       <Field label="Connected wallet" value={account} disabled />
       <Field
         disabled
-        label="Soul you claim"
-        placeholder="ID of the soul you want to claim"
-        value={soulId}
+        label="Humanity you claim"
+        placeholder="ID of the humanity you want to claim"
+        value={humanityId}
         onChange={(e) => dispatch({ type: "SOUL_ID", payload: e.target.value })}
       />
       <Field
@@ -69,7 +69,7 @@ const Info: React.FC = () => {
 
       <button
         className="btn-main"
-        disabled={!soulId || !name || !tookNotice}
+        disabled={!humanityId || !name || !tookNotice}
         onClick={advance}
       >
         NEXT

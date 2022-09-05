@@ -1,10 +1,11 @@
 import UAParser from "ua-parser-js";
 
-export const USER_AGENT = new UAParser.UAParser(
-  navigator.userAgent
-).getResult();
+const parser = new UAParser(navigator.userAgent);
+export const USER_AGENT = parser.getResult();
 
-export const OS = USER_AGENT.os;
-export const IS_MOBILE = USER_AGENT.device.type === "mobile";
+const device = parser.getDevice();
+export const IS_MOBILE = device.type === "mobile" || device.type === "tablet";
+
+export const OS = parser.getOS();
 export const IS_IOS = OS.name === "iOS";
 export const IS_ANDROID = OS.name === "Android";

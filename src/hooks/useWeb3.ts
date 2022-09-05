@@ -1,18 +1,35 @@
-import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
-import { Web3ReactContextInterface } from "@web3-react/core/dist/types";
-import { SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { Web3Provider } from "@ethersproject/providers";
+import { Connector } from "@web3-react/types";
+import { ChainId } from "constants/chains";
+import { injected, network } from "./connectors";
 
-const useWeb3 = (network: boolean = false) => {
-  if (network) return useWeb3React<JsonRpcProvider>("NETWORK");
+interface Web3Interface {
+  connector: Connector;
+  account?: string;
+  chainId?: ChainId;
+  isActive: boolean;
+  provider?: Web3Provider;
+  ENSName?: string;
+}
 
-  const web3 = useWeb3React<Web3Provider>();
+const useWeb3 = (useNetwork: boolean = true): Web3Interface => {
+  const networkState = {
+    connector: network.connector,
+    chainId: network.hooks.useChainId(),
+    isActive: network.hooks.useIsActive(),
+    provider: network.hooks.useProvider(),
+  };
 
-  return {
-    ...web3,
-    active:
-      web3.active && !!SUPPORTED_CHAIN_IDS.find((c) => c === web3.chainId),
-  } as Web3ReactContextInterface<Web3Provider>;
+  const injectedState = {
+    connector: injected.connector,
+    ENSName: injected.hooks.useENSName(),
+    account: injected.hooks.useAccount(),
+    chainId: injected.hooks.useChainId(),
+    isActive: injected.hooks.useIsActive(),
+    provider: injected.hooks.useProvider(),
+  };
+
+  return useNetwork ? networkState : injectedState;
 };
 
 export default useWeb3;

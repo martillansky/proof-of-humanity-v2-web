@@ -6,7 +6,7 @@ query Request($id: ID!) {
     requester
     creationTime
     lastStatusChange
-    soul {
+    humanity {
       id
       claimed
     }
@@ -17,7 +17,7 @@ query Request($id: ID!) {
         from {
           id
         }
-        soul {
+        humanity {
           id
         }
       }

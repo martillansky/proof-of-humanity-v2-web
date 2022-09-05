@@ -11,6 +11,7 @@ import Identicon from "components/Identicon";
 import Image from "components/Image";
 import Label from "components/Label";
 import Modal from "components/Modal";
+import PageLoader from "components/PageLoader";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
 import { CHAIN, ChainId } from "constants/chains";
@@ -29,12 +30,17 @@ import {
 import Challenge from "modules/challenge";
 import EvidenceSection from "modules/evidence/Section";
 import { explorerLink, shortenAddress } from "utils/address";
-import { decodeId } from "utils/identifier";
+import { machinifyId } from "utils/identifier";
 import { ipfs } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 
+const genRequestId = (humanityId: string, index: string) =>
+  keccak256(
+    concat([machinifyId(humanityId!), BigNumber.from(index).toHexString()])
+  );
+
 const Request: React.FC = () => {
-  const { soul, index, chain, old } = useParams();
+  const { humanity, index, chain, old } = useParams();
 
   const isV1 = old === "v1";
   const chainId = useMemo<ChainId | undefined>(
@@ -42,44 +48,42 @@ const Request: React.FC = () => {
     [chain]
   );
 
-  const { request } = useRequest(
+  const request = useRequest(
     chainId,
-    useMemo(
-      () =>
-        keccak256(
-          concat([
-            BigNumber.from(decodeId(soul!)).toHexString(),
-            BigNumber.from(index).toHexString(),
-          ])
-        ),
-      []
-    )
+    useMemo(() => genRequestId(humanity!, index!), [])
   );
   const [evidence] = useIPFS<EvidenceFileInterface>(request?.evidence[0]?.URI);
   const [registration] = useIPFS<RegistrationFileInterface>(evidence?.fileURI);
 
   const [requiredVouches] = useRequiredNumberOfVouches();
   const [challengePeriodDuration] = useChallengePeriodDuration();
-  const [advanceState] = useAdvanceState();
-  const [executeRequest] = useExecuteRequest();
-  const [addVouch] = useAddVouch();
-  const [fundRequest] = useFundRequest();
+  const advanceState = useAdvanceState();
+  const executeRequest = useExecuteRequest();
+  const addVouch = useAddVouch();
+  const fundRequest = useFundRequest();
   const totalCost = useRequestTotalCost();
 
-  if (!request || !evidence || !registration || !soul || !index || !chainId) {
-    // console.log({ request, evidence, registration, soul, index, chainId });
-    return <div>Loading...</div>;
-  }
+  console.log({ challengePeriodDuration });
+
+  const challengePeriodEnd = useMemo(
+    () =>
+      challengePeriodDuration &&
+      request &&
+      challengePeriodDuration.add(request.lastStatusChange).toNumber(),
+    [request, challengePeriodDuration]
+  );
+
+  if (!request || !evidence || !registration || !humanity || !index || !chainId)
+    return <PageLoader />;
 
   const ChainLogo = CHAIN[chainId].Logo;
 
   const fullName = registration.firstName
     ? `${registration.firstName} ${registration.lastName}`
     : registration.name;
-  const funded = request.challenges[0].rounds[0].requesterFunds;
-  const challengePeriodEnd =
-    challengePeriodDuration &&
-    challengePeriodDuration.add(request.lastStatusChange).toNumber();
+  const funded = !isV1 && request.challenges[0].rounds[0].requesterFunds;
+
+  console.log(request.status, challengePeriodEnd);
 
   return (
     <div
@@ -110,14 +114,14 @@ const Request: React.FC = () => {
           <span className="font-bold">{fullName}</span>
           <span className="mb-4">{registration.bio}</span>
           <div className="mb-8 flex flex-col items-center font-semibold text-green-500">
-            <span>Soul:</span>
-            <strong>{soul}</strong>
+            <span>Humanity:</span>
+            <strong>{humanity}</strong>
           </div>
 
           {isV1 ? (
             <>
               <ALink
-                href={`https://app.proofofhumanity.id/profile/${request.soul.id}`}
+                href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
                 className="text-center font-semibold text-blue-500"
               >
                 This is a profile registered on the old contract. Check it out
@@ -139,7 +143,7 @@ const Request: React.FC = () => {
                   <button
                     className="btn-main mb-2"
                     onClick={async () =>
-                      await addVouch(request.requester, request.soul.id)
+                      await addVouch(request.requester, request.humanity.id)
                     }
                   >
                     Vouch
@@ -162,7 +166,10 @@ const Request: React.FC = () => {
                         <button
                           className="btn-main mb-2"
                           onClick={async () =>
-                            await addVouch(request.requester, request.soul.id)
+                            await addVouch(
+                              request.requester,
+                              request.humanity.id
+                            )
                           }
                         >
                           Fund request
@@ -215,7 +222,7 @@ const Request: React.FC = () => {
                   <button
                     className="btn-main mb-2"
                     onClick={async () =>
-                      await executeRequest(request.soul.id, index)
+                      await executeRequest(request.humanity.id, index)
                     }
                     disabled={challengePeriodEnd > Date.now() / 1000}
                   >
@@ -263,8 +270,7 @@ const Request: React.FC = () => {
       </div>
 
       <EvidenceSection
-        chainId={chainId}
-        soulId={request.soul.id}
+        humanityId={request.humanity.id}
         requestIndex={index}
         request={request}
       />

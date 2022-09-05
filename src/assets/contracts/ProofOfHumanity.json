@@ -19,12 +19,6 @@
         "internalType": "enum ProofOfHumanity.Party",
         "name": "side",
         "type": "uint8"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
       }
     ],
     "name": "AppealContribution",
@@ -73,9 +67,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -143,7 +137,7 @@
       {
         "indexed": false,
         "internalType": "uint64",
-        "name": "soulLifespan",
+        "name": "humanityLifespan",
         "type": "uint64"
       },
       {
@@ -198,40 +192,15 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "evidence",
-        "type": "string"
-      }
-    ],
-    "name": "EvidenceAppended",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "beneficiary",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -266,6 +235,143 @@
       }
     ],
     "name": "GovernorChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "requester",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "evidence",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      }
+    ],
+    "name": "HumanityClaim",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "expirationTime",
+        "type": "uint64"
+      }
+    ],
+    "name": "HumanityGrantedManually",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "requester",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "evidence",
+        "type": "string"
+      }
+    ],
+    "name": "HumanityRenewal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "requester",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "evidence",
+        "type": "string"
+      }
+    ],
+    "name": "HumanityRevocation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "human",
+        "type": "address"
+      }
+    ],
+    "name": "HumanityRevokedManually",
     "type": "event"
   },
   {
@@ -313,9 +419,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -353,12 +459,6 @@
         "internalType": "address",
         "name": "claimer",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
       }
     ],
     "name": "RequestContribution",
@@ -369,9 +469,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -388,9 +488,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -444,158 +544,21 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "requester",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "evidence",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      }
-    ],
-    "name": "SoulClaim",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "expirationTime",
-        "type": "uint64"
-      }
-    ],
-    "name": "SoulGrantedManually",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "requester",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "evidence",
-        "type": "string"
-      }
-    ],
-    "name": "SoulRenewal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "requester",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "evidence",
-        "type": "string"
-      }
-    ],
-    "name": "SoulRevokal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "human",
-        "type": "address"
-      }
-    ],
-    "name": "SoulRevokedManually",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "sharedStakeMultiplier",
+        "name": "sharedMultiplier",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "winnerStakeMultiplier",
+        "name": "winnerMultiplier",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "loserStakeMultiplier",
+        "name": "loserMultiplier",
         "type": "uint256"
       }
     ],
@@ -632,9 +595,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       }
     ],
     "name": "VouchAdded",
@@ -657,9 +620,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       }
     ],
     "name": "VouchRemoved",
@@ -670,9 +633,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       },
       {
         "indexed": false,
@@ -698,9 +661,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       }
     ],
     "name": "addVouch",
@@ -788,40 +751,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "arbitratorDisputeIdToDisputeData",
-    "outputs": [
-      {
-        "internalType": "uint96",
-        "name": "requestId",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint96",
-        "name": "challengeId",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
       
     ],
     "name": "challengePeriodDuration",
@@ -838,9 +767,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint64",
@@ -904,7 +833,7 @@
     "inputs": [
       {
         "internalType": "uint64",
-        "name": "_soulLifespan",
+        "name": "_humanityLifespan",
         "type": "uint64"
       },
       {
@@ -1018,6 +947,11 @@
   {
     "inputs": [
       {
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
+      },
+      {
         "internalType": "string",
         "name": "_evidence",
         "type": "string"
@@ -1028,7 +962,7 @@
         "type": "string"
       }
     ],
-    "name": "claimSoul",
+    "name": "claimHumanity",
     "outputs": [
       
     ],
@@ -1038,11 +972,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
-      },
-      {
         "internalType": "string",
         "name": "_evidence",
         "type": "string"
@@ -1053,7 +982,7 @@
         "type": "string"
       }
     ],
-    "name": "claimSoul",
+    "name": "claimHumanity",
     "outputs": [
       
     ],
@@ -1078,9 +1007,43 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "disputeIdToData",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "requestId",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "challengeId",
+        "type": "uint96"
+      },
+      {
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1098,9 +1061,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1158,9 +1121,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1221,9 +1184,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1265,9 +1228,53 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
+      }
+    ],
+    "name": "getHumanityInfo",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "vouching",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "pendingRevocation",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint64",
+        "name": "nbPendingRequests",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "expirationTime",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nbRequests",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1289,9 +1296,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1353,9 +1360,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1406,50 +1413,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
-      }
-    ],
-    "name": "getSoulInfo",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "vouching",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "pendingRevokal",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint64",
-        "name": "nbPendingRequests",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "expirationTime",
-        "type": "uint64"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nbRequests",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
       
     ],
     "name": "governor",
@@ -1466,9 +1429,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "address",
@@ -1481,7 +1444,7 @@
         "type": "uint64"
       }
     ],
-    "name": "grantSoulManually",
+    "name": "grantManually",
     "outputs": [
       {
         "internalType": "bool",
@@ -1490,6 +1453,21 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      
+    ],
+    "name": "humanityLifespan",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1503,9 +1481,9 @@
     "name": "humans",
     "outputs": [
       {
-        "internalType": "uint160",
+        "internalType": "bytes20",
         "name": "",
-        "type": "uint160"
+        "type": "bytes20"
       }
     ],
     "stateMutability": "view",
@@ -1540,7 +1518,7 @@
       },
       {
         "internalType": "uint64",
-        "name": "_soulLifespan",
+        "name": "_humanityLifespan",
         "type": "uint64"
       },
       {
@@ -1589,12 +1567,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_humanId",
-        "type": "address"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       }
     ],
-    "name": "isRegistered",
+    "name": "isClaimed",
     "outputs": [
       {
         "internalType": "bool",
@@ -1608,12 +1586,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "address",
+        "name": "_humanId",
+        "type": "address"
       }
     ],
-    "name": "isSoulClaimed",
+    "name": "isHuman",
     "outputs": [
       {
         "internalType": "bool",
@@ -1642,9 +1620,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1672,9 +1650,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       }
     ],
     "name": "removeVouch",
@@ -1692,7 +1670,7 @@
         "type": "string"
       }
     ],
-    "name": "renewSoul",
+    "name": "renewHumanity",
     "outputs": [
       
     ],
@@ -1747,9 +1725,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "string",
@@ -1757,7 +1735,7 @@
         "type": "string"
       }
     ],
-    "name": "revokeSoul",
+    "name": "revokeHumanity",
     "outputs": [
       
     ],
@@ -1772,7 +1750,7 @@
         "type": "address"
       }
     ],
-    "name": "revokeSoulManually",
+    "name": "revokeManually",
     "outputs": [
       {
         "internalType": "uint64",
@@ -1780,9 +1758,9 @@
         "type": "uint64"
       },
       {
-        "internalType": "uint160",
-        "name": "soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "humanityId",
+        "type": "bytes20"
       }
     ],
     "stateMutability": "nonpayable",
@@ -1825,25 +1803,10 @@
   },
   {
     "inputs": [
-      
-    ],
-    "name": "soulLifespan",
-    "outputs": [
       {
-        "internalType": "uint64",
-        "name": "",
-        "type": "uint64"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
@@ -1876,9 +1839,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint160",
+        "internalType": "bytes20",
         "name": "",
-        "type": "uint160"
+        "type": "bytes20"
       }
     ],
     "name": "vouches",
@@ -1915,9 +1878,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint160",
-        "name": "_soulId",
-        "type": "uint160"
+        "internalType": "bytes20",
+        "name": "_humanityId",
+        "type": "bytes20"
       },
       {
         "internalType": "uint256",
