@@ -1,0 +1,11 @@
+{
+    "background_color": "#fff",
+    "display": "standalone",
+    "homepage_url": "https://poh.vercel.app",
+    "name": "Proof of Humanity",
+    "description": "Proof of Humanity",
+    "iconPath": "./ProofOfHumanityLogo.svg",
+    "short_name": "PoH",
+    "start_url": ".",
+    "theme_color": "#FF9966"
+}
