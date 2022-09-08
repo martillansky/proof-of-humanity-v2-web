@@ -1,10 +1,9 @@
-import cn from "classnames";
 import { Suspense, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { RequestInterface } from "api/requests";
 import ErrorBoundary from "components/ErrorBoundary";
 import { CHAIN } from "constants/chains";
-import { STATUS_TO_COLOR } from "constants/misc";
+import { getColorForStatus } from "constants/misc";
 import { queryToStatus } from "constants/requests";
 import { camelToTitle } from "utils/case";
 import { prettifyId } from "utils/identifier";
@@ -16,28 +15,22 @@ const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
     () => queryToStatus(request.status, request.registration),
     [request]
   );
+  const statusColor = getColorForStatus(request.status, request.registration);
 
   return (
     <Link
       to={`/request/${CHAIN[request.chainID].NAME.toLowerCase()}/${prettifyId(
         request.humanity.id
       )}/${request.index}${request.old ? "/v1" : ""}`}
-      className="rounded shadow flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
+      className="h-84 rounded border shadow-sm flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
-      <div className="justify-between bg-slate-100 font-light">
-        <div
-          className={cn("w-full h-1", `bg-${STATUS_TO_COLOR[request.status]}`)}
-        />
+      <div className="justify-between bg-shade-50 font-light">
+        <div className={`w-full h-1 bg-status-${statusColor}`} />
         <div className="p-2 centered font-semibold">
-          <span className={`text-${STATUS_TO_COLOR[request.status]}`}>
+          <span className={`text-status-${statusColor}`}>
             {camelToTitle(status)}
           </span>
-          <span
-            className={cn(
-              "m-1 h-2 w-2 rounded-full",
-              `bg-${STATUS_TO_COLOR[request.status]}`
-            )}
-          />
+          <span className={`dot m-1 bg-status-${statusColor}`} />
         </div>
       </div>
 

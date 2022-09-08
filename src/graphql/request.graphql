@@ -9,6 +9,16 @@ query Request($id: ID!) {
     humanity {
       id
       claimed
+      winnerClaimRequest: requests(
+        where: { status: Resolved, registration: true }
+        orderBy: resolutionTime
+        orderDirection: desc
+      ) {
+        index
+        evidence(orderBy: creationTime, first: 1) {
+          URI
+        }
+      }
     }
     claimer {
       id
@@ -22,7 +32,7 @@ query Request($id: ID!) {
         }
       }
     }
-    evidence(orderBy: creationTime) {
+    evidence(orderBy: creationTime, orderDirection: desc) {
       creationTime
       id
       URI
@@ -42,6 +52,10 @@ query Request($id: ID!) {
         requesterFunds
         challengerFunds
       }
+    }
+    arbitratorData {
+      metaEvidenceUpdateTime
+      registrationMeta
     }
   }
 }

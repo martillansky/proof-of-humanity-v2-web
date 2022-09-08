@@ -43,14 +43,10 @@ const Home: React.FC = () => {
     prevListLength === requests.length; // Submissions loaded filled a batch but no more were loaded previously
   // TODO not perfect, maybe add this to a separate atom?
 
+  if (!requests.length) return <PageLoader />;
+
   return (
-    <div
-      className="py-4 px-8
-                 flex flex-col justify-center
-                 sm:px-12
-                 md:py-8 md:px-16
-                 lg:px-32"
-    >
+    <div className="content-wide flex flex-col justify-center">
       <div className="my-4 py-2 flex">
         <input
           className="w-full p-2 mr-2 border rounded"
@@ -88,12 +84,8 @@ const Home: React.FC = () => {
         </Dropdown>
       </div>
 
-      {loading.active && !requests.length ? (
-        // <LoadingCardList />
-        <PageLoader />
-      ) : (
-        <CardList requests={requests} />
-      )}
+      <CardList requests={requests} />
+
       {!loading.active && !loadExhausted && (
         <button
           className="mx-auto my-8 px-8 py-4 bg-amber-400 rounded-full text-white font-bold shadow-md shadow-orange-500/10"

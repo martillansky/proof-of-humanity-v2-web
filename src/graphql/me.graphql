@@ -1,0 +1,13 @@
+query Me($id: ID!) {
+  claimer(id: $id) {
+    humanity {
+      id
+    }
+    targetHumanity {
+      id
+    }
+    currentRequest {
+      id
+    }
+  }
+}

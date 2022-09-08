@@ -25,7 +25,7 @@ const EvidenceItem: React.FC<EvidenceItemInterface> = ({
 
   return (
     <div className="mt-4 flex flex-col">
-      <div className="relative px-8 py-4 bg-white border shadow-sm rounded-sm">
+      <div className="paper relative px-8 py-4">
         <span className="absolute left-3 text-sm text-slate-500">
           {romanize(index + 1)}
         </span>

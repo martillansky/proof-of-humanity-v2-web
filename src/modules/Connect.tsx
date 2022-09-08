@@ -1,7 +1,7 @@
 import { Connector } from "@web3-react/types";
 import { useCallback, useEffect } from "react";
-import { injected, network } from "./connectors";
-import useSuggestedChain from "./useSuggestedChain";
+import useSuggestedChain from "hooks/useSuggestedChain";
+import { injected, network } from "utils/connectors";
 
 const connect = async (connector: Connector) => {
   try {
@@ -14,9 +14,9 @@ const connect = async (connector: Connector) => {
 
 const { useChainId } = network.hooks;
 
-const useConnect = () => {
-  const suggestedChainId = useSuggestedChain();
+const Connect = () => {
   const chainId = useChainId();
+  const suggestedChainId = useSuggestedChain();
 
   const syncChain = useCallback(
     async (desiredChainId: number) => {
@@ -39,6 +39,8 @@ const useConnect = () => {
     if (!suggestedChainId) return;
     syncChain(suggestedChainId);
   }, [suggestedChainId, chainId]);
+
+  return null;
 };
 
-export default useConnect;
+export default Connect;

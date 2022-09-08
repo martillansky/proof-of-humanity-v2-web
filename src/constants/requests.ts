@@ -3,14 +3,18 @@ import { Status } from "generated/graphql";
 export const REQUEST_STATUS = {
   all: { filter: {} },
   vouching: { filter: { status: Status.Vouching } },
-  resolvingClaim: { filter: { status: Status.Resolving, registration: true } },
-  resolvingRevokal: {
+  pendingClaim: { filter: { status: Status.Resolving, registration: true } },
+  pendingRevocation: {
     filter: { status: Status.Resolving, registration: false },
   },
   disputedClaim: { filter: { status: Status.Disputed, registration: true } },
-  disputedRevokal: { filter: { status: Status.Disputed, registration: false } },
+  disputedRevocation: {
+    filter: { status: Status.Disputed, registration: false },
+  },
   resolvedClaim: { filter: { status: Status.Resolved, registration: true } },
-  resolvedRevokal: { filter: { status: Status.Resolved, registration: false } },
+  resolvedRevocation: {
+    filter: { status: Status.Resolved, registration: false },
+  },
 } as const;
 
 export type RequestStatus = keyof typeof REQUEST_STATUS;
@@ -23,11 +27,11 @@ export const queryToStatus = (
     case Status.Vouching:
       return "vouching";
     case Status.Resolving:
-      return registration ? "resolvingClaim" : "resolvingRevokal";
+      return registration ? "pendingClaim" : "pendingRevocation";
     case Status.Disputed:
-      return registration ? "disputedClaim" : "disputedRevokal";
+      return registration ? "disputedClaim" : "disputedRevocation";
     case Status.Resolved:
-      return registration ? "resolvedClaim" : "resolvedRevokal";
+      return registration ? "resolvedClaim" : "resolvedRevocation";
     default:
       return "all";
   }

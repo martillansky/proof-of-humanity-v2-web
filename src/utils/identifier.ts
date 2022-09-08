@@ -10,4 +10,4 @@ export const machinifyId = (s: string) =>
 export const shortenId = (id: string, chars = 4) =>
   id.length <= 2 * chars
     ? id
-    : `${id.substring(0, chars)}~${id.substring(id.length - chars)}`;
+    : `${id.substring(0, chars)}~👻~${id.substring(id.length - chars)}`;

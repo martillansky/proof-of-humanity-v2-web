@@ -1,6 +1,5 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
 import { humanitiesAtom } from "api/humanities";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
@@ -10,7 +9,6 @@ import { HUMANITIES_DISPLAY_BATCH } from "constants/misc";
 import useDebounce from "hooks/useDebounce";
 import { useLoading } from "hooks/useLoading";
 import HumanityCard from "modules/humanity/Card";
-import HumanityWidget from "modules/humanity/Widget";
 import { camelToTitle } from "utils/case";
 
 const Humanities: React.FC = () => {
@@ -45,12 +43,7 @@ const Humanities: React.FC = () => {
   if (loading.active) return <PageLoader />;
 
   return (
-    <div
-      className="py-4 px-8
-                 sm:px-12
-                 md:py-8 md:px-16
-                 lg:px-32"
-    >
+    <div className="content-wide">
       <div className="my-4 py-2 flex">
         <input
           className="w-full p-2 mr-2 border rounded"
@@ -78,9 +71,9 @@ const Humanities: React.FC = () => {
         </Dropdown>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {humanities.map((humanity) => (
-          <HumanityCard humanity={humanity} />
+          <HumanityCard key={humanity.id} humanity={humanity} />
         ))}
       </div>
 

@@ -4,7 +4,7 @@ import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 import Card from "./Individual";
 
 const CardList: React.FC<{ requests: RequestInterface[] }> = ({ requests }) => (
-  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
     {requests.map((requests, i) => (
       <Card key={i} request={requests} />
     ))}
@@ -14,7 +14,7 @@ const CardList: React.FC<{ requests: RequestInterface[] }> = ({ requests }) => (
 export default CardList;
 
 export const LoadingCardList: React.FC = () => (
-  <div className="animate-pulse grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+  <div className="animate-pulse grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
     {[...Array(12)].map((_, i) => (
       <div
         key={i}

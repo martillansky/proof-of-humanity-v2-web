@@ -13,7 +13,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
   return (
     <div className="flex flex-col text-black">
       <div
-        className="p-4 flex justify-between overflow-hidden border bg-white font-bold cursor-pointer shadow rounded-sm"
+        className="paper p-4 flex justify-between overflow-hidden font-bold cursor-pointer"
         onClick={() => setOpen((o) => !o)}
       >
         <span>{title}</span>

@@ -14,13 +14,14 @@ import useWeb3 from "hooks/useWeb3";
 import { phraseFromAddress } from "utils/address";
 import { useFormContext } from "./context";
 import { VideoType } from "./reducer";
+import useFormNavigate from "./useFormNavigate";
 
 const MIN_DIMS = { width: 352, height: 352 };
 
 const VideoStep: React.FC = () => {
   const { account } = useWeb3();
+  const nav = useFormNavigate();
   const {
-    advance,
     state: { video, videoType },
     dispatch,
   } = useFormContext();
@@ -92,15 +93,16 @@ const VideoStep: React.FC = () => {
           <span className="txt mb-4">
             You must be in a quiet room, with a working microphone and be able
             to read from your screen. You must speak the phrase{" "}
-            <span className="text-[#ff9966]">"</span>
+            <span className="text-theme">"</span>
             <strong>
-              I certify I am a real human and not registered in this registry
+              I certify that I am a real human and that I am not already
+              registered in this registry
             </strong>
-            <span className="text-[#ff9966]">"</span> accompanied by one of the
+            <span className="text-theme">"</span> accompanied by one of the
             following you choose:
           </span>
 
-          <div className="flex m-auto">
+          <div className="m-auto flex flex-col md:flex-row">
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
                 gradient: videoType === VideoType.SIGN,
@@ -108,7 +110,7 @@ const VideoStep: React.FC = () => {
             >
               <button
                 className={cn(
-                  "w-full h-full p-2 bg-white rounded-sm font-semibold ",
+                  "w-full h-16 p-2 bg-white rounded-sm font-semibold ",
                   videoType === VideoType.SIGN
                     ? "bg-orange-50"
                     : "hover:bg-slate-100"
@@ -120,7 +122,7 @@ const VideoStep: React.FC = () => {
                 Hold a sign with your address
               </button>
             </div>
-            <span className="txt self-center text-slate-400">OR</span>
+            <span className="my-2 txt self-center text-slate-400">OR</span>
             <div
               className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
                 gradient: videoType === VideoType.PHRASE,
@@ -128,7 +130,7 @@ const VideoStep: React.FC = () => {
             >
               <button
                 className={cn(
-                  "w-full h-full p-2 bg-white rounded-sm font-semibold",
+                  "w-full h-16 p-2 bg-white rounded-sm font-semibold",
                   videoType === VideoType.PHRASE
                     ? "bg-blend-overlay opacity-90"
                     : "hover:bg-slate-100"
@@ -148,23 +150,25 @@ const VideoStep: React.FC = () => {
         <span className="txt text-center my-8 mx-12">
           You must record yourself holding a sign with your address{" "}
           <strong>{account}</strong> and say the phrase{" "}
-          <span className="text-[#ff9966]">"</span>
+          <span className="text-theme">"</span>
           <strong>
-            I certify I am a real human and not registered in this registry
+            I certify that I am a real human and that I am not already
+            registered in this registry
           </strong>
-          <span className="text-[#ff9966]">"</span>
+          <span className="text-theme">"</span>
         </span>
       )}
 
       {videoType === VideoType.PHRASE && (
         <span className="txt text-center my-8 mx-12">
           You must record yourself saying the phrase{" "}
-          <span className="text-[#ff9966]">"</span>
+          <span className="text-theme">"</span>
           <strong>
-            I certify I am a real human and not registered in this registry. My
-            confirmation phrase is <strong>{phraseFromAddress(account)}</strong>
+            I certify that I am a real human and that I am not already
+            registered in this registry. My confirmation phrase is{" "}
+            <strong>{phraseFromAddress(account)}</strong>
           </strong>
-          <span className="text-[#ff9966]">"</span>
+          <span className="text-theme">"</span>
         </span>
       )}
 
@@ -209,7 +213,7 @@ const VideoStep: React.FC = () => {
               });
             }}
           >
-            <UploadIcon className="w-12 h-12 mr-4 fill-[#ff9966]" />
+            <UploadIcon className="w-12 h-12 mr-4 fill-theme" />
             <span className="text-lg font-semibold">Upload video</span>
           </Uploader>
 
@@ -218,7 +222,7 @@ const VideoStep: React.FC = () => {
                          p-1
                          border-2 border-slate-200
                          bg-white rounded-full 
-                         text-[#ff9966] text-xs font-semibold"
+                         text-theme text-xs font-semibold"
           >
             OR
           </span>
@@ -253,7 +257,7 @@ const VideoStep: React.FC = () => {
       {!!video && (
         <div className="flex flex-col items-center">
           <Video uri={video.uri} />
-          <button className="btn-main mt-4" onClick={advance}>
+          <button className="btn-main mt-4" onClick={nav.toReview}>
             Next
           </button>
         </div>
@@ -261,10 +265,10 @@ const VideoStep: React.FC = () => {
 
       {(showCamera || !!video) && (
         <button
-          className="centered mt-4 text-[#ff9966] font-semibold text-lg uppercase"
+          className="centered mt-4 text-theme font-semibold text-lg uppercase"
           onClick={() => retakeVideo()}
         >
-          <ResetIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+          <ResetIcon className="w-6 h-6 mr-2 fill-theme" />
           {showCamera ? "Return" : "Retake"}
         </button>
       )}

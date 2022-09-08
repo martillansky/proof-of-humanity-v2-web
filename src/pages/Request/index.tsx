@@ -1,36 +1,32 @@
-import cn from "classnames";
 import { BigNumber } from "ethers";
 import { concat, keccak256 } from "ethers/lib/utils";
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
+import useContractData from "api/useContractData";
 import { useRequest } from "api/useRequest";
 import ALink from "components/ALink";
-import Field from "components/Field";
 import Identicon from "components/Identicon";
 import Image from "components/Image";
 import Label from "components/Label";
-import Modal from "components/Modal";
 import PageLoader from "components/PageLoader";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
 import { CHAIN, ChainId } from "constants/chains";
-import { STATUS_TO_COLOR } from "constants/misc";
+import { getColorForStatus } from "constants/misc";
 import { Status } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
 import {
-  useAddVouch,
   useAdvanceState,
-  useChallengePeriodDuration,
   useExecuteRequest,
-  useFundRequest,
   useRequestTotalCost,
-  useRequiredNumberOfVouches,
 } from "hooks/useProofOfHumanity";
 import Challenge from "modules/challenge";
 import EvidenceSection from "modules/evidence/Section";
+import FundButton from "modules/funding/Button";
+import VouchButton from "modules/vouch/Button";
 import { explorerLink, shortenAddress } from "utils/address";
-import { machinifyId } from "utils/identifier";
+import { machinifyId, shortenId } from "utils/identifier";
 import { ipfs } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 
@@ -42,67 +38,63 @@ const genRequestId = (humanityId: string, index: string) =>
 const Request: React.FC = () => {
   const { humanity, index, chain, old } = useParams();
 
-  const isV1 = old === "v1";
   const chainId = useMemo<ChainId | undefined>(
     () => chain && ChainId[chain.toUpperCase()],
     [chain]
   );
 
+  const contractData = useContractData(chainId);
   const request = useRequest(
     chainId,
     useMemo(() => genRequestId(humanity!, index!), [])
   );
-  const [evidence] = useIPFS<EvidenceFileInterface>(request?.evidence[0]?.URI);
+
+  const [evidence] = useIPFS<EvidenceFileInterface>(
+    request &&
+      (request.registration
+        ? request
+        : request?.humanity.winnerClaimRequest[0]
+      ).evidence.at(-1)?.URI
+  );
   const [registration] = useIPFS<RegistrationFileInterface>(evidence?.fileURI);
 
-  const [requiredVouches] = useRequiredNumberOfVouches();
-  const [challengePeriodDuration] = useChallengePeriodDuration();
   const advanceState = useAdvanceState();
   const executeRequest = useExecuteRequest();
-  const addVouch = useAddVouch();
-  const fundRequest = useFundRequest();
   const totalCost = useRequestTotalCost();
 
-  console.log({ challengePeriodDuration });
-
-  const challengePeriodEnd = useMemo(
-    () =>
-      challengePeriodDuration &&
-      request &&
-      challengePeriodDuration.add(request.lastStatusChange).toNumber(),
-    [request, challengePeriodDuration]
-  );
+  const challengePeriodEnd =
+    contractData &&
+    request &&
+    BigNumber.from(contractData.challengePeriodDuration)
+      .add(request.lastStatusChange)
+      .toNumber();
 
   if (!request || !evidence || !registration || !humanity || !index || !chainId)
     return <PageLoader />;
 
   const ChainLogo = CHAIN[chainId].Logo;
 
+  const isV1 = old === "v1";
   const fullName = registration.firstName
     ? `${registration.firstName} ${registration.lastName}`
     : registration.name;
   const funded = !isV1 && request.challenges[0].rounds[0].requesterFunds;
-
-  console.log(request.status, challengePeriodEnd);
+  const statusColor = getColorForStatus(request.status, request.registration);
 
   return (
     <div
-      className="mt-8 mb-16 w-11/12
-                 sm:mt-12 sm:w-5/6
-                 lg:mt-16 lg:w-3/5
-                 mx-auto flex flex-col justify-center"
+      className="content
+                 mx-auto flex flex-col justify-center
+                 font-semibold"
     >
       <div className="p-4 border flex justify-between rounded shadow bg-white">
-        <span className="flex font-semibold">Request</span>
+        <span className="flex">
+          {request.registration ? <>Claim</> : <>Revocation</>} request
+        </span>
         <div className="flex items-center">
-          <span className={`text-${STATUS_TO_COLOR[request.status]}`}>
-            {request.status}
-          </span>
+          <span className={`text-status-${statusColor}`}>{request.status}</span>
           <span
-            className={cn(
-              "m-1 h-2 w-2 rounded-full",
-              `bg-${STATUS_TO_COLOR[request.status]}`
-            )}
+            className={`m-1 h-2 w-2 rounded-full bg-status-${statusColor}`}
           />
         </div>
       </div>
@@ -115,130 +107,81 @@ const Request: React.FC = () => {
           <span className="mb-4">{registration.bio}</span>
           <div className="mb-8 flex flex-col items-center font-semibold text-green-500">
             <span>Humanity:</span>
-            <strong>{humanity}</strong>
+            <Link to={`/humanity/${humanity}`}>{shortenId(humanity)} ➜</Link>
           </div>
 
-          {isV1 ? (
+          {isV1 && (
+            <ALink
+              href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
+              className="text-center font-semibold text-blue-500"
+            >
+              This is a profile registered on the old contract. Check it out
+              there.
+            </ALink>
+          )}
+
+          {!isV1 && request.status == Status.Vouching && (
             <>
-              <ALink
-                href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
-                className="text-center font-semibold text-blue-500"
-              >
-                This is a profile registered on the old contract. Check it out
-                there.
-              </ALink>
+              <Label>
+                Vouches:{" "}
+                <strong>
+                  {request.claimer?.vouchesReceived.length} /{" "}
+                  {contractData?.requiredNumberOfVouches}
+                </strong>
+              </Label>
+
+              <VouchButton request={request} />
+
+              {totalCost && (
+                <span className="font-semibold">
+                  Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
+                </span>
+              )}
+
+              <FundButton
+                totalCost={totalCost}
+                funded={funded}
+                request={request}
+              />
+
+              {request.claimer &&
+                contractData &&
+                request.claimer.vouchesReceived.length >=
+                  Number(contractData.requiredNumberOfVouches) && (
+                  <button
+                    className="btn-main mb-2"
+                    onClick={async () =>
+                      await advanceState(
+                        request.requester,
+                        request.claimer!.vouchesReceived.map((v) => v.from.id),
+                        []
+                      )
+                    }
+                  >
+                    Advance state
+                  </button>
+                )}
             </>
-          ) : (
+          )}
+
+          {!isV1 && request.status == Status.Resolving && challengePeriodEnd && (
             <>
-              {request.status == Status.Vouching && (
-                <>
-                  <Label>
-                    Vouches:{" "}
-                    <strong>
-                      {request.claimer?.vouchesReceived.length} /{" "}
-                      {requiredVouches?.toNumber()}
-                    </strong>
-                  </Label>
+              <button
+                className="btn-main mb-2"
+                onClick={async () =>
+                  await executeRequest(request.humanity.id, index)
+                }
+                disabled={challengePeriodEnd > Date.now() / 1000}
+              >
+                Execute request
+              </button>
 
-                  <button
-                    className="btn-main mb-2"
-                    onClick={async () =>
-                      await addVouch(request.requester, request.humanity.id)
-                    }
-                  >
-                    Vouch
-                  </button>
+              <Label>
+                Challenge period end:{" "}
+                {challengePeriodEnd && <TimeAgo time={challengePeriodEnd} />}
+              </Label>
 
-                  {totalCost && (
-                    <>
-                      <span className="font-semibold">
-                        Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
-                      </span>
-                      <span>
-                        Fully funded: {totalCost.eq(funded) ? "Yes" : "No"}
-                      </span>
-                    </>
-                  )}
-
-                  {totalCost && !totalCost.eq(funded) && (
-                    <Modal
-                      trigger={
-                        <button
-                          className="btn-main mb-2"
-                          onClick={async () =>
-                            await addVouch(
-                              request.requester,
-                              request.humanity.id
-                            )
-                          }
-                        >
-                          Fund request
-                        </button>
-                      }
-                    >
-                      <div className="flex flex-col">
-                        <div className="w-full p-4 flex justify-center rounded font-bold">
-                          {totalCost && formatEth(totalCost)} ETH Deposit
-                        </div>
-                        <Field label="Amount" value={formatEth(totalCost)} />
-                        <button
-                          onClick={async () =>
-                            await fundRequest(request.requester, {
-                              value: totalCost,
-                            })
-                          }
-                          className="btn-main mt-12"
-                        >
-                          Fund
-                        </button>
-                      </div>
-                    </Modal>
-                  )}
-
-                  {request.claimer &&
-                    requiredVouches &&
-                    request.claimer.vouchesReceived.length >=
-                      requiredVouches!.toNumber() && (
-                      <button
-                        className="btn-main mb-2"
-                        onClick={async () =>
-                          await advanceState(
-                            request.requester,
-                            request.claimer!.vouchesReceived.map(
-                              (v) => v.from.id
-                            ),
-                            []
-                          )
-                        }
-                      >
-                        Advance state
-                      </button>
-                    )}
-                </>
-              )}
-
-              {request.status == Status.Resolving && challengePeriodEnd && (
-                <>
-                  <button
-                    className="btn-main mb-2"
-                    onClick={async () =>
-                      await executeRequest(request.humanity.id, index)
-                    }
-                    disabled={challengePeriodEnd > Date.now() / 1000}
-                  >
-                    Execute request
-                  </button>
-
-                  <Label>
-                    Challenge period end:{" "}
-                    {challengePeriodDuration && (
-                      <TimeAgo time={challengePeriodEnd} />
-                    )}
-                  </Label>
-
-                  <Challenge request={request} />
-                </>
-              )}
+              <Challenge request={request} />
             </>
           )}
 
@@ -255,6 +198,7 @@ const Request: React.FC = () => {
               {CHAIN[chainId].NAME}
             </span>
           </div>
+
           <div className="flex mb-4">
             <Identicon address={request.requester} />
             <ALink

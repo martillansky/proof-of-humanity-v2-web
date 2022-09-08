@@ -20,8 +20,18 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
       id
       nbRequests
       claimed
+      winnerClaimRequest: requests(
+        where: { status: Resolved, registration: true }
+        orderBy: resolutionTime
+        orderDirection: desc
+      ) {
+        index
+        evidence(orderBy: creationTime, first: 1) {
+          URI
+        }
+      }
     }
-    evidence(orderBy: creationTime) {
+    evidence(orderBy: creationTime, first: 1) {
       URI
     }
   }

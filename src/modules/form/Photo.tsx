@@ -26,6 +26,7 @@ import { useLoading } from "hooks/useLoading";
 import { getCroppedPhoto, sanitizeImage } from "utils/media";
 import { base64ToUint8Array } from "utils/misc";
 import { useFormContext } from "./context";
+import useFormNavigate from "./useFormNavigate";
 
 const ExamplePic: React.FC<{ uri: string; wrong?: boolean }> = ({
   uri,
@@ -42,8 +43,8 @@ const ExamplePic: React.FC<{ uri: string; wrong?: boolean }> = ({
 );
 
 const Photo: React.FC = () => {
+  const nav = useFormNavigate();
   const {
-    advance,
     dispatch,
     state: { photo },
   } = useFormContext();
@@ -181,7 +182,7 @@ const Photo: React.FC = () => {
               }}
               disabled={!!originalPhoto}
             >
-              <UploadIcon className="w-12 h-12 mr-4 fill-[#ff9966]" />
+              <UploadIcon className="w-12 h-12 mr-4 fill-theme" />
               <span className="text-lg font-semibold">Upload photo</span>
             </Uploader>
 
@@ -190,7 +191,7 @@ const Photo: React.FC = () => {
                          p-1
                          border-2 border-slate-200
                          bg-white rounded-full 
-                         text-[#ff9966] text-xs font-semibold"
+                         text-theme text-xs font-semibold"
             >
               OR
             </span>
@@ -223,7 +224,7 @@ const Photo: React.FC = () => {
       {!showCamera && !!originalPhoto && !photo && (
         <>
           <div className="centered mx-12 mb-4">
-            <ZoomIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+            <ZoomIcon className="w-6 h-6 mr-2 fill-theme" />
             <input
               className="w-full h-0.5 bg-slate-200 appearance-none slider-thumb"
               type="range"
@@ -277,7 +278,7 @@ const Photo: React.FC = () => {
       {!!photo && (
         <div className="flex flex-col items-center">
           <Image uri={photo.uri} rounded previewed />
-          <button className="btn-main mt-4" onClick={advance}>
+          <button className="btn-main mt-4" onClick={nav.toVideo}>
             Next
           </button>
         </div>
@@ -285,10 +286,10 @@ const Photo: React.FC = () => {
 
       {(showCamera || !!originalPhoto || !!photo) && (
         <button
-          className="centered mt-4 text-[#ff9966] font-semibold text-lg uppercase"
+          className="centered mt-4 text-theme font-semibold text-lg uppercase"
           onClick={retakePhoto}
         >
-          <ResetIcon className="w-6 h-6 mr-2 fill-[#ff9966]" />
+          <ResetIcon className="w-6 h-6 mr-2 fill-theme" />
           {showCamera ? "Return" : "Retake"}
         </button>
       )}

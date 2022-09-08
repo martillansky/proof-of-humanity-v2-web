@@ -2,7 +2,7 @@ import React from "react";
 import ALink from "components/ALink";
 
 const Footer: React.FC = () => (
-  <nav className="flex justify-between items-center text-white text-lg gradient shadow-sm px-8 py-4">
+  <nav className="absolute bottom-0 w-full flex justify-between items-center text-white text-lg gradient shadow-sm px-8 py-4">
     <ALink href="https://proofofhumanity.id/">Learn More</ALink>
 
     <ALink className="text-sm" href="https://kleros.io/">

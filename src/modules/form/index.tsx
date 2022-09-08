@@ -1,7 +1,12 @@
 import { BigNumber } from "@ethersproject/bignumber/lib/bignumber";
 import { isBytesLike } from "ethers/lib/utils";
 import React, { useEffect, useReducer, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import Steps from "components/Steps";
 import useWeb3 from "hooks/useWeb3";
 import { machinifyId, prettifyId } from "utils/identifier";
@@ -14,49 +19,58 @@ import { emptySubmission, submissionReducer } from "./reducer";
 
 const STEPS_LIST = ["Info", "Photo", "Video", "Review"];
 
+const StepToIndex = { info: 0, photo: 1, video: 2, review: 3 };
+
 const Form: React.FC = () => {
   const { humanity } = useParams();
   const { account } = useWeb3();
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   const [tookNotice, setTookNotice] = useState(false);
   const [state, dispatch] = useReducer(submissionReducer, emptySubmission);
-  const [step, setStep] = useState(3);
+
+  const [params] = useSearchParams();
+  const step = params.get("step")?.toLowerCase();
 
   useEffect(() => {
     if (humanity && BigNumber.from(machinifyId(humanity)).isZero())
-      nav("/claim");
+      navigate("/claim?step=info");
   }, []);
 
   if (humanity && !isBytesLike(machinifyId(humanity)))
     return (
       <div className="m-auto flex flex-col text-center">
         <span className="font-semibold">Invalid humanity ID:</span>
-        <span className="text-6xl font-light text-[#ff9966]">{humanity}</span>
+        <span className="text-6xl font-light text-theme">{humanity}</span>
       </div>
     );
 
+  if (!step || typeof StepToIndex[step] === "undefined")
+    return <Navigate to="?step=info" replace={true} />;
+
   return (
     <>
-      <Steps list={STEPS_LIST} current={step} setCurrent={setStep} />
+      <Steps
+        list={STEPS_LIST}
+        current={StepToIndex[step]}
+        setCurrent={(i: number) => navigate(`?step=${STEPS_LIST[i]}`)}
+      />
 
       <FormContext.Provider
         value={{
+          dispatch,
+          tookNotice,
+          setTookNotice,
           state: {
             ...state,
             humanityId: humanity ?? prettifyId(account!),
           },
-          dispatch,
-          setStep,
-          advance: () => setStep((s) => Math.min(s + 1, STEPS_LIST.length - 1)),
-          tookNotice,
-          setTookNotice,
         }}
       >
-        {step === 0 && <InfoStep />}
-        {step === 1 && <PhotoStep />}
-        {step === 2 && <VideoStep />}
-        {step === 3 && <ReviewStep />}
+        {step === "info" && <InfoStep />}
+        {step === "photo" && <PhotoStep />}
+        {step === "video" && <VideoStep />}
+        {step === "review" && <ReviewStep />}
       </FormContext.Provider>
     </>
   );

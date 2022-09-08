@@ -31,7 +31,7 @@ export const CameraButton: React.FC<CameraButtonInterface> = ({
       "btn-main rounded-full absolute",
       secondary
         ? "w-12 h-12 opacity-70"
-        : "w-16 h-16 outline outline-2 outline-offset-2 outline-[#ff9966]",
+        : "w-16 h-16 outline outline-2 outline-offset-2 outline-theme",
       className
     )}
     onClick={onClick}
@@ -143,13 +143,13 @@ const Webcam: React.FC<WebcamProps> = ({
                      w-full h-full
                      centered
                      bg-black opacity-70 select-none
-                     font-semibold text-white text-center
+                     font-semibold text-white text-center uppercase
                      text-xl sm:text-3xl md:text-3xl lg:text-4xl"
         >
-          I CERTIFY I AM A REAL HUMAN AND I AM NOT ALREADY REGISTERED IN THIS
-          REGISTRY
+          I certify that I am a real human and that I am not already registered
+          in this registry
           {overlay === VideoType.PHRASE && (
-            <>. MY CONFIRMATION PHRASE IS {phraseFromAddress(account)}</>
+            <>. My confirmation phrase is {phraseFromAddress(account)}</>
           )}
         </div>
       )}

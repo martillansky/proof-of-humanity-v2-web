@@ -13,11 +13,10 @@ const Claim: React.FC = () => {
 
   return (
     <div
-      className="mx-auto mt-8 mb-16 px-4 py-4 w-11/12
-                 sm:mt-12 sm:px-8 sm:py-6 sm:w-5/6
-                 lg:mt-16 lg:px-10 lg:py-6 lg:w-3/5
-                 flex flex-col
-                 border rounded bg-white shadow"
+      className="content paper px-4 py-4
+                 sm:px-8 sm:py-6
+                 lg:px-10 lg:py-6
+                 flex flex-col"
     >
       {account && isActive ? (
         <SubmissionForm />

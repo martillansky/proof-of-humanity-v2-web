@@ -10,10 +10,23 @@ query Humanity($id: ID!) {
     }
     nbPendingRequests
     pendingRequests: requests(where: { status_not: Resolved }) {
-      id
       status
+      index
       registration
       requester
+      evidence(orderBy: creationTime, first: 1) {
+        URI
+      }
+    }
+    winnerClaimRequest: requests(
+      where: { status: Resolved, registration: true }
+      orderBy: resolutionTime
+      orderDirection: desc
+    ) {
+      index
+      evidence(orderBy: creationTime, first: 1) {
+        URI
+      }
     }
   }
 }

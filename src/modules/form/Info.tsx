@@ -1,11 +1,12 @@
 import Field from "components/Field";
 import useWeb3 from "hooks/useWeb3";
 import { useFormContext } from "./context";
+import useFormNavigate from "./useFormNavigate";
 
 const Info: React.FC = () => {
   const { account } = useWeb3();
+  const nav = useFormNavigate();
   const {
-    advance,
     tookNotice,
     setTookNotice,
     state: { humanityId, name, bio },
@@ -70,7 +71,7 @@ const Info: React.FC = () => {
       <button
         className="btn-main"
         disabled={!humanityId || !name || !tookNotice}
-        onClick={advance}
+        onClick={nav.toPhoto}
       >
         NEXT
       </button>

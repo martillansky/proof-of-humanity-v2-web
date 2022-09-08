@@ -53,12 +53,6 @@ export const CHAIN = {
   },
 } as const;
 
-export const CHAIN_ID_TO_NAME: { [key in ChainId]: string } = {
-  [ChainId.MAINNET]: "Mainnet",
-  [ChainId.RINKEBY]: "Rinkeby",
-  [ChainId.GNOSIS]: "Gnosis",
-};
-
 export const chainSetting = (chain: ChainId) =>
   ({
     [chain]: {
@@ -76,7 +70,7 @@ export const CHAIN_SETTING = {
   ...chainSetting(ChainId.GNOSIS),
 };
 
-export const FALLBACK_CHAIN = ChainId.MAINNET;
+export const FALLBACK_CHAIN = ChainId.GNOSIS;
 
 export const SUPPORTED_CHAIN_IDS = [
   // ChainId.MAINNET,

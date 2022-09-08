@@ -5,43 +5,43 @@ import { useContract } from "./useContract";
 import { useArbitrationCost as useKLARbitrationCost } from "./useKlerosLiquid";
 import useSend from "./useSend";
 
-const useProofOfHumanity = (useNetwork: boolean = true) =>
-  useContract<ProofOfHumanity>(Contracts.PROOF_OF_HUMANITY, useNetwork);
+const useProofOfHumanity = (signer?: boolean) =>
+  useContract<ProofOfHumanity>(Contracts.PROOF_OF_HUMANITY, signer);
 
 export default useProofOfHumanity;
 
 export const useClaimHumanity = (defaultId?: boolean) =>
   useSend(
-    useProofOfHumanity(false),
+    useProofOfHumanity(true),
     defaultId
       ? "claimHumanity(string,string)"
       : "claimHumanity(bytes20,string,string)"
   );
 export const useRevokeHumanity = () =>
-  useSend(useProofOfHumanity(false), "revokeHumanity");
+  useSend(useProofOfHumanity(true), "revokeHumanity");
 export const useRenewHumanity = () =>
-  useSend(useProofOfHumanity(false), "renewHumanity");
+  useSend(useProofOfHumanity(true), "renewHumanity");
 export const useFundRequest = () =>
-  useSend(useProofOfHumanity(false), "fundRequest");
+  useSend(useProofOfHumanity(true), "fundRequest");
 export const useWithdrawRequest = () =>
-  useSend(useProofOfHumanity(false), "withdrawRequest");
-export const useAddVouch = () => useSend(useProofOfHumanity(false), "addVouch");
+  useSend(useProofOfHumanity(true), "withdrawRequest");
+export const useAddVouch = () => useSend(useProofOfHumanity(true), "addVouch");
 export const useRemoveVouch = () =>
-  useSend(useProofOfHumanity(false), "removeVouch");
+  useSend(useProofOfHumanity(true), "removeVouch");
 export const useAdvanceState = () =>
-  useSend(useProofOfHumanity(false), "advanceState");
+  useSend(useProofOfHumanity(true), "advanceState");
 export const useChallengeRequest = () =>
-  useSend(useProofOfHumanity(false), "challengeRequest");
+  useSend(useProofOfHumanity(true), "challengeRequest");
 export const useFundAppeal = () =>
-  useSend(useProofOfHumanity(false), "fundAppeal");
+  useSend(useProofOfHumanity(true), "fundAppeal");
 export const useExecuteRequest = () =>
-  useSend(useProofOfHumanity(false), "executeRequest");
+  useSend(useProofOfHumanity(true), "executeRequest");
 export const useProcessVouches = () =>
-  useSend(useProofOfHumanity(false), "processVouches");
+  useSend(useProofOfHumanity(true), "processVouches");
 export const useWithdrawFeesAndRewards = () =>
-  useSend(useProofOfHumanity(false), "withdrawFeesAndRewards");
+  useSend(useProofOfHumanity(true), "withdrawFeesAndRewards");
 export const useSubmitEvidence = () =>
-  useSend(useProofOfHumanity(false), "submitEvidence");
+  useSend(useProofOfHumanity(true), "submitEvidence");
 
 export const useIsHuman = (
   params: Parameters<ProofOfHumanity["isHuman"]> | null

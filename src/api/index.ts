@@ -19,7 +19,7 @@ export const sdk = SUPPORTED_CHAIN_IDS.reduce(
 );
 
 type MULTIPLE_ENTITIES_QUERY = "Requests" | "Humanities";
-type SINGLE_ENTITY_QUERY = "Request" | "Humanity";
+type SINGLE_ENTITY_QUERY = "Request" | "Humanity" | "Me";
 
 export const queryFetchSingle = async <Q extends SINGLE_ENTITY_QUERY>(
   fetchChainId: number,
@@ -34,6 +34,20 @@ export const queryFetch = async <Q extends MULTIPLE_ENTITIES_QUERY>(
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<ReturnType<sdkReturnType[Q]>> =>
   await sdk[fetchChainId][query](...((params as any) || []));
+
+export const queryFetchSingleAllChains = async <Q extends SINGLE_ENTITY_QUERY>(
+  query: Q,
+  id: string
+): Promise<queryReturnType<Q>> => {
+  const res = await Promise.all(
+    SUPPORTED_CHAIN_IDS.map((chainID) => sdk[chainID][query]({ id }))
+  );
+
+  return SUPPORTED_CHAIN_IDS.reduce(
+    (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
+    {}
+  );
+};
 
 export const queryFetchAllChains = async <Q extends MULTIPLE_ENTITIES_QUERY>(
   query: Q,

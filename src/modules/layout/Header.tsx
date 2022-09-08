@@ -1,20 +1,51 @@
+import cn from "classnames";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useMeQuery } from "api/useMeQuery";
 import ALink from "components/ALink";
+import Modal from "components/Modal";
 import Popover from "components/Popover";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { injected } from "hooks/connectors";
 import useChangeChain from "hooks/useChangeChain";
-import useConnect from "hooks/useConnect";
 import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
+import {
+  ConnectionMapping,
+  ConnectionType,
+  SHOWN_CONNECTIONS,
+  getConnection,
+  getConnectionName,
+  getIsMetaMask,
+  injected,
+  isNetwork,
+} from "utils/connectors";
+import { prettifyId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
 const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 
 const Header: React.FC = () => {
-  useConnect();
-  const { chainId, account, ENSName } = useWeb3(false);
+  const { chainId, isActive, account, ENSName, connector } = useWeb3();
   const changeChain = useChangeChain();
+  const me = useMeQuery(account);
+
+  const [humanity, setHumanity] = useState<string>();
+
+  useEffect(() => {
+    if (!me) return;
+
+    const homeChain = SUPPORTED_CHAIN_IDS.find((chain) => me[chain]?.humanity);
+
+    if (!homeChain) return;
+
+    setHumanity(prettifyId(me[homeChain]!.humanity!.id));
+  }, [!!me]);
+
+  const currentConnection =
+    isActive && ConnectionType[getConnection(connector)];
+  const walletConnected = currentConnection && !isNetwork(connector);
+
+  console.log({ me });
 
   return (
     <nav
@@ -26,7 +57,7 @@ const Header: React.FC = () => {
     >
       <Link to="/" className="flex items-center">
         <ProofOfHumanityLogo height={32} width={32} />
-        <div className="mx-2 flex flex-col font-thin leading-5">
+        <div className="ml-2 flex flex-col font-thin leading-5">
           <span>PROOF OF</span>
           <span>HUMANITY</span>
         </div>
@@ -34,60 +65,114 @@ const Header: React.FC = () => {
 
       <div
         className="my-2
-                   grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-16 xl:gap-32
+                   grid grid-cols-2 sm:grid-flow-col gap-2 sm:gap-16 xl:gap-32
                    justify-items-center
                    font-bold whitespace-nowrap"
       >
         <Link to="/">Requests</Link>
-        <Link to="/humanities">Humanities</Link>
+        <Link to="/humanities">Humans</Link>
         {/* {account && <Link to={`/humanity/${account}`}>Humanity</Link>} */}
-        {account && <Link to="/claim">Claim</Link>}
+        {humanity && <Link to={`/humanity/${humanity}`}>Me</Link>}
+        {!humanity && account && <Link to="/claim">Claim</Link>}
       </div>
 
       <div
         className="justify-self-center sm:justify-self-end col-span-2 sm:col-span-1
                    flex items-center"
       >
-        <Popover
+        <Modal
+          className="flex-col bg-white p-4 w-4/5 md:w-1/2"
           trigger={
             <button
-              className="mr-2 py-1 px-4
-                         bg-white mix-blend-lighten
-                         rounded
-                         text-black text-sm"
+              className="mr-2 px-2 h-8 centered
+                         border-2 border-white rounded bg-white/10
+                         text-white text-sm font-semibold"
+              onClick={() => injected.connector.activate()}
             >
-              {SUPPORTED_CHAIN_IDS.find((c) => c === chainId)
-                ? CHAIN[chainId as ChainId].NAME
-                : "SWITCH"}
+              {isActive && !!account ? (
+                <>
+                  <div className="dot mr-1 bg-white" />
+                  {SUPPORTED_CHAIN_IDS.find((c) => c === chainId) ? (
+                    CHAIN[chainId as ChainId].NAME
+                  ) : (
+                    <>Unsupported</>
+                  )}
+                  <div className="w-0.5 h-full mx-2 bg-white" />
+                  {ENSName ?? shortenAddress(account)}
+                </>
+              ) : (
+                <>Connect Wallet</>
+              )}
             </button>
           }
         >
-          <div className="flex flex-col">
-            {DISPLAYED_CHAINS.map((chainId: ChainId) => (
-              <button
-                key={chainId}
-                className="cursor-pointer"
-                onClick={() => changeChain(chainId)}
-              >
-                {CHAIN[chainId].NAME}
-              </button>
-            ))}
-          </div>
-        </Popover>
+          {walletConnected ? (
+            <>
+              <span className="mb-2 centered uppercase font-semibold">
+                Supported chains
+              </span>
+              <div className="grid grid-cols-2 gap-4">
+                {DISPLAYED_CHAINS.map((chain) => {
+                  const ChainLogo = CHAIN[chain].Logo;
+                  return (
+                    <button
+                      key={chain}
+                      className={cn(
+                        "p-4 flex flex-col items-center border cursor-pointer",
+                        { "bg-slate-100": chain === chainId }
+                      )}
+                      onClick={() => changeChain(chain)}
+                    >
+                      <ChainLogo className="w-8 h-8 mb-2" />
+                      {CHAIN[chain].NAME}
+                    </button>
+                  );
+                })}
+              </div>
 
-        <button
-          className="mr-2 py-1 px-4
-                     border border-white rounded
-                     text-white text-sm"
-          onClick={() => injected.connector.activate()}
-        >
-          {!!account ? ENSName ?? shortenAddress(account) : "Connect"}
-        </button>
+              <div className="p-4 mt-8 flex justify-between cursor-pointer">
+                <span>
+                  Connected with{" "}
+                  {getConnectionName(currentConnection, getIsMetaMask())}
+                </span>
+                <button
+                  className="text-red-500"
+                  onClick={() => {
+                    if (connector && connector.deactivate)
+                      connector.deactivate();
+                    connector.resetState();
+                  }}
+                >
+                  Disconnect
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <span className="centered uppercase font-semibold">
+                Choose a wallet to connect with
+              </span>
+              <div className="grid grid-cols-2">
+                {SHOWN_CONNECTIONS.map((connection) => (
+                  <button
+                    key={connection}
+                    className="p-4 m-2 border cursor-pointer"
+                    onClick={() => {
+                      console.log(isNetwork(connector));
+                      return ConnectionMapping[connection].connector.activate();
+                    }}
+                  >
+                    {getConnectionName(connection)}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </Modal>
 
         <button
           className="mr-2 w-6 h-6
-                     grid place-content-center
-                     bg-white
+                     centered bg-white
                      border-2 border-white rounded-full"
         >
           <ALink href="https://snapshot.org/#/poh.eth/">

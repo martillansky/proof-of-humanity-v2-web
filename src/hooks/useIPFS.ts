@@ -5,11 +5,13 @@ interface useIPFSConfig {
   suspense?: boolean;
 }
 
-const ipfsFetcher = async (ipfsURI: string) =>
-  (await axios.get(`https://ipfs.kleros.io${ipfsURI}`)).data;
+const ipfsFetcher = async (ipfsURI: string) => {
+  console.log({ ipfsURI });
+  return (await axios.get(`https://ipfs.kleros.io${ipfsURI}`)).data;
+};
 
 const useIPFS = <T>(
-  uri?: string,
+  uri?: string | null | false,
   { suspense }: useIPFSConfig = {}
 ): [T | undefined, Error] => {
   const { data, error } = useSWR(uri || null, ipfsFetcher, {

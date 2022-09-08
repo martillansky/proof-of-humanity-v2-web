@@ -1,0 +1,13 @@
+query Contract {
+  contract(id: "0x00000000") {
+    humanityLifespan
+    renewalTime
+    requestBaseDeposit
+    challengePeriodDuration
+    requiredNumberOfVouches
+    latestArbitratorData {
+      registrationMeta
+      metaEvidenceUpdateTime
+    }
+  }
+}

@@ -12,12 +12,14 @@ const App: React.FC = () => (
   <Routes>
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
-      <Route path="request/:chain/:humanity/:index" element={<Request />}>
-        <Route path=":old" />
+      <Route path="request/:chain/:humanity/:index">
+        <Route index element={<Request />} />
+        <Route path=":old" element={<Request />} />
       </Route>
-      <Route path="claim" element={<Claim />}>
-        <Route path=":humanity" />
-        <Route path=":chain/:humanity" />
+      <Route path="claim">
+        <Route index element={<Claim />} />
+        <Route path=":humanity" element={<Claim />} />
+        {/* <Route path=":chain/:humanity" /> */}
       </Route>
       <Route path="humanities" element={<Humanities />} />
       <Route path="humanity/:humanity" element={<Humanity />} />

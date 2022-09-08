@@ -1,29 +1,27 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { BaseContract, Contract, ContractInterface } from "ethers";
+import { BaseContract, Contract } from "ethers";
 import { useMemo } from "react";
 import { CONTRACT, Contracts } from "constants/contracts";
 import useWeb3 from "./useWeb3";
-
-const getProviderOrSigner = (provider: JsonRpcProvider, account?: string) =>
-  account ? provider.getSigner(account).connectUnchecked() : provider;
-
-export const getContract = (
-  address: string,
-  abi: ContractInterface,
-  provider: JsonRpcProvider,
-  account?: string
-) => new Contract(address, abi, getProviderOrSigner(provider, account));
+import useWeb3Network from "./useWeb3Network";
 
 export const useContract = <T extends BaseContract = Contract>(
   contract: Contracts,
-  useNetwork: boolean = true
+  signer: boolean = false
 ) => {
-  const { provider, account, chainId } = useWeb3(useNetwork);
+  const { account, chainId, provider } = signer ? useWeb3() : useWeb3Network();
 
   return useMemo(() => {
     if (!provider || !chainId) return null;
+
     const address = CONTRACT[contract][chainId];
     if (!address) return null;
-    return getContract(address, CONTRACT[contract].ABI, provider, account);
+
+    return new Contract(
+      address,
+      CONTRACT[contract].ABI,
+      signer && account
+        ? provider.getSigner(account).connectUnchecked()
+        : provider
+    );
   }, [provider, chainId, account]) as T | null;
 };

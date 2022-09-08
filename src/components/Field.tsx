@@ -20,7 +20,7 @@ const Field: React.FC<FieldProps> = ({
       {label && <Label>{label}</Label>}
       <div
         className={cn("w-full bordered", {
-          "ring-2 ring-offset-2 ring-[#ff9966]/60": focused,
+          "ring-2 ring-offset-2 ring-theme/60": focused,
         })}
       >
         {textarea ? (

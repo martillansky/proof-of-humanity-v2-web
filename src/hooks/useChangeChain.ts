@@ -1,13 +1,14 @@
 import { useCallback } from "react";
 import { CHAIN_SETTING, ChainId } from "constants/chains";
+import { isNetwork } from "utils/connectors";
 import useWeb3 from "./useWeb3";
 
 const useChangeChain = () => {
-  const { chainId, account, connector } = useWeb3(false);
+  const { chainId, account, connector } = useWeb3();
 
   const changeChain = useCallback(
     async (desiredChainId?: ChainId) => {
-      console.log(desiredChainId, account, desiredChainId === chainId);
+      if (isNetwork(connector)) throw new Error("Got network as connector");
       if (!desiredChainId || (account && desiredChainId === chainId))
         return false;
       await connector.activate(CHAIN_SETTING[desiredChainId]);

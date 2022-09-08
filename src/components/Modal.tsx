@@ -1,3 +1,4 @@
+import cn from "classnames";
 import React from "react";
 import Popup from "reactjs-popup";
 
@@ -6,9 +7,20 @@ interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   open?: boolean;
   onClose?: () => void;
+  className?: string;
+  formal?: boolean;
+  header?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ trigger, children, open, onClose }) => (
+const Modal: React.FC<ModalProps> = ({
+  formal,
+  header,
+  className,
+  trigger,
+  children,
+  open,
+  onClose,
+}) => (
   <Popup modal trigger={trigger} closeOnEscape={false} open={open}>
     {(close) => (
       <>
@@ -20,12 +32,17 @@ const Modal: React.FC<ModalProps> = ({ trigger, children, open, onClose }) => (
           }}
         />
         <div
-          className="fixed
-                     p-4
-                     top-1/4 left-1/4 w-1/2 max-h-1/2 z-30
-                     bg-white
-                     rounded"
+          className={cn(
+            "fixed z-30 absolute-centered w-4/5 md:w-3/5 xl:w-2/5",
+            { "bg-white rounded overflow-clip": formal },
+            className
+          )}
         >
+          {header && (
+            <div className="py-2 gradient text-white text-center font-semibold uppercase">
+              {header}
+            </div>
+          )}
           {children}
         </div>
       </>

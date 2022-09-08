@@ -12,7 +12,7 @@
 @tailwind components;
 @layer components {
   .slider-thumb::-webkit-slider-thumb {
-    @apply appearance-none w-4 h-4 rounded-full bg-[#ff9966] cursor-pointer;
+    @apply appearance-none w-4 h-4 rounded-full bg-theme cursor-pointer;
   }
 
   .no-spinner::-webkit-outer-spin-button,
@@ -26,19 +26,19 @@
   }
 
   .divider {
-    @apply h-0.5 w-full gradient rounded;
+    @apply h-0.5 w-full;
   }
 
   .checkbox {
-    @apply w-4 h-4 border-2 border-[#ff9966] rounded-sm bg-shade-100
-         checked:text-[#ff9966]
-           focus:ring-2 focus:ring-offset-1 focus:ring-[#ff9966]/60;
+    @apply w-4 h-4 border-2 border-theme rounded-sm bg-shade-100
+         checked:text-theme
+           focus:ring-2 focus:ring-offset-1 focus:ring-theme/60;
   }
 
   .radio {
-    @apply w-4 h-4 border-2 border-[#ff9966] rounded-full bg-shade-100
-         checked:text-[#ff9966]
-           focus:ring-2 focus:ring-offset-2 focus:ring-[#ff9966]/60;
+    @apply w-4 h-4 border-2 border-theme rounded-full bg-shade-100
+         checked:text-theme
+           focus:ring-2 focus:ring-offset-2 focus:ring-theme/60;
   }
 
   .bordered {
@@ -55,6 +55,26 @@
 
   .backdrop {
     @apply fixed top-0 left-0 h-screen z-10 w-full flex justify-center items-center bg-slate-800/30 backdrop-blur;
+  }
+
+  .dot {
+    @apply h-2 w-2 rounded-full;
+  }
+
+  .content {
+    @apply mt-8 mb-16 mx-auto w-11/12
+           sm:mt-12 sm:w-5/6
+           lg:w-3/5;
+  }
+
+  .content-wide {
+    @apply mt-8 mb-16 mx-auto w-11/12
+           sm:mt-12 sm:w-5/6
+           lg:w-4/5;
+  }
+
+  .paper {
+    @apply bg-white border rounded shadow;
   }
 }
 
