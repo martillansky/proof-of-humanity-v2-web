@@ -200,7 +200,13 @@ const Request: React.FC = () => {
           </div>
 
           <div className="flex mb-4">
-            <Identicon address={request.requester} />
+            <Identicon
+              address={
+                request.registration
+                  ? request.requester
+                  : request.humanity.winnerClaimRequest[0].requester
+              }
+            />
             <ALink
               className="ml-2 font-semibold underline underline-offset-2"
               href={explorerLink(request.requester, chainId)}

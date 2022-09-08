@@ -3,13 +3,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import { PendingRequest as PendingRequestType } from "api/types";
-import ALink from "components/ALink";
 import Image from "components/Image";
 import { CHAIN } from "constants/chains";
 import { getColorForStatus } from "constants/misc";
 import { queryToStatus } from "constants/requests";
 import useIPFS from "hooks/useIPFS";
-import { explorerLink, shortenAddress } from "utils/address";
+import { shortenAddress } from "utils/address";
 import { camelToTitle } from "utils/case";
 import { ipfs } from "utils/ipfs";
 
@@ -28,7 +27,6 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
   const [data] = useIPFS<RegistrationFileInterface>(evidenceURI?.fileURI);
 
   const ChainLogo = CHAIN[request.chainId].Logo;
-
   const statusColor = getColorForStatus(request.status, request.registration);
 
   return (
@@ -44,7 +42,9 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
       )}
     >
       <div className="flex items-center">
-        {data && <Image className="w-16 h-16" uri={ipfs(data.photo)} rounded />}
+        {data?.photo && (
+          <Image className="w-16 h-16" uri={ipfs(data.photo)} rounded />
+        )}
         <span className="ml-2 underline underline-offset-2">
           {shortenAddress(request.requester)}
         </span>

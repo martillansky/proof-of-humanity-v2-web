@@ -15,6 +15,7 @@ query Request($id: ID!) {
         orderDirection: desc
       ) {
         index
+        requester
         evidence(orderBy: creationTime, first: 1) {
           URI
         }
