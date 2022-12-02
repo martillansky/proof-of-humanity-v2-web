@@ -2,6 +2,24 @@ import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import ABC2048 from "./base2048/words";
 
+export const shuffleArray = <T>(array: T[]): T[] => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+// A wrapper for "JSON.parse()"" to support "undefined" value
+export const parseJSON = <T>(value: string | null): T | undefined => {
+  try {
+    return value === "undefined" ? undefined : JSON.parse(value ?? "");
+  } catch {
+    console.log("parsing error on", { value });
+    return undefined;
+  }
+};
+
 export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
   const totalByteLength = buffers.reduce((sum, bf) => sum + bf.byteLength, 0);
   const temporary = new Uint8Array(totalByteLength);

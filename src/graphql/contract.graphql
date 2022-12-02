@@ -10,4 +10,8 @@ query Contract {
       metaEvidenceUpdateTime
     }
   }
+  crossChainGateways {
+    id
+    foreignProxy
+  }
 }

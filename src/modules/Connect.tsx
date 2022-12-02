@@ -1,7 +1,10 @@
 import { Connector } from "@web3-react/types";
 import { useCallback, useEffect } from "react";
+import { IS_MOBILE } from "constants/media";
+import useConnector from "hooks/useConnector";
 import useSuggestedChain from "hooks/useSuggestedChain";
-import { injected, network } from "utils/connectors";
+import useWeb3 from "hooks/useWeb3";
+import { getIsMetaMask, injected, network } from "utils/connectors";
 
 const connect = async (connector: Connector) => {
   try {
@@ -17,6 +20,8 @@ const { useChainId } = network.hooks;
 const Connect = () => {
   const chainId = useChainId();
   const suggestedChainId = useSuggestedChain();
+  const { connector } = useConnector();
+  const { chainId: clientChainId } = useWeb3();
 
   const syncChain = useCallback(
     async (desiredChainId: number) => {
@@ -32,13 +37,15 @@ const Connect = () => {
 
   useEffect(() => {
     connect(network.connector);
-    connect(injected.connector);
+
+    if (IS_MOBILE && getIsMetaMask()) connect(injected.connector);
+    else connect(connector);
   }, []);
 
   useEffect(() => {
-    if (!suggestedChainId) return;
-    syncChain(suggestedChainId);
-  }, [suggestedChainId, chainId]);
+    if (suggestedChainId) syncChain(suggestedChainId);
+    else if (clientChainId) syncChain(clientChainId);
+  }, [suggestedChainId, clientChainId, chainId]);
 
   return null;
 };

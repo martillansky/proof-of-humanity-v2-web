@@ -1,7 +1,7 @@
 import { Contracts } from "constants/contracts";
 import { ProofOfHumanity } from "generated/contracts";
 import useCall from "./useCall";
-import { useContract } from "./useContract";
+import useContract from "./useContract";
 import { useArbitrationCost as useKLARbitrationCost } from "./useKlerosLiquid";
 import useSend from "./useSend";
 

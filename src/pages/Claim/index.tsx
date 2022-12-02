@@ -2,12 +2,14 @@ import React from "react";
 import ALink from "components/ALink";
 import { CHAIN_SETTING, FALLBACK_CHAIN } from "constants/chains";
 import useChangeChain from "hooks/useChangeChain";
+import useConnector from "hooks/useConnector";
 import useSuggestedChain from "hooks/useSuggestedChain";
 import useWeb3 from "hooks/useWeb3";
 import SubmissionForm from "modules/form";
 
 const Claim: React.FC = () => {
-  const { account, isActive, connector } = useWeb3();
+  const { account, isActive } = useWeb3();
+  const { connector } = useConnector();
   const changeChain = useChangeChain();
   const suggestedChain = useSuggestedChain();
 

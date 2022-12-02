@@ -41,7 +41,7 @@ const Home: React.FC = () => {
     !requests.length || // No requests loaded
     requests.length % REQUESTS_DISPLAY_BATCH || // Submissions loaded did not fill a batch
     prevListLength === requests.length; // Submissions loaded filled a batch but no more were loaded previously
-  // TODO not perfect, maybe add this to a separate atom?
+  // TODO - not perfect, maybe add this to a separate atom?
 
   if (!requests.length) return <PageLoader />;
 

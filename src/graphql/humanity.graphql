@@ -19,14 +19,29 @@ query Humanity($id: ID!) {
       }
     }
     winnerClaimRequest: requests(
-      where: { status: Resolved, registration: true }
+      where: { status: Resolved, registration: true, requesterLost: false }
       orderBy: resolutionTime
       orderDirection: desc
+      first: 1
     ) {
       index
+      resolutionTime
       evidence(orderBy: creationTime, first: 1) {
         URI
       }
     }
+  }
+  crossChainHumanity(id: $id) {
+    owner {
+      id
+    }
+    claimed
+    expirationTime
+    lastReceivedTransferTimestamp
+  }
+  outTransfer(id: $id) {
+    foreignProxy
+    transferHash
+    transferTimestamp
   }
 }

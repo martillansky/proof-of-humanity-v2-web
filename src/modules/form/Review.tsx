@@ -27,7 +27,7 @@ import { useFormContext } from "./context";
 import useFormNavigate from "./useFormNavigate";
 
 const Review: React.FC = () => {
-  const { account } = useWeb3();
+  const { account, chainId } = useWeb3();
   const nav = useFormNavigate();
   const {
     state: { humanityId, name, bio, photo, video, videoType },
@@ -35,7 +35,7 @@ const Review: React.FC = () => {
   const loading = useLoading();
   const claimHumanity = useClaimHumanity();
   const totalCost = useRequestTotalCost();
-  const contractData = useContractData();
+  const contractData = useContractData(chainId!);
 
   const [selfFunded, setSelfFunded] = useState<number>(
     parseFloat(formatEther(totalCost || Zero))
@@ -110,6 +110,8 @@ const Review: React.FC = () => {
     loading.stop();
   };
 
+  console.log({ totalCost });
+
   return (
     <>
       <span className="w-full my-4 flex flex-col text-2xl font-semibold">
@@ -117,11 +119,13 @@ const Review: React.FC = () => {
         <div className="divider mt-4 w-2/3" />
       </span>
 
-      {contractData && (
+      {contractData?.contract && (
         <div className="centered flex-col mb-4">
           <ALink
             className="flex mr-1 text-theme font-semibold"
-            href={ipfs(contractData.latestArbitratorData.registrationMeta)}
+            href={ipfs(
+              contractData.contract.latestArbitratorData.registrationMeta
+            )}
           >
             <DocumentIcon className="w-6 h-6 fill-theme" />
             Registration Policy
@@ -129,7 +133,10 @@ const Review: React.FC = () => {
           <span className="text-sm text-slate-400">
             Updated:{" "}
             <TimeAgo
-              time={contractData.latestArbitratorData.metaEvidenceUpdateTime}
+              time={
+                contractData.contract.latestArbitratorData
+                  .metaEvidenceUpdateTime
+              }
             />
           </span>
         </div>

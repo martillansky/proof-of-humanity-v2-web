@@ -15,6 +15,7 @@ export const REQUEST_STATUS = {
   resolvedRevocation: {
     filter: { status: Status.Resolved, registration: false },
   },
+  withdrawn: { filter: { status: Status.Withdrawn } },
 } as const;
 
 export type RequestStatus = keyof typeof REQUEST_STATUS;
@@ -32,6 +33,8 @@ export const queryToStatus = (
       return registration ? "disputedClaim" : "disputedRevocation";
     case Status.Resolved:
       return registration ? "resolvedClaim" : "resolvedRevocation";
+    case Status.Withdrawn:
+      return "withdrawn";
     default:
       return "all";
   }

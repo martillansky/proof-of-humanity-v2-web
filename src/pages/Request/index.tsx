@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import useContractData from "api/useContractData";
 import { useRequest } from "api/useRequest";
+import { useVouches } from "api/useVouches";
 import ALink from "components/ALink";
 import Identicon from "components/Identicon";
 import Image from "components/Image";
@@ -20,6 +21,7 @@ import {
   useAdvanceState,
   useExecuteRequest,
   useRequestTotalCost,
+  useWithdrawRequest,
 } from "hooks/useProofOfHumanity";
 import Challenge from "modules/challenge";
 import EvidenceSection from "modules/evidence/Section";
@@ -43,11 +45,14 @@ const Request: React.FC = () => {
     [chain]
   );
 
-  const contractData = useContractData(chainId);
-  const request = useRequest(
-    chainId,
-    useMemo(() => genRequestId(humanity!, index!), [])
-  );
+  const contractData = useContractData(chainId!);
+
+  const requestId = useMemo(() => genRequestId(humanity!, index!), []);
+
+  const request = useRequest(chainId, requestId);
+  const { totalCount, getRequestValidVouches } = useVouches(chainId, requestId);
+
+  console.log({ request });
 
   const [evidence] = useIPFS<EvidenceFileInterface>(
     request &&
@@ -59,13 +64,14 @@ const Request: React.FC = () => {
   const [registration] = useIPFS<RegistrationFileInterface>(evidence?.fileURI);
 
   const advanceState = useAdvanceState();
+  const withdrawRequest = useWithdrawRequest();
   const executeRequest = useExecuteRequest();
   const totalCost = useRequestTotalCost();
 
   const challengePeriodEnd =
-    contractData &&
+    contractData?.contract &&
     request &&
-    BigNumber.from(contractData.challengePeriodDuration)
+    BigNumber.from(contractData.contract.challengePeriodDuration)
       .add(request.lastStatusChange)
       .toNumber();
 
@@ -80,6 +86,8 @@ const Request: React.FC = () => {
     : registration.name;
   const funded = !isV1 && request.challenges[0].rounds[0].requesterFunds;
   const statusColor = getColorForStatus(request.status, request.registration);
+
+  const currentReason = request.challenges.at(-1)?.reason;
 
   return (
     <div
@@ -105,6 +113,7 @@ const Request: React.FC = () => {
 
           <span className="font-bold">{fullName}</span>
           <span className="mb-4">{registration.bio}</span>
+
           <div className="mb-8 flex flex-col items-center font-semibold text-green-500">
             <span>Humanity:</span>
             <Link to={`/humanity/${humanity}`}>{shortenId(humanity)} ➜</Link>
@@ -125,8 +134,8 @@ const Request: React.FC = () => {
               <Label>
                 Vouches:{" "}
                 <strong>
-                  {request.claimer?.vouchesReceived.length} /{" "}
-                  {contractData?.requiredNumberOfVouches}
+                  {totalCount} /{" "}
+                  {contractData?.contract?.requiredNumberOfVouches}
                 </strong>
               </Label>
 
@@ -145,21 +154,35 @@ const Request: React.FC = () => {
               />
 
               {request.claimer &&
-                contractData &&
+                contractData?.contract &&
                 request.claimer.vouchesReceived.length >=
-                  Number(contractData.requiredNumberOfVouches) && (
-                  <button
-                    className="btn-main mb-2"
-                    onClick={async () =>
-                      await advanceState(
-                        request.requester,
-                        request.claimer!.vouchesReceived.map((v) => v.from.id),
-                        []
-                      )
-                    }
-                  >
-                    Advance state
-                  </button>
+                  Number(contractData.contract.requiredNumberOfVouches) && (
+                  <>
+                    <button
+                      className="btn-main mb-2"
+                      onClick={async () => {
+                        const validVouches = await getRequestValidVouches(
+                          contractData.contract!.requiredNumberOfVouches
+                        );
+                        await advanceState(
+                          request.requester,
+                          validVouches.onChain,
+                          validVouches.offChain
+                        );
+                      }}
+                    >
+                      Advance state
+                    </button>
+
+                    <button
+                      className="btn-main mb-2"
+                      onClick={async () => {
+                        await withdrawRequest();
+                      }}
+                    >
+                      Withdraw request
+                    </button>
+                  </>
                 )}
             </>
           )}
@@ -184,6 +207,22 @@ const Request: React.FC = () => {
               <Challenge request={request} />
             </>
           )}
+
+          {!isV1 &&
+            request.status == Status.Disputed &&
+            request.challenges.length && (
+              <div>
+                {request.challenges.map((challenge, i) => (
+                  <ALink
+                    href={`https://resolve.kleros.io/cases/${challenge.disputeId}`}
+                    className="text-blue-500 underline underline-offset-2"
+                  >
+                    #{challenge.disputeId}:{" "}
+                    {request.registration ? currentReason : "Challenge"}
+                  </ALink>
+                ))}
+              </div>
+            )}
 
           <Label>
             Last status change: <TimeAgo time={request.lastStatusChange} />
@@ -218,6 +257,8 @@ const Request: React.FC = () => {
           <Video className="w-full" uri={ipfs(registration.video)} />
         </div>
       </div>
+
+      {/* <Accordion title="Appeal">Appeal here</Accordion> */}
 
       <EvidenceSection
         humanityId={request.humanity.id}

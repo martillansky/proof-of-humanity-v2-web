@@ -6,18 +6,15 @@ import ALink from "components/ALink";
 import Modal from "components/Modal";
 import Popover from "components/Popover";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { MeQuery } from "generated/graphql";
 import useChangeChain from "hooks/useChangeChain";
+import useConnector from "hooks/useConnector";
 import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
 import {
   ConnectionMapping,
-  ConnectionType,
-  SHOWN_CONNECTIONS,
-  getConnection,
+  SUPPORTED_CONNECTIONS,
   getConnectionName,
-  getIsMetaMask,
-  injected,
-  isNetwork,
 } from "utils/connectors";
 import { prettifyId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
@@ -25,27 +22,35 @@ import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
 
 const Header: React.FC = () => {
-  const { chainId, isActive, account, ENSName, connector } = useWeb3();
+  const { chainId, isActive, account, disconnect } = useWeb3();
+  const { connectionType, setConnectionType } = useConnector();
+
   const changeChain = useChangeChain();
   const me = useMeQuery(account);
 
   const [humanity, setHumanity] = useState<string>();
+  const [currentRequest, setCurrentRequest] = useState<{
+    chain: ChainId;
+    data: NonNullable<NonNullable<MeQuery["claimer"]>["currentRequest"]>;
+  }>();
 
   useEffect(() => {
     if (!me) return;
 
     const homeChain = SUPPORTED_CHAIN_IDS.find((chain) => me[chain]?.humanity);
 
-    if (!homeChain) return;
+    if (homeChain) return setHumanity(prettifyId(me[homeChain]!.humanity!.id));
 
-    setHumanity(prettifyId(me[homeChain]!.humanity!.id));
+    const requestChain = SUPPORTED_CHAIN_IDS.find(
+      (chain) => me[chain]?.currentRequest
+    );
+
+    if (requestChain)
+      setCurrentRequest({
+        chain: requestChain,
+        data: me[requestChain]!.currentRequest!,
+      });
   }, [!!me]);
-
-  const currentConnection =
-    isActive && ConnectionType[getConnection(connector)];
-  const walletConnected = currentConnection && !isNetwork(connector);
-
-  console.log({ me });
 
   return (
     <nav
@@ -72,8 +77,21 @@ const Header: React.FC = () => {
         <Link to="/">Requests</Link>
         <Link to="/humanities">Humans</Link>
         {/* {account && <Link to={`/humanity/${account}`}>Humanity</Link>} */}
-        {humanity && <Link to={`/humanity/${humanity}`}>Me</Link>}
-        {!humanity && account && <Link to="/claim">Claim</Link>}
+        {humanity ? (
+          <Link to={`/humanity/${humanity}`}>Me</Link>
+        ) : currentRequest ? (
+          <Link
+            to={`/request/${CHAIN[
+              currentRequest.chain
+            ].NAME.toLowerCase()}/${prettifyId(
+              currentRequest.data.humanity.id
+            )}/${currentRequest.data.index}`}
+          >
+            Me
+          </Link>
+        ) : (
+          account && <Link to="/claim">Claim</Link>
+        )}
       </div>
 
       <div
@@ -87,7 +105,7 @@ const Header: React.FC = () => {
               className="mr-2 px-2 h-8 centered
                          border-2 border-white rounded bg-white/10
                          text-white text-sm font-semibold"
-              onClick={() => injected.connector.activate()}
+              // onClick={() => injected.connector.activate()}
             >
               {isActive && !!account ? (
                 <>
@@ -98,7 +116,8 @@ const Header: React.FC = () => {
                     <>Unsupported</>
                   )}
                   <div className="w-0.5 h-full mx-2 bg-white" />
-                  {ENSName ?? shortenAddress(account)}
+                  {shortenAddress(account)}
+                  {/* {ens ?? shortenAddress(account)} */}
                 </>
               ) : (
                 <>Connect Wallet</>
@@ -106,7 +125,7 @@ const Header: React.FC = () => {
             </button>
           }
         >
-          {walletConnected ? (
+          {isActive ? (
             <>
               <span className="mb-2 centered uppercase font-semibold">
                 Supported chains
@@ -131,18 +150,12 @@ const Header: React.FC = () => {
               </div>
 
               <div className="p-4 mt-8 flex justify-between cursor-pointer">
-                <span>
-                  Connected with{" "}
-                  {getConnectionName(currentConnection, getIsMetaMask())}
-                </span>
-                <button
-                  className="text-red-500"
-                  onClick={() => {
-                    if (connector && connector.deactivate)
-                      connector.deactivate();
-                    connector.resetState();
-                  }}
-                >
+                {connectionType && (
+                  <span>
+                    Connected with {getConnectionName(connectionType)}
+                  </span>
+                )}
+                <button className="text-red-500" onClick={disconnect}>
                   Disconnect
                 </button>
               </div>
@@ -153,13 +166,13 @@ const Header: React.FC = () => {
                 Choose a wallet to connect with
               </span>
               <div className="grid grid-cols-2">
-                {SHOWN_CONNECTIONS.map((connection) => (
+                {SUPPORTED_CONNECTIONS.map((connection) => (
                   <button
                     key={connection}
                     className="p-4 m-2 border cursor-pointer"
-                    onClick={() => {
-                      console.log(isNetwork(connector));
-                      return ConnectionMapping[connection].connector.activate();
+                    onClick={async () => {
+                      await ConnectionMapping[connection].connector.activate();
+                      setConnectionType(connection);
                     }}
                   >
                     {getConnectionName(connection)}

@@ -13,6 +13,7 @@ query Request($id: ID!) {
         where: { status: Resolved, registration: true }
         orderBy: resolutionTime
         orderDirection: desc
+        first: 1
       ) {
         index
         requester
@@ -24,9 +25,13 @@ query Request($id: ID!) {
     claimer {
       id
       name
-      vouchesReceived {
+      vouchesReceived(where: { from_: { hasHumanity: true } }) {
         from {
           id
+          humanity {
+            expirationTime
+            vouching
+          }
         }
         humanity {
           id

@@ -18,7 +18,7 @@ export const sdk = SUPPORTED_CHAIN_IDS.reduce(
   {} as Record<ChainId, sdkReturnType>
 );
 
-type MULTIPLE_ENTITIES_QUERY = "Requests" | "Humanities";
+type MULTIPLE_ENTITIES_QUERY = "Requests" | "Humanities" | "Gateways";
 type SINGLE_ENTITY_QUERY = "Request" | "Humanity" | "Me";
 
 export const queryFetchSingle = async <Q extends SINGLE_ENTITY_QUERY>(

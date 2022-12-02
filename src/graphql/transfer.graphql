@@ -1,0 +1,6 @@
+query Transfer($hash: ID!) {
+  inTransfer(id: $hash) {
+    id
+    humanityId
+  }
+}

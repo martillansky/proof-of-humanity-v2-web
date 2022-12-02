@@ -1,11 +1,25 @@
 import useSWR from "swr";
-import { ChainId, FALLBACK_CHAIN } from "constants/chains";
+import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { ContractQuery } from "generated/graphql";
 import { sdk } from ".";
 
-const useContractData = (chain?: ChainId) =>
-  useSWR(
-    ["Contract"],
-    async () => (await sdk[chain || FALLBACK_CHAIN]["Contract"]()).contract
-  ).data;
+function useContractData(): Record<ChainId, ContractQuery> | undefined;
+function useContractData(chain: ChainId): ContractQuery | undefined;
+function useContractData(
+  chain?: ChainId
+): Record<ChainId, ContractQuery> | ContractQuery | undefined {
+  return chain
+    ? useSWR(["Contract", chain], async (_, c) => await sdk[c]["Contract"]())
+        .data
+    : useSWR(["Contract"], async () => {
+        const res = await Promise.all(
+          SUPPORTED_CHAIN_IDS.map((c) => sdk[c]["Contract"]())
+        );
+        return SUPPORTED_CHAIN_IDS.reduce(
+          (acc, chain, i) => ({ ...acc, [chain]: res[i] }),
+          {} as Record<ChainId, ContractQuery>
+        );
+      }).data;
+}
 
 export default useContractData;

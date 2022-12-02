@@ -6,7 +6,7 @@ export const useHumanity = (id?: string) =>
   useSWR(id && ["Humanity", id], async (_, humanity: string) => {
     const res = await queryFetchSingleAllChains("Humanity", humanity);
     return Object.keys(res).reduce(
-      (acc, chain) => ({ ...acc, [chain]: res[chain].humanity }),
-      {} as Record<number, HumanityQuery["humanity"]>
+      (acc, chain) => ({ ...acc, [chain]: res[chain] }),
+      {} as Record<number, HumanityQuery>
     );
   }).data;

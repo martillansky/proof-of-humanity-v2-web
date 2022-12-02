@@ -1,6 +1,6 @@
 import { Zero } from "@ethersproject/constants";
 import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils";
+import { formatEther, parseEther } from "ethers/lib/utils";
 import { useState } from "react";
 import { RequestQueryItem } from "api/types";
 import Field from "components/Field";
@@ -48,7 +48,9 @@ const FundButton: React.FC<FundButtonProps> = ({
         />
         <button
           onClick={async () =>
-            await fundRequest(request.requester, { value: totalCost })
+            await fundRequest(request.requester, {
+              value: parseEther(funding.toString()),
+            })
           }
           className="btn-main mt-12"
         >

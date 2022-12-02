@@ -1,10 +1,23 @@
-import { BaseContract, Contract } from "ethers";
+import { Web3Provider } from "@ethersproject/providers";
+import { BaseContract, Contract, Signer } from "ethers";
 import { useMemo } from "react";
+import { ChainId } from "constants/chains";
 import { CONTRACT, Contracts } from "constants/contracts";
 import useWeb3 from "./useWeb3";
 import useWeb3Network from "./useWeb3Network";
 
-export const useContract = <T extends BaseContract = Contract>(
+export const getContract = <T extends BaseContract = Contract>(
+  contract: Contracts,
+  chainId: ChainId,
+  signerOrProvider: Signer | Web3Provider
+) =>
+  new Contract(
+    CONTRACT[contract][chainId],
+    CONTRACT[contract].ABI,
+    signerOrProvider
+  ) as T;
+
+const useContract = <T extends BaseContract = Contract>(
   contract: Contracts,
   signer: boolean = false
 ) => {
@@ -13,15 +26,16 @@ export const useContract = <T extends BaseContract = Contract>(
   return useMemo(() => {
     if (!provider || !chainId) return null;
 
-    const address = CONTRACT[contract][chainId];
-    if (!address) return null;
+    console.log({ chainId, contract, signer });
 
-    return new Contract(
-      address,
-      CONTRACT[contract].ABI,
+    return getContract<T>(
+      contract,
+      chainId,
       signer && account
         ? provider.getSigner(account).connectUnchecked()
         : provider
     );
-  }, [provider, chainId, account]) as T | null;
+  }, [provider, chainId, account]);
 };
+
+export default useContract;

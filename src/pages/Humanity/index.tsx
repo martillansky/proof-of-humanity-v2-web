@@ -2,51 +2,131 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import { PendingRequest as PendingRequestType } from "api/types";
+import { useGateways } from "api/useGateways";
 import { useHumanity } from "api/useHumanity";
 import ProofOfHumanityLogo from "assets/svg/ProofOfHumanityLogo.svg";
 import ALink from "components/ALink";
 import Image from "components/Image";
+import Modal from "components/Modal";
 import PageLoader from "components/PageLoader";
+import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
 import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { CONTRACT, Contracts } from "constants/contracts";
+import { Status } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
 import PendingRequest from "modules/PendingRequest";
+import Transfer from "modules/crosschain/Transfer";
+import Update from "modules/crosschain/Update";
 import Revoke from "modules/humanity/Revoke";
 import { explorerLink, shortenAddress } from "utils/address";
 import { machinifyId, shortenId } from "utils/identifier";
 import { ipfs } from "utils/ipfs";
+
+interface TransferState {
+  foreignProxy: string;
+  senderChainId: ChainId;
+  receivingChainId: ChainId;
+  transferHash: string;
+  transferTimestamp: string;
+  received: boolean;
+}
 
 const Humanity: React.FC = () => {
   const { humanity: humanityId } = useParams();
   const humanityAllChains = useHumanity(humanityId && machinifyId(humanityId));
 
   const [homeChain, setHomeChain] = useState<ChainId>();
+  const [lastEvidenceChain, setLastEvidenceChain] = useState<ChainId>();
   const [pendingRequests, setPendingRequests] = useState<PendingRequestType[]>(
     []
   );
+  const [transferState, setTransferState] = useState<TransferState>();
+  const gateways = useGateways();
 
   const winnerClaimRequest =
-    homeChain && humanityAllChains![homeChain]!.winnerClaimRequest[0];
+    lastEvidenceChain &&
+    humanityAllChains![lastEvidenceChain]!.humanity!.winnerClaimRequest[0];
 
   const [winnerEvidence] = useIPFS<EvidenceFileInterface>(
     winnerClaimRequest?.evidence[0].URI
   );
-  const [winnerRegistration] = useIPFS<RegistrationFileInterface>(
+  const [registration] = useIPFS<RegistrationFileInterface>(
     winnerEvidence?.fileURI
   );
+
+  const fullName = registration?.firstName
+    ? `${registration.firstName} ${registration.lastName}`
+    : registration?.name;
+
+  console.log({ transferState });
+
+  const updateTransferState = async () => {
+    if (!humanityAllChains || !gateways) return;
+
+    const lastTransferChain = SUPPORTED_CHAIN_IDS.sort((chain1, chain2) => {
+      const out1 = humanityAllChains[chain1]?.outTransfer;
+      const out2 = humanityAllChains[chain2]?.outTransfer;
+      return out2
+        ? out1
+          ? out2.transferTimestamp - out1.transferTimestamp
+          : 1
+        : -1;
+    })[0];
+
+    if (!lastTransferChain || !humanityAllChains[lastTransferChain].outTransfer)
+      return;
+
+    const { transferHash, foreignProxy, transferTimestamp } =
+      humanityAllChains[lastTransferChain].outTransfer!;
+
+    setTransferState({
+      transferHash,
+      foreignProxy,
+      transferTimestamp,
+      senderChainId: lastTransferChain,
+      receivingChainId: SUPPORTED_CHAIN_IDS.find(
+        (chainId) =>
+          CONTRACT[Contracts.CROSS_CHAIN_POH][chainId].toLowerCase() ===
+          foreignProxy
+      )!,
+      received: !!SUPPORTED_CHAIN_IDS.find(
+        (c) => CONTRACT[Contracts.CROSS_CHAIN_POH][c] === foreignProxy
+      ),
+    });
+  };
 
   useEffect(() => {
     if (!humanityAllChains) return;
 
+    console.log({ humanityAllChains });
+
     setHomeChain(
-      SUPPORTED_CHAIN_IDS.find((chain) => humanityAllChains[chain]?.claimed)
+      SUPPORTED_CHAIN_IDS.find(
+        (chain) => humanityAllChains[chain]?.humanity?.claimed
+      )
     );
+
+    const lastEvChain = SUPPORTED_CHAIN_IDS.sort((chain1, chain2) => {
+      const req1 = humanityAllChains[chain1]?.humanity?.winnerClaimRequest[0];
+      const req2 = humanityAllChains[chain2]?.humanity?.winnerClaimRequest[0];
+      return req2 ? (req1 ? req2.resolutionTime - req1.resolutionTime : 1) : -1;
+    })[0];
+
+    setLastEvidenceChain(
+      humanityAllChains[lastEvChain]?.humanity?.winnerClaimRequest[0]
+        ? lastEvChain
+        : undefined
+    );
+
     setPendingRequests(
       SUPPORTED_CHAIN_IDS.reduce<PendingRequestType[]>(
         (acc, chain) => [
           ...acc,
-          ...(humanityAllChains[chain]
-            ? humanityAllChains[chain]!.pendingRequests.map((req) => ({
+          ...(humanityAllChains[chain].humanity
+            ? humanityAllChains[chain]!.humanity!.pendingRequests.filter(
+                ({ status }) => status !== Status.Withdrawn
+              ).map((req) => ({
                 ...req,
                 chainId: chain,
               }))
@@ -55,13 +135,16 @@ const Humanity: React.FC = () => {
         []
       )
     );
+
+    updateTransferState();
   }, [humanityAllChains]);
 
   if (!humanityId) return null;
-
   if (!humanityAllChains) return <PageLoader />;
 
   const HomeChainLogo = (homeChain && CHAIN[homeChain].Logo)!;
+
+  // console.log("123456", { humanityAllChains });
 
   return (
     <div className="content">
@@ -78,23 +161,24 @@ const Humanity: React.FC = () => {
           </span>
         </div>
 
-        {homeChain ? (
+        {lastEvidenceChain && homeChain ? (
           <>
             <div className="mb-8 flex flex-col">
               <div className="flex justify-between mb-2">
                 <div className="flex flex-col">
                   <span className="text-xs text-slate-400">
-                    Claimed by{" "}
-                    <strong>{humanityAllChains[homeChain]!.owner!.name}</strong>
+                    Claimed by <strong>{fullName}</strong>
                   </span>
                   <ALink
                     className="underline underline-offset-2"
                     href={explorerLink(
-                      humanityAllChains[homeChain]!.owner!.id,
+                      humanityAllChains[homeChain]!.humanity!.owner!.id,
                       homeChain
                     )}
                   >
-                    {shortenAddress(humanityAllChains[homeChain]!.owner!.id)}
+                    {shortenAddress(
+                      humanityAllChains[homeChain]!.humanity!.owner!.id
+                    )}
                   </ALink>
                 </div>
                 <div className="flex flex-col items-end">
@@ -106,17 +190,13 @@ const Humanity: React.FC = () => {
                 </div>
               </div>
 
-              {winnerRegistration && (
+              {registration && (
                 <div className="flex flex-col items-end">
                   <div className="w-full flex flex-col sm:flex-row items-center justify-center mx-auto">
-                    <Image
-                      uri={ipfs(winnerRegistration!.photo)}
-                      rounded
-                      previewed
-                    />
+                    <Image uri={ipfs(registration!.photo)} rounded previewed />
                     <Video
                       className="h-40 mt-4 sm:mt-0 sm:ml-8 cursor-pointer"
-                      uri={ipfs(winnerRegistration!.video)}
+                      uri={ipfs(registration!.video)}
                       previewed
                     />
                   </div>
@@ -124,18 +204,24 @@ const Humanity: React.FC = () => {
                   <Link
                     className="mt-1 text-theme underline underline-offset-2 font-semibold"
                     to={`/request/${CHAIN[
-                      homeChain
+                      lastEvidenceChain
                     ].NAME.toLowerCase()}/${humanityId}/${
                       winnerClaimRequest!.index
                     }`}
                   >
-                    See winner claim ➜
+                    See winner claim request ➜
                   </Link>
                 </div>
               )}
             </div>
 
             <Revoke humanity={humanityId} homeChain={homeChain} />
+
+            <Transfer homeChain={homeChain} />
+            <Update
+              humanityAllChains={humanityAllChains}
+              homeChain={homeChain}
+            />
           </>
         ) : (
           <>
@@ -144,6 +230,29 @@ const Humanity: React.FC = () => {
               Claim humanity
             </Link>
           </>
+        )}
+
+        {transferState && (
+          <Modal
+            trigger={
+              <button className="m-4 p-2 border-2 border-blue-500 text-blue-500 font-bold">
+                ⏳ Pending transfer
+              </button>
+            }
+            header="Last transfer"
+          >
+            <div className="paper p-4 flex flex-col">
+              <span>
+                {CHAIN[transferState.senderChainId].NAME} ▶{" "}
+                {CHAIN[transferState.receivingChainId].NAME}
+              </span>
+              <TimeAgo time={parseInt(transferState.transferTimestamp)} />
+              <span>Received: {String(transferState.received)}</span>
+              <span>
+                Transfer hash: {transferState.transferHash.substring(0, 12)}...
+              </span>
+            </div>
+          </Modal>
         )}
       </div>
 

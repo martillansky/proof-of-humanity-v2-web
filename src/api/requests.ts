@@ -25,15 +25,13 @@ const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
     )
     .sort((req1, req2) => req2.creationTime - req1.creationTime);
 
-const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce(
-  (acc, chainID) => ({ ...acc, [chainID]: [] }),
-  {}
-);
+const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce<
+  Record<number, RequestsQueryItem[]>
+>((acc, chainID) => ({ ...acc, [chainID]: [] }), {});
 
 const cursorAtom = atom(0);
-const chainStacksAtom =
-  atom<Record<number, RequestsQueryItem[]>>(initialChainStacks);
-const normalizedRequestsAtom = atom<RequestInterface[]>((get) =>
+const chainStacksAtom = atom(initialChainStacks);
+const normalizedRequestsAtom = atom((get) =>
   normalizeRequests(get(chainStacksAtom))
 );
 

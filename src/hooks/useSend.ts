@@ -2,6 +2,7 @@ import { TransactionReceipt } from "@ethersproject/providers";
 import { Contract, ContractTransaction } from "ethers";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
+import { ChainId } from "constants/chains";
 import useChangeChain from "./useChangeChain";
 import useSuggestedChain from "./useSuggestedChain";
 
@@ -11,6 +12,7 @@ interface TransactionEvents {
   onConfirm?: (tx?: ContractTransaction) => void;
   onMined?: (receipt?: TransactionReceipt) => void;
   onError?: () => void;
+  chain?: ChainId;
 }
 
 type SendFunc<C extends Contract, F extends keyof C["callStatic"]> = (
@@ -26,16 +28,25 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
 
   const send = useCallback<SendFunc<C, F>>(
     async (...params) => {
-      if (suggestedChain && (await changeChain(suggestedChain!))) return;
+      // TODO fix for when there is no txEvents
+      const txEvents = params.at(-1) as TransactionEvents | undefined;
+      let { chain, withToast, onConfirm, onError, onMined, onPending } =
+        txEvents || {};
 
-      const txEvents = params.at(-1) as TransactionEvents;
-      const {
-        withToast = true,
-        onConfirm,
-        onError,
-        onMined,
-        onPending,
-      } = txEvents;
+      if (!chain) {
+        chain = suggestedChain!;
+        if (typeof withToast === "undefined") {
+          withToast = true;
+          if (onConfirm || onError || onMined || onPending)
+            params = params.slice(0, -1) as any;
+        } else params = params.slice(0, -1) as any;
+      } else {
+        if (typeof withToast === "undefined") withToast = true;
+        params = params.slice(0, -1) as any;
+      }
+
+      if (await changeChain(chain)) return;
+
       try {
         if (!contract) return;
 

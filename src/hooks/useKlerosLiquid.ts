@@ -1,10 +1,9 @@
 import { Contracts } from "constants/contracts";
 import { KlerosLiquid } from "generated/contracts";
 import useCall from "./useCall";
-import { useContract } from "./useContract";
+import useContract from "./useContract";
 
-const useKlerosLiquid = () =>
-  useContract<KlerosLiquid>(Contracts.KLEROS_LIQUID);
+const useKlerosLiquid = () => useContract<KlerosLiquid>(Contracts.ARBITRATOR);
 
 export default useKlerosLiquid;
 

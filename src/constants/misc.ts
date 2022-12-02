@@ -8,6 +8,7 @@ export const STATUS_TO_COLOR: Record<Status, string> = {
   Resolving: "resolving",
   Disputed: "disputed",
   Resolved: "resolved",
+  Withdrawn: "withdrawn",
 };
 
 // vouching
@@ -27,5 +28,7 @@ export const getColorForStatus = (status: Status, registration: boolean) => {
       return "challenged";
     case Status.Resolved:
       return registration ? "registered" : "removed";
+    case Status.Withdrawn:
+      return "withdrawn";
   }
 };

@@ -28,7 +28,7 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const changeChain = useChangeChain();
-  const contractData = useContractData();
+  const contractData = useContractData(homeChain);
 
   const revokeHumanity = useRevokeHumanity();
 
@@ -58,13 +58,15 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
     <Modal
       formal
       header="Revoke"
-      trigger={<button className="btn-main w-48">Revoke humanity</button>}
+      trigger={<button className="btn-main w-48 my-4">Revoke humanity</button>}
     >
       <div className="p-4 flex flex-col items-center">
-        {contractData && (
+        {contractData && contractData.contract && (
           <ALink
             className="flex"
-            href={ipfs(contractData.latestArbitratorData.registrationMeta)}
+            href={ipfs(
+              contractData.contract.latestArbitratorData.registrationMeta
+            )}
           >
             <DocumentIcon className="w-6 h-6 fill-theme" />
             <strong className="mr-1 text-theme font-semibold">

@@ -6,7 +6,6 @@ import { WalletConnect } from "@web3-react/walletconnect";
 import { FALLBACK_CHAIN, RPC_ENDPOINT } from "constants/chains";
 
 export enum ConnectionType {
-  NETWORK = "NETWORK",
   INJECTED = "INJECTED",
   WALLET_CONNECT = "WALLET_CONNECT",
 }
@@ -26,10 +25,9 @@ const [web3Network, web3NetworkHooks] = initializeConnector<Network>(
     })
 );
 
-export const network: Connection = {
+export const network = {
   connector: web3Network,
   hooks: web3NetworkHooks,
-  type: ConnectionType.NETWORK,
 };
 
 const [web3Injected, web3InjectedHooks] = initializeConnector<MetaMask>(
@@ -65,21 +63,12 @@ export const walletConnect: Connection = {
 export const getIsInjected = () => Boolean(window.ethereum);
 export const getIsMetaMask = () => window.ethereum?.isMetaMask ?? false;
 
-export const isNetwork = (c: Connector) => c === network.connector;
-
-const SUPPORTED_CONNECTIONS = [
-  ConnectionType.NETWORK,
-  ConnectionType.INJECTED,
-  ConnectionType.WALLET_CONNECT,
-];
-
-export const SHOWN_CONNECTIONS = [
+export const SUPPORTED_CONNECTIONS = [
   ConnectionType.INJECTED,
   ConnectionType.WALLET_CONNECT,
 ];
 
 export const ConnectionMapping = {
-  [ConnectionType.NETWORK]: network,
   [ConnectionType.INJECTED]: injected,
   [ConnectionType.WALLET_CONNECT]: walletConnect,
 };
@@ -92,16 +81,11 @@ export const getConnection = (c: Connector) => {
   return connection;
 };
 
-export function getConnectionName(
-  connectionType: ConnectionType,
-  isMetaMask?: boolean
-) {
+export function getConnectionName(connectionType: ConnectionType) {
   switch (connectionType) {
     case ConnectionType.INJECTED:
-      return isMetaMask ? "MetaMask" : "Injected";
+      return getIsMetaMask() ? "MetaMask" : "Injected";
     case ConnectionType.WALLET_CONNECT:
       return "WalletConnect";
-    case ConnectionType.NETWORK:
-      return "Network";
   }
 }

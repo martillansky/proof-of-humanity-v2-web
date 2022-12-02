@@ -24,6 +24,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
         where: { status: Resolved, registration: true }
         orderBy: resolutionTime
         orderDirection: desc
+        first: 1
       ) {
         index
         evidence(orderBy: creationTime, first: 1) {

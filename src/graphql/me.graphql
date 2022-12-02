@@ -8,6 +8,10 @@ query Me($id: ID!) {
     }
     currentRequest {
       id
+      humanity {
+        id
+      }
+      index
     }
   }
 }

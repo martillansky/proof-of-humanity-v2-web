@@ -5,7 +5,8 @@ import GnosisLogo from "../assets/svg/gnosis.svg";
 
 export enum ChainId {
   MAINNET = 1,
-  RINKEBY = 4,
+  GOERLI = 5,
+  OPGOERLI = 420,
   GNOSIS = 100,
 }
 
@@ -13,7 +14,8 @@ const INFURA_KEY = process.env.INFURA_KEY;
 
 export const RPC_ENDPOINT: { [key in ChainId]: string } = {
   [ChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-  [ChainId.RINKEBY]: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
+  [ChainId.GOERLI]: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+  [ChainId.OPGOERLI]: "https://goerli.optimism.io",
   [ChainId.GNOSIS]: "https://rpc.gnosischain.com/",
 };
 
@@ -37,11 +39,18 @@ export const CHAIN = {
     EXPLORER: "https://etherscan.io",
     CURRENCY: ETH,
   },
-  [ChainId.RINKEBY]: {
-    NAME: "Rinkeby",
+  [ChainId.GOERLI]: {
+    NAME: "Goerli",
     Logo: TestnetLogo,
-    RPC: RPC_ENDPOINT[ChainId.RINKEBY],
-    EXPLORER: "https://rinkeby.etherscan.io",
+    RPC: RPC_ENDPOINT[ChainId.GOERLI],
+    EXPLORER: "https://goerli.etherscan.io",
+    CURRENCY: ETH,
+  },
+  [ChainId.OPGOERLI]: {
+    NAME: "OpGoerli",
+    Logo: TestnetLogo,
+    RPC: RPC_ENDPOINT[ChainId.OPGOERLI],
+    EXPLORER: "https://goerli-optimism.etherscan.io",
     CURRENCY: ETH,
   },
   [ChainId.GNOSIS]: {
@@ -66,14 +75,17 @@ export const chainSetting = (chain: ChainId) =>
 
 export const CHAIN_SETTING = {
   ...chainSetting(ChainId.MAINNET),
-  ...chainSetting(ChainId.RINKEBY),
+  ...chainSetting(ChainId.GOERLI),
+  ...chainSetting(ChainId.OPGOERLI),
   ...chainSetting(ChainId.GNOSIS),
 };
 
-export const FALLBACK_CHAIN = ChainId.GNOSIS;
+export const FALLBACK_CHAIN = ChainId.GOERLI;
 
 export const SUPPORTED_CHAIN_IDS = [
-  // ChainId.MAINNET,
-  ChainId.RINKEBY,
-  ChainId.GNOSIS,
+  ChainId.GOERLI,
+  ChainId.OPGOERLI,
+  // ChainId.GNOSIS,
 ];
+
+export const VDB_CHAIN = ChainId.GOERLI;

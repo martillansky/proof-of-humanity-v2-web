@@ -307,7 +307,27 @@ export type Claimer_Filter = {
   hasHumanity_in?: InputMaybe<Array<Scalars['Boolean']>>;
   hasHumanity_not?: InputMaybe<Scalars['Boolean']>;
   hasHumanity_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  humanity?: InputMaybe<Scalars['String']>;
   humanity_?: InputMaybe<Humanity_Filter>;
+  humanity_contains?: InputMaybe<Scalars['String']>;
+  humanity_contains_nocase?: InputMaybe<Scalars['String']>;
+  humanity_ends_with?: InputMaybe<Scalars['String']>;
+  humanity_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  humanity_gt?: InputMaybe<Scalars['String']>;
+  humanity_gte?: InputMaybe<Scalars['String']>;
+  humanity_in?: InputMaybe<Array<Scalars['String']>>;
+  humanity_lt?: InputMaybe<Scalars['String']>;
+  humanity_lte?: InputMaybe<Scalars['String']>;
+  humanity_not?: InputMaybe<Scalars['String']>;
+  humanity_not_contains?: InputMaybe<Scalars['String']>;
+  humanity_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  humanity_not_ends_with?: InputMaybe<Scalars['String']>;
+  humanity_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  humanity_not_in?: InputMaybe<Array<Scalars['String']>>;
+  humanity_not_starts_with?: InputMaybe<Scalars['String']>;
+  humanity_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  humanity_starts_with?: InputMaybe<Scalars['String']>;
+  humanity_starts_with_nocase?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['Bytes']>;
   id_contains?: InputMaybe<Scalars['Bytes']>;
   id_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -706,6 +726,103 @@ export enum Counter_OrderBy {
   Vouching = 'vouching'
 }
 
+export type CrossChainGateway = {
+  __typename?: 'CrossChainGateway';
+  foreignProxy: Scalars['Bytes'];
+  id: Scalars['Bytes'];
+};
+
+export type CrossChainGateway_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  foreignProxy?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_contains?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  foreignProxy_not?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_not_contains?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+};
+
+export enum CrossChainGateway_OrderBy {
+  ForeignProxy = 'foreignProxy',
+  Id = 'id'
+}
+
+export type CrossChainHumanity = {
+  __typename?: 'CrossChainHumanity';
+  claimed: Scalars['Boolean'];
+  expirationTime: Scalars['BigInt'];
+  id: Scalars['Bytes'];
+  lastReceivedTransferTimestamp: Scalars['BigInt'];
+  owner?: Maybe<Claimer>;
+};
+
+export type CrossChainHumanity_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  claimed?: InputMaybe<Scalars['Boolean']>;
+  claimed_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  claimed_not?: InputMaybe<Scalars['Boolean']>;
+  claimed_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  expirationTime?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_gt?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_gte?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  expirationTime_lt?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_lte?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_not?: InputMaybe<Scalars['BigInt']>;
+  expirationTime_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  lastReceivedTransferTimestamp?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  lastReceivedTransferTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  lastReceivedTransferTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  owner?: InputMaybe<Scalars['String']>;
+  owner_?: InputMaybe<Claimer_Filter>;
+  owner_contains?: InputMaybe<Scalars['String']>;
+  owner_contains_nocase?: InputMaybe<Scalars['String']>;
+  owner_ends_with?: InputMaybe<Scalars['String']>;
+  owner_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  owner_gt?: InputMaybe<Scalars['String']>;
+  owner_gte?: InputMaybe<Scalars['String']>;
+  owner_in?: InputMaybe<Array<Scalars['String']>>;
+  owner_lt?: InputMaybe<Scalars['String']>;
+  owner_lte?: InputMaybe<Scalars['String']>;
+  owner_not?: InputMaybe<Scalars['String']>;
+  owner_not_contains?: InputMaybe<Scalars['String']>;
+  owner_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  owner_not_ends_with?: InputMaybe<Scalars['String']>;
+  owner_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  owner_not_in?: InputMaybe<Array<Scalars['String']>>;
+  owner_not_starts_with?: InputMaybe<Scalars['String']>;
+  owner_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  owner_starts_with?: InputMaybe<Scalars['String']>;
+  owner_starts_with_nocase?: InputMaybe<Scalars['String']>;
+};
+
+export enum CrossChainHumanity_OrderBy {
+  Claimed = 'claimed',
+  ExpirationTime = 'expirationTime',
+  Id = 'id',
+  LastReceivedTransferTimestamp = 'lastReceivedTransferTimestamp',
+  Owner = 'owner'
+}
+
 export type Evidence = {
   __typename?: 'Evidence';
   URI: Scalars['String'];
@@ -937,6 +1054,34 @@ export enum Humanity_OrderBy {
   Vouching = 'vouching'
 }
 
+export type InTransfer = {
+  __typename?: 'InTransfer';
+  humanityId: Scalars['Bytes'];
+  id: Scalars['Bytes'];
+};
+
+export type InTransfer_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  humanityId?: InputMaybe<Scalars['Bytes']>;
+  humanityId_contains?: InputMaybe<Scalars['Bytes']>;
+  humanityId_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  humanityId_not?: InputMaybe<Scalars['Bytes']>;
+  humanityId_not_contains?: InputMaybe<Scalars['Bytes']>;
+  humanityId_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+};
+
+export enum InTransfer_OrderBy {
+  HumanityId = 'humanityId',
+  Id = 'id'
+}
+
 export enum OldSubmissionStatus {
   None = 'None',
   PendingRegistration = 'PendingRegistration',
@@ -948,6 +1093,52 @@ export enum OldSubmissionStatus {
 export enum OrderDirection {
   Asc = 'asc',
   Desc = 'desc'
+}
+
+export type OutTransfer = {
+  __typename?: 'OutTransfer';
+  foreignProxy: Scalars['Bytes'];
+  id: Scalars['Bytes'];
+  transferHash: Scalars['Bytes'];
+  transferTimestamp: Scalars['BigInt'];
+};
+
+export type OutTransfer_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  foreignProxy?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_contains?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  foreignProxy_not?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_not_contains?: InputMaybe<Scalars['Bytes']>;
+  foreignProxy_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transferHash?: InputMaybe<Scalars['Bytes']>;
+  transferHash_contains?: InputMaybe<Scalars['Bytes']>;
+  transferHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transferHash_not?: InputMaybe<Scalars['Bytes']>;
+  transferHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  transferHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transferTimestamp?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  transferTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  transferTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+};
+
+export enum OutTransfer_OrderBy {
+  ForeignProxy = 'foreignProxy',
+  Id = 'id',
+  TransferHash = 'transferHash',
+  TransferTimestamp = 'transferTimestamp'
 }
 
 export enum Party {
@@ -972,10 +1163,18 @@ export type Query = {
   contributions: Array<Contribution>;
   counter?: Maybe<Counter>;
   counters: Array<Counter>;
+  crossChainGateway?: Maybe<CrossChainGateway>;
+  crossChainGateways: Array<CrossChainGateway>;
+  crossChainHumanities: Array<CrossChainHumanity>;
+  crossChainHumanity?: Maybe<CrossChainHumanity>;
   evidence?: Maybe<Evidence>;
   evidences: Array<Evidence>;
   humanities: Array<Humanity>;
   humanity?: Maybe<Humanity>;
+  inTransfer?: Maybe<InTransfer>;
+  inTransfers: Array<InTransfer>;
+  outTransfer?: Maybe<OutTransfer>;
+  outTransfers: Array<OutTransfer>;
   request?: Maybe<Request>;
   requests: Array<Request>;
   round?: Maybe<Round>;
@@ -1099,6 +1298,42 @@ export type QueryCountersArgs = {
 };
 
 
+export type QueryCrossChainGatewayArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryCrossChainGatewaysArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CrossChainGateway_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<CrossChainGateway_Filter>;
+};
+
+
+export type QueryCrossChainHumanitiesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CrossChainHumanity_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<CrossChainHumanity_Filter>;
+};
+
+
+export type QueryCrossChainHumanityArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type QueryEvidenceArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
@@ -1132,6 +1367,42 @@ export type QueryHumanityArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
   subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryInTransferArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryInTransfersArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<InTransfer_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<InTransfer_Filter>;
+};
+
+
+export type QueryOutTransferArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryOutTransfersArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<OutTransfer_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<OutTransfer_Filter>;
 };
 
 
@@ -1585,7 +1856,8 @@ export enum Status {
   Disputed = 'Disputed',
   Resolved = 'Resolved',
   Resolving = 'Resolving',
-  Vouching = 'Vouching'
+  Vouching = 'Vouching',
+  Withdrawn = 'Withdrawn'
 }
 
 export type Subscription = {
@@ -1604,10 +1876,18 @@ export type Subscription = {
   contributions: Array<Contribution>;
   counter?: Maybe<Counter>;
   counters: Array<Counter>;
+  crossChainGateway?: Maybe<CrossChainGateway>;
+  crossChainGateways: Array<CrossChainGateway>;
+  crossChainHumanities: Array<CrossChainHumanity>;
+  crossChainHumanity?: Maybe<CrossChainHumanity>;
   evidence?: Maybe<Evidence>;
   evidences: Array<Evidence>;
   humanities: Array<Humanity>;
   humanity?: Maybe<Humanity>;
+  inTransfer?: Maybe<InTransfer>;
+  inTransfers: Array<InTransfer>;
+  outTransfer?: Maybe<OutTransfer>;
+  outTransfers: Array<OutTransfer>;
   request?: Maybe<Request>;
   requests: Array<Request>;
   round?: Maybe<Round>;
@@ -1730,6 +2010,42 @@ export type SubscriptionCountersArgs = {
 };
 
 
+export type SubscriptionCrossChainGatewayArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionCrossChainGatewaysArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CrossChainGateway_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<CrossChainGateway_Filter>;
+};
+
+
+export type SubscriptionCrossChainHumanitiesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CrossChainHumanity_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<CrossChainHumanity_Filter>;
+};
+
+
+export type SubscriptionCrossChainHumanityArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type SubscriptionEvidenceArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
@@ -1763,6 +2079,42 @@ export type SubscriptionHumanityArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID'];
   subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionInTransferArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionInTransfersArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<InTransfer_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<InTransfer_Filter>;
+};
+
+
+export type SubscriptionOutTransferArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionOutTransfersArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<OutTransfer_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<OutTransfer_Filter>;
 };
 
 
@@ -1914,8 +2266,8 @@ export type _Block_ = {
   hash?: Maybe<Scalars['Bytes']>;
   /** The block number */
   number: Scalars['Int'];
-  /** Timestamp of the block if available, format depends on the chain */
-  timestamp?: Maybe<Scalars['String']>;
+  /** Integer representation of the timestamp stored in blocks for the chain */
+  timestamp?: Maybe<Scalars['Int']>;
 };
 
 /** The type for the top-level _meta field */
@@ -1945,7 +2297,12 @@ export enum _SubgraphErrorPolicy_ {
 export type ContractQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ContractQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', humanityLifespan: any, renewalTime: any, requestBaseDeposit: any, challengePeriodDuration: any, requiredNumberOfVouches: any, latestArbitratorData: { __typename?: 'ArbitratorData', registrationMeta: string, metaEvidenceUpdateTime: any } } | null };
+export type ContractQuery = { __typename?: 'Query', contract?: { __typename?: 'Contract', humanityLifespan: any, renewalTime: any, requestBaseDeposit: any, challengePeriodDuration: any, requiredNumberOfVouches: any, latestArbitratorData: { __typename?: 'ArbitratorData', registrationMeta: string, metaEvidenceUpdateTime: any } } | null, crossChainGateways: Array<{ __typename?: 'CrossChainGateway', id: any, foreignProxy: any }> };
+
+export type GatewaysQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GatewaysQuery = { __typename?: 'Query', crossChainGateways: Array<{ __typename?: 'CrossChainGateway', id: any, foreignProxy: any }> };
 
 export type HumanitiesQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -1961,21 +2318,21 @@ export type HumanityQueryVariables = Exact<{
 }>;
 
 
-export type HumanityQuery = { __typename?: 'Query', humanity?: { __typename?: 'Humanity', id: any, claimed: boolean, claimTime: any, expirationTime: any, nbPendingRequests: any, owner?: { __typename?: 'Claimer', id: any, name?: string | null } | null, pendingRequests: Array<{ __typename?: 'Request', status: Status, index: any, registration: boolean, requester: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }>, winnerClaimRequest: Array<{ __typename?: 'Request', index: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> } | null };
+export type HumanityQuery = { __typename?: 'Query', humanity?: { __typename?: 'Humanity', id: any, claimed: boolean, claimTime: any, expirationTime: any, nbPendingRequests: any, owner?: { __typename?: 'Claimer', id: any, name?: string | null } | null, pendingRequests: Array<{ __typename?: 'Request', status: Status, index: any, registration: boolean, requester: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }>, winnerClaimRequest: Array<{ __typename?: 'Request', index: any, resolutionTime: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> } | null, crossChainHumanity?: { __typename?: 'CrossChainHumanity', claimed: boolean, expirationTime: any, lastReceivedTransferTimestamp: any, owner?: { __typename?: 'Claimer', id: any } | null } | null, outTransfer?: { __typename?: 'OutTransfer', foreignProxy: any, transferHash: any, transferTimestamp: any } | null };
 
 export type MeQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', claimer?: { __typename?: 'Claimer', humanity?: { __typename?: 'Humanity', id: any } | null, targetHumanity?: { __typename?: 'Humanity', id: any } | null, currentRequest?: { __typename?: 'Request', id: any } | null } | null };
+export type MeQuery = { __typename?: 'Query', claimer?: { __typename?: 'Claimer', humanity?: { __typename?: 'Humanity', id: any } | null, targetHumanity?: { __typename?: 'Humanity', id: any } | null, currentRequest?: { __typename?: 'Request', id: any, index: any, humanity: { __typename?: 'Humanity', id: any } } | null } | null };
 
 export type RequestQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, index: any, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, humanity: { __typename?: 'Humanity', id: any, claimed: boolean, winnerClaimRequest: Array<{ __typename?: 'Request', index: any, requester: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> }, claimer: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any }, humanity: { __typename?: 'Humanity', id: any } }> }, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }>, arbitratorData: { __typename?: 'ArbitratorData', metaEvidenceUpdateTime: any, registrationMeta: string } } | null };
+export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', status: Status, index: any, registration: boolean, requester: any, creationTime: any, lastStatusChange: any, humanity: { __typename?: 'Humanity', id: any, claimed: boolean, winnerClaimRequest: Array<{ __typename?: 'Request', index: any, requester: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> }, claimer: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any, humanity?: { __typename?: 'Humanity', expirationTime: any, vouching: boolean } | null }, humanity: { __typename?: 'Humanity', id: any } }> }, evidence: Array<{ __typename?: 'Evidence', creationTime: any, id: any, URI: string, sender: any }>, challenges: Array<{ __typename?: 'Challenge', id: any, appealPeriodStart: any, appealPeriodEnd: any, reason: Reason, disputeId: any, challenger?: any | null, nbRounds: any, rounds: Array<{ __typename?: 'Round', requesterPaid: boolean, challengerPaid: boolean, requesterFunds: any, challengerFunds: any }> }>, arbitratorData: { __typename?: 'ArbitratorData', metaEvidenceUpdateTime: any, registrationMeta: string } } | null };
 
 export type RequestsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -1985,6 +2342,13 @@ export type RequestsQueryVariables = Exact<{
 
 
 export type RequestsQuery = { __typename?: 'Query', requests: Array<{ __typename?: 'Request', id: any, index: any, status: Status, registration: boolean, creationTime: any, requester: any, claimer: { __typename?: 'Claimer', id: any, name?: string | null }, humanity: { __typename?: 'Humanity', id: any, nbRequests: any, claimed: boolean, winnerClaimRequest: Array<{ __typename?: 'Request', index: any, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> }, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> };
+
+export type TransferQueryVariables = Exact<{
+  hash: Scalars['ID'];
+}>;
+
+
+export type TransferQuery = { __typename?: 'Query', inTransfer?: { __typename?: 'InTransfer', id: any, humanityId: any } | null };
 
 
 export const ContractDocument = gql`
@@ -1999,6 +2363,18 @@ export const ContractDocument = gql`
       registrationMeta
       metaEvidenceUpdateTime
     }
+  }
+  crossChainGateways {
+    id
+    foreignProxy
+  }
+}
+    `;
+export const GatewaysDocument = gql`
+    query Gateways {
+  crossChainGateways {
+    id
+    foreignProxy
   }
 }
     `;
@@ -2042,15 +2418,30 @@ export const HumanityDocument = gql`
       }
     }
     winnerClaimRequest: requests(
-      where: {status: Resolved, registration: true}
+      where: {status: Resolved, registration: true, requesterLost: false}
       orderBy: resolutionTime
       orderDirection: desc
+      first: 1
     ) {
       index
+      resolutionTime
       evidence(orderBy: creationTime, first: 1) {
         URI
       }
     }
+  }
+  crossChainHumanity(id: $id) {
+    owner {
+      id
+    }
+    claimed
+    expirationTime
+    lastReceivedTransferTimestamp
+  }
+  outTransfer(id: $id) {
+    foreignProxy
+    transferHash
+    transferTimestamp
   }
 }
     `;
@@ -2065,6 +2456,10 @@ export const MeDocument = gql`
     }
     currentRequest {
       id
+      humanity {
+        id
+      }
+      index
     }
   }
 }
@@ -2085,6 +2480,7 @@ export const RequestDocument = gql`
         where: {status: Resolved, registration: true}
         orderBy: resolutionTime
         orderDirection: desc
+        first: 1
       ) {
         index
         requester
@@ -2096,9 +2492,13 @@ export const RequestDocument = gql`
     claimer {
       id
       name
-      vouchesReceived {
+      vouchesReceived(where: {from_: {hasHumanity: true}}) {
         from {
           id
+          humanity {
+            expirationTime
+            vouching
+          }
         }
         humanity {
           id
@@ -2160,6 +2560,7 @@ export const RequestsDocument = gql`
         where: {status: Resolved, registration: true}
         orderBy: resolutionTime
         orderDirection: desc
+        first: 1
       ) {
         index
         evidence(orderBy: creationTime, first: 1) {
@@ -2173,6 +2574,14 @@ export const RequestsDocument = gql`
   }
 }
     `;
+export const TransferDocument = gql`
+    query Transfer($hash: ID!) {
+  inTransfer(id: $hash) {
+    id
+    humanityId
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -2183,6 +2592,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     Contract(variables?: ContractQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ContractQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ContractQuery>(ContractDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Contract', 'query');
+    },
+    Gateways(variables?: GatewaysQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GatewaysQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GatewaysQuery>(GatewaysDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Gateways', 'query');
     },
     Humanities(variables?: HumanitiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<HumanitiesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<HumanitiesQuery>(HumanitiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Humanities', 'query');
@@ -2198,6 +2610,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     Requests(variables?: RequestsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RequestsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<RequestsQuery>(RequestsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Requests', 'query');
+    },
+    Transfer(variables: TransferQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TransferQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<TransferQuery>(TransferDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Transfer', 'query');
     }
   };
 }
