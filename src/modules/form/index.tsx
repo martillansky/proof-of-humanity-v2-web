@@ -45,7 +45,7 @@ const Form: React.FC = () => {
       </div>
     );
 
-  if (!step || typeof StepToIndex[step] === "undefined")
+  if (!account || !step || typeof StepToIndex[step] === "undefined")
     return <Navigate to="?step=info" replace={true} />;
 
   return (
