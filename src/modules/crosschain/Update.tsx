@@ -62,7 +62,7 @@ const Update: React.FC<UpdateInterface> = ({
                         Expiration time:{" "}
                         {timeAgo(
                           humanityAllChains[chainId].crossChainHumanity
-                            ?.expirationTime * 1000
+                            ?.expirationTime
                         )}
                       </div>
                     )}
