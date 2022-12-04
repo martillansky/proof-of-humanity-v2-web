@@ -32,3 +32,5 @@ export const getColorForStatus = (status: Status, registration: boolean) => {
       return "withdrawn";
   }
 };
+
+export const NetworkContextName = "WEB3NETWORK";

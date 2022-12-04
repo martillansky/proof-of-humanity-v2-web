@@ -1,4 +1,4 @@
-import { ChainId } from "./chains";
+import { ChainId } from "enums/ChainId";
 
 export const SUBGRAPH_ENDPOINTS = {
   [ChainId.GOERLI]:

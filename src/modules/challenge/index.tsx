@@ -6,7 +6,7 @@ import Field from "components/Field";
 import Label from "components/Label";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
-import { Reason } from "constants/enum";
+import { Reason } from "generated/graphql";
 import { useLoading } from "hooks/useLoading";
 import {
   useArbitrationCost,

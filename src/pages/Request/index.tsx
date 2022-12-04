@@ -1,3 +1,4 @@
+import { ChainId } from "enums/ChainId";
 import { BigNumber } from "ethers";
 import { concat, keccak256 } from "ethers/lib/utils";
 import { useMemo } from "react";
@@ -13,7 +14,7 @@ import Label from "components/Label";
 import PageLoader from "components/PageLoader";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
-import { CHAIN, ChainId } from "constants/chains";
+import { CHAIN } from "constants/chains";
 import { getColorForStatus } from "constants/misc";
 import { Status } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
@@ -187,26 +188,28 @@ const Request: React.FC = () => {
             </>
           )}
 
-          {!isV1 && request.status == Status.Resolving && challengePeriodEnd && (
-            <>
-              <button
-                className="btn-main mb-2"
-                onClick={async () =>
-                  await executeRequest(request.humanity.id, index)
-                }
-                disabled={challengePeriodEnd > Date.now() / 1000}
-              >
-                Execute request
-              </button>
+          {!isV1 &&
+            request.status == Status.Resolving &&
+            challengePeriodEnd && (
+              <>
+                <button
+                  className="btn-main mb-2"
+                  onClick={async () =>
+                    await executeRequest(request.humanity.id, index)
+                  }
+                  disabled={challengePeriodEnd > Date.now() / 1000}
+                >
+                  Execute request
+                </button>
 
-              <Label>
-                Challenge period end:{" "}
-                {challengePeriodEnd && <TimeAgo time={challengePeriodEnd} />}
-              </Label>
+                <Label>
+                  Challenge period end:{" "}
+                  {challengePeriodEnd && <TimeAgo time={challengePeriodEnd} />}
+                </Label>
 
-              <Challenge request={request} />
-            </>
-          )}
+                <Challenge request={request} />
+              </>
+            )}
 
           {!isV1 &&
             request.status == Status.Disputed &&

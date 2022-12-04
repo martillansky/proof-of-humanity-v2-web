@@ -1,9 +1,10 @@
+import { ChainId } from "enums/ChainId";
+import { PoHContract } from "enums/PoHContract";
 import React from "react";
 import { RequestQueryItem } from "api/types";
 import useVouchDB from "api/useVouchDB";
 import Modal from "components/Modal";
-import { ChainId } from "constants/chains";
-import { CONTRACT, Contracts } from "constants/contracts";
+import { CONTRACT } from "constants/contracts";
 import { useAddVouch } from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
 
@@ -13,21 +14,21 @@ interface VouchButtonProps {
 
 const VouchButton: React.FC<VouchButtonProps> = ({ request }) => {
   const addVouch = useAddVouch();
-  const { provider, account } = useWeb3();
+  const { library, account } = useWeb3();
 
   const { pushVouch } = useVouchDB();
 
   const gaslessVouch = async () => {
-    if (!provider || !account) return;
+    if (!library || !account) return;
 
     const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 * 6;
 
-    const signature = await provider.getSigner()._signTypedData(
+    const signature = await library.getSigner()._signTypedData(
       {
         name: "Proof of Humanity",
         chainId: ChainId.GOERLI,
         verifyingContract:
-          CONTRACT[Contracts.PROOF_OF_HUMANITY][ChainId.GOERLI],
+          CONTRACT[PoHContract.PROOF_OF_HUMANITY][ChainId.GOERLI],
       },
       {
         IsHumanVoucher: [

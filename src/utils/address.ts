@@ -1,5 +1,6 @@
 import { getAddress } from "@ethersproject/address";
-import { CHAIN, ChainId } from "constants/chains";
+import { ChainId } from "enums/ChainId";
+import { CHAIN } from "constants/chains";
 import { base2048 } from "./misc";
 
 export function isAddress(value: any): string | false {

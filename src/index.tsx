@@ -10,11 +10,12 @@ injectStyle();
 
 const container = document.getElementById("root");
 const root = createRoot(container!);
+
 root.render(
   <Router>
     <Web3Manager>
       <App />
-      <ToastContainer />
     </Web3Manager>
+    <ToastContainer />
   </Router>
 );

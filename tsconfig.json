@@ -27,6 +27,7 @@
             "assets/*": ["assets/*"],
             "components/*": ["components/*"],
             "constants/*": ["constants/*"],
+            "enums/*": ["enums/*"],
             "generated/*": ["generated/*"],
             "hooks/*": ["hooks/*"],
             "modules/*": ["modules/*"],

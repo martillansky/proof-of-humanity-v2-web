@@ -2,7 +2,7 @@ import useSWR from "swr";
 import { MeQuery } from "generated/graphql";
 import { queryFetchSingleAllChains } from ".";
 
-export const useMeQuery = (id?: string) =>
+export const useMeQuery = (id?: string | null) =>
   useSWR(id && ["MeQuery", id], async (_, id: string) => {
     const res = await queryFetchSingleAllChains("Me", id);
     return Object.keys(res).reduce(

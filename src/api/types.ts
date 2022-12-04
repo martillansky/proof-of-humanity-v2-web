@@ -1,4 +1,4 @@
-import { ChainId } from "constants/chains";
+import { ChainId } from "enums/ChainId";
 import { HumanityQuery, RequestQuery, RequestsQuery } from "generated/graphql";
 
 export type RequestQueryItem = NonNullable<RequestQuery["request"]>;

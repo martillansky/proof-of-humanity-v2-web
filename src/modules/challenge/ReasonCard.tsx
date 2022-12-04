@@ -3,7 +3,7 @@ import DeceasedImage from "assets/images/deceased.png";
 import DoesNotExistImage from "assets/images/does-not-exist.png";
 import DuplicateImage from "assets/images/duplicate.png";
 import IncorrectSubmissionImage from "assets/images/incorrect-submission.png";
-import { Reason } from "constants/enum";
+import { Reason } from "generated/graphql";
 
 const reasonToImage = {
   [Reason.DoesNotExist]: DoesNotExistImage,

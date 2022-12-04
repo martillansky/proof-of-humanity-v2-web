@@ -1,14 +1,12 @@
-import { Contracts } from "constants/contracts";
+import { PoHContract } from "enums/PoHContract";
 import { CrossChainProofOfHumanity } from "generated/contracts";
 import useContract from "./useContract";
 import useSend from "./useSend";
 
-const useCrossChainPoH = (signer?: boolean) =>
-  useContract<CrossChainProofOfHumanity>(Contracts.CROSS_CHAIN_POH, signer);
-
-export default useCrossChainPoH;
+const useCrossChainPoH = () =>
+  useContract<CrossChainProofOfHumanity>(PoHContract.CROSS_CHAIN_POH);
 
 export const useTransferHumanity = () =>
-  useSend(useCrossChainPoH(true), "transferHumanity");
+  useSend(useCrossChainPoH(), "transferHumanity");
 export const useUpdateHumanity = () =>
-  useSend(useCrossChainPoH(true), "updateHumanity");
+  useSend(useCrossChainPoH(), "updateHumanity");

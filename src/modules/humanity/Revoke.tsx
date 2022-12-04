@@ -1,3 +1,4 @@
+import { ChainId } from "enums/ChainId";
 import React, { useState } from "react";
 import useContractData from "api/useContractData";
 import DocumentIcon from "assets/svg/NoteMajor.svg";
@@ -6,12 +7,11 @@ import Field from "components/Field";
 import Label from "components/Label";
 import Modal from "components/Modal";
 import Uploader from "components/Uploader";
-import { ChainId } from "constants/chains";
-import useChangeChain from "hooks/useChangeChain";
 import {
   useRequestTotalCost,
   useRevokeHumanity,
 } from "hooks/useProofOfHumanity";
+import useSwitchChain from "hooks/useSwitchChain";
 import { EvidenceFile } from "types/docs";
 import { machinifyId } from "utils/identifier";
 import { ipfs, uploadToIPFS } from "utils/ipfs";
@@ -27,7 +27,7 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const changeChain = useChangeChain();
+  const switchChain = useSwitchChain();
   const contractData = useContractData(homeChain);
 
   const revokeHumanity = useRevokeHumanity();
@@ -35,7 +35,7 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
   if (!totalCost) return null;
 
   const submit = async () => {
-    if (await changeChain(homeChain)) return;
+    if (await switchChain(homeChain)) return;
 
     const evidence: EvidenceFile = { name: title, description };
 

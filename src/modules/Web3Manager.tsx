@@ -1,16 +1,72 @@
-import { Web3ReactProvider } from "@web3-react/core";
-import { ReactNode } from "react";
-import { injected, network, walletConnect } from "utils/connectors";
+import { Web3Provider } from "@ethersproject/providers";
+import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
+import { createWeb3ReactRoot } from "@web3-react/core";
+import { useEffect } from "react";
+import { NetworkContextName } from "constants/misc";
+import useEagerConnect from "hooks/useEagerConnect";
+import useInactiveListener from "hooks/useInactiveListener";
+import useSuggestedChain from "hooks/useSuggestedChain";
+import useSwitchChain from "hooks/useSwitchChain";
+import { network } from "utils/connectors";
 
-const Web3Manager: React.FC<{ children: ReactNode }> = ({ children }) => (
-  <Web3ReactProvider
-    connectors={[
-      [injected.connector, injected.hooks],
-      [walletConnect.connector, walletConnect.hooks],
-      [network.connector, network.hooks],
-    ]}
-  >
-    {children}
+const Web3ReactRoot = createWeb3ReactRoot(NetworkContextName);
+
+const Web3Connection = ({ children }: { children: JSX.Element }) => {
+  const chainId = useSuggestedChain();
+
+  const { active } = useWeb3React();
+  const {
+    active: networkActive,
+    error: networkError,
+    activate: activateNetwork,
+  } = useWeb3React(NetworkContextName);
+
+  const switchChainForNetwork = useSwitchChain(true);
+
+  const triedEager = useEagerConnect();
+
+  useEffect(() => {
+    if (triedEager && !networkActive && !networkError) activateNetwork(network);
+  }, [triedEager, networkActive, networkError, activateNetwork]);
+
+  useInactiveListener(!triedEager);
+
+  useEffect(() => {
+    if (!chainId) return;
+    switchChainForNetwork(chainId);
+  }, [chainId, switchChainForNetwork]);
+
+  if (!triedEager) return null;
+
+  if (!active && networkError)
+    return (
+      <div>
+        Oops! An unknown error occurred. Please refresh the page, or visit from
+        another browser or device
+      </div>
+    );
+
+  return children;
+};
+
+function getLibrary(provider: any): Web3Provider {
+  const library = new Web3Provider(
+    provider,
+    typeof provider.chainId === "number"
+      ? provider.chainId
+      : typeof provider.chainId === "string"
+      ? parseInt(provider.chainId)
+      : "any"
+  );
+  library.pollingInterval = 15_000;
+  return library;
+}
+
+const Web3Manager = ({ children }: { children: JSX.Element }) => (
+  <Web3ReactProvider getLibrary={getLibrary}>
+    <Web3ReactRoot getLibrary={getLibrary}>
+      <Web3Connection>{children}</Web3Connection>
+    </Web3ReactRoot>
   </Web3ReactProvider>
 );
 

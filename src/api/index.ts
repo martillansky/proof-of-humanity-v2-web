@@ -1,5 +1,6 @@
+import { ChainId } from "enums/ChainId";
 import { GraphQLClient } from "graphql-request";
-import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { supportedChainIds } from "constants/chains";
 import { SUBGRAPH_ENDPOINTS } from "constants/subgraph";
 import { getSdk } from "generated/graphql";
 
@@ -10,7 +11,7 @@ export type queryReturnType<Q extends queryType> = Record<
   Awaited<ReturnType<sdkReturnType[Q]>>
 >;
 
-export const sdk = SUPPORTED_CHAIN_IDS.reduce(
+export const sdk = supportedChainIds.reduce(
   (acc, chainID) => ({
     ...acc,
     [chainID]: getSdk(new GraphQLClient(SUBGRAPH_ENDPOINTS[chainID])),
@@ -40,10 +41,10 @@ export const queryFetchSingleAllChains = async <Q extends SINGLE_ENTITY_QUERY>(
   id: string
 ): Promise<queryReturnType<Q>> => {
   const res = await Promise.all(
-    SUPPORTED_CHAIN_IDS.map((chainID) => sdk[chainID][query]({ id }))
+    supportedChainIds.map((chainID) => sdk[chainID][query]({ id }))
   );
 
-  return SUPPORTED_CHAIN_IDS.reduce(
+  return supportedChainIds.reduce(
     (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
     {}
   );
@@ -54,12 +55,12 @@ export const queryFetchAllChains = async <Q extends MULTIPLE_ENTITIES_QUERY>(
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<queryReturnType<Q>> => {
   const res = await Promise.all(
-    SUPPORTED_CHAIN_IDS.map((chainID) =>
+    supportedChainIds.map((chainID) =>
       sdk[chainID][query](...((params as any) || []))
     )
   );
 
-  return SUPPORTED_CHAIN_IDS.reduce(
+  return supportedChainIds.reduce(
     (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
     {}
   );

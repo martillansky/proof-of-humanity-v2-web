@@ -1,7 +1,7 @@
+import { ChainId } from "enums/ChainId";
 import React, { useEffect } from "react";
 import useContractData from "api/useContractData";
 import Modal from "components/Modal";
-import { ChainId } from "constants/chains";
 import { useTransferHumanity } from "hooks/useCrossChainPoH";
 import useProofOfHumanity from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";

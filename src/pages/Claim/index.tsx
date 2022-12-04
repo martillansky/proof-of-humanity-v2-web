@@ -1,17 +1,14 @@
 import React from "react";
 import ALink from "components/ALink";
-import { CHAIN_SETTING, FALLBACK_CHAIN } from "constants/chains";
-import useChangeChain from "hooks/useChangeChain";
-import useConnector from "hooks/useConnector";
-import useSuggestedChain from "hooks/useSuggestedChain";
+import { FALLBACK_CHAIN } from "constants/chains";
+import useSwitchChain from "hooks/useSwitchChain";
 import useWeb3 from "hooks/useWeb3";
 import SubmissionForm from "modules/form";
+import { injected } from "utils/connectors";
 
 const Claim: React.FC = () => {
-  const { account, isActive } = useWeb3();
-  const { connector } = useConnector();
-  const changeChain = useChangeChain();
-  const suggestedChain = useSuggestedChain();
+  const { account, active, activate } = useWeb3();
+  const switchChain = useSwitchChain();
 
   return (
     <div
@@ -20,7 +17,7 @@ const Claim: React.FC = () => {
                  lg:px-10 lg:py-6
                  flex flex-col"
     >
-      {account && isActive ? (
+      {active && account ? (
         <SubmissionForm />
       ) : (
         <>
@@ -41,18 +38,14 @@ const Claim: React.FC = () => {
           {account ? (
             <button
               className="btn-main my-8"
-              onClick={() => changeChain(FALLBACK_CHAIN)}
+              onClick={() => switchChain(FALLBACK_CHAIN)}
             >
               Switch to supported chain
             </button>
           ) : (
             <button
               className="btn-main my-8"
-              onClick={() =>
-                connector.activate(
-                  suggestedChain && CHAIN_SETTING[suggestedChain]
-                )
-              }
+              onClick={() => activate(injected)}
             >
               Connect wallet
             </button>

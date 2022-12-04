@@ -1,67 +1,66 @@
-import { Contracts } from "constants/contracts";
+import { PoHContract } from "enums/PoHContract";
 import { ProofOfHumanity } from "generated/contracts";
 import useCall from "./useCall";
 import useContract from "./useContract";
 import { useArbitrationCost as useKLARbitrationCost } from "./useKlerosLiquid";
 import useSend from "./useSend";
 
-const useProofOfHumanity = (signer?: boolean) =>
-  useContract<ProofOfHumanity>(Contracts.PROOF_OF_HUMANITY, signer);
+const useProofOfHumanity = (onlyNetwork = false) =>
+  useContract<ProofOfHumanity>(PoHContract.PROOF_OF_HUMANITY, onlyNetwork);
 
 export default useProofOfHumanity;
 
 export const useClaimHumanity = (defaultId?: boolean) =>
   useSend(
-    useProofOfHumanity(true),
+    useProofOfHumanity(),
     defaultId
       ? "claimHumanity(string,string)"
       : "claimHumanity(bytes20,string,string)"
   );
 export const useRevokeHumanity = () =>
-  useSend(useProofOfHumanity(true), "revokeHumanity");
+  useSend(useProofOfHumanity(), "revokeHumanity");
 export const useRenewHumanity = () =>
-  useSend(useProofOfHumanity(true), "renewHumanity");
+  useSend(useProofOfHumanity(), "renewHumanity");
 export const useFundRequest = () =>
-  useSend(useProofOfHumanity(true), "fundRequest");
+  useSend(useProofOfHumanity(), "fundRequest");
 export const useWithdrawRequest = () =>
-  useSend(useProofOfHumanity(true), "withdrawRequest");
-export const useAddVouch = () => useSend(useProofOfHumanity(true), "addVouch");
+  useSend(useProofOfHumanity(), "withdrawRequest");
+export const useAddVouch = () => useSend(useProofOfHumanity(), "addVouch");
 export const useRemoveVouch = () =>
-  useSend(useProofOfHumanity(true), "removeVouch");
+  useSend(useProofOfHumanity(), "removeVouch");
 export const useAdvanceState = () =>
-  useSend(useProofOfHumanity(true), "advanceState");
+  useSend(useProofOfHumanity(), "advanceState");
 export const useChallengeRequest = () =>
-  useSend(useProofOfHumanity(true), "challengeRequest");
-export const useFundAppeal = () =>
-  useSend(useProofOfHumanity(true), "fundAppeal");
+  useSend(useProofOfHumanity(), "challengeRequest");
+export const useFundAppeal = () => useSend(useProofOfHumanity(), "fundAppeal");
 export const useExecuteRequest = () =>
-  useSend(useProofOfHumanity(true), "executeRequest");
+  useSend(useProofOfHumanity(), "executeRequest");
 export const useProcessVouches = () =>
-  useSend(useProofOfHumanity(true), "processVouches");
+  useSend(useProofOfHumanity(), "processVouches");
 export const useWithdrawFeesAndRewards = () =>
-  useSend(useProofOfHumanity(true), "withdrawFeesAndRewards");
+  useSend(useProofOfHumanity(), "withdrawFeesAndRewards");
 export const useSubmitEvidence = () =>
-  useSend(useProofOfHumanity(true), "submitEvidence");
+  useSend(useProofOfHumanity(), "submitEvidence");
 
 export const useIsHuman = (
   params: Parameters<ProofOfHumanity["isHuman"]> | null
-) => useCall(useProofOfHumanity(), "isHuman", params);
+) => useCall(useProofOfHumanity(true), "isHuman", params);
 export const useVouches = (
   params: Parameters<ProofOfHumanity["vouches"]> | null
-) => useCall(useProofOfHumanity(), "vouches", params);
+) => useCall(useProofOfHumanity(true), "vouches", params);
 export const useHumanityLifespan = () =>
-  useCall(useProofOfHumanity(), "humanityLifespan", []);
+  useCall(useProofOfHumanity(true), "humanityLifespan", []);
 export const useChallengePeriodDuration = () =>
-  useCall(useProofOfHumanity(), "challengePeriodDuration", []);
+  useCall(useProofOfHumanity(true), "challengePeriodDuration", []);
 export const useRequiredNumberOfVouches = () =>
-  useCall(useProofOfHumanity(), "requiredNumberOfVouches", []);
+  useCall(useProofOfHumanity(true), "requiredNumberOfVouches", []);
 export const useRequestBaseDeposit = () =>
-  useCall(useProofOfHumanity(), "requestBaseDeposit", []);
+  useCall(useProofOfHumanity(true), "requestBaseDeposit", []);
 export const useArbitratorDataListCount = () =>
-  useCall(useProofOfHumanity(), "getArbitratorDataListCount", []);
+  useCall(useProofOfHumanity(true), "getArbitratorDataListCount", []);
 export const useArbitratorDataList = (
   params: Parameters<ProofOfHumanity["arbitratorDataList"]> | null
-) => useCall(useProofOfHumanity(), "arbitratorDataList", params);
+) => useCall(useProofOfHumanity(true), "arbitratorDataList", params);
 
 export const useArbitratorData = () => {
   const [dataListCount] = useArbitratorDataListCount();

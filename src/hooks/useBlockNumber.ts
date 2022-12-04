@@ -6,11 +6,11 @@ const getBlockNumber = (provider: Web3Provider) => async () =>
   provider.getBlockNumber();
 
 export default function useBlockNumber() {
-  const { provider } = useWeb3();
+  const { library } = useWeb3();
 
   const { data } = useSWR(
-    !!provider ? "block-number" : null,
-    getBlockNumber(provider!),
+    !!library ? "block-number" : null,
+    getBlockNumber(library!),
     { refreshInterval: 10 * 1000 }
   );
 

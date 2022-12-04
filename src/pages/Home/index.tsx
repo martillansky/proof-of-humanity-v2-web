@@ -1,10 +1,11 @@
+import { ChainId } from "enums/ChainId";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { requestsAtom } from "api/requests";
 import Dropdown from "components/Dropdown";
 import DropdownItem from "components/DropdownItem";
 import PageLoader from "components/PageLoader";
-import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { CHAIN, supportedChainIds } from "constants/chains";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { RequestStatus, statusFilters } from "constants/requests";
 import useDebounce from "hooks/useDebounce";
@@ -73,7 +74,7 @@ const Home: React.FC = () => {
             onSelect={() => setChainFilter("all")}
             name={"all"}
           />
-          {SUPPORTED_CHAIN_IDS.map((chainID) => (
+          {supportedChainIds.map((chainID) => (
             <DropdownItem
               key={chainID}
               selected={chainFilter === chainID}

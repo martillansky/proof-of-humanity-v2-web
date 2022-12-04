@@ -1,5 +1,6 @@
+import { ChainId } from "enums/ChainId";
 import { atom } from "jotai";
-import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { supportedChainIds } from "constants/chains";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { REQUEST_STATUS, RequestStatus } from "constants/requests";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
@@ -25,7 +26,7 @@ const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
     )
     .sort((req1, req2) => req2.creationTime - req1.creationTime);
 
-const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce<
+const initialChainStacks = supportedChainIds.reduce<
   Record<number, RequestsQueryItem[]>
 >((acc, chainID) => ({ ...acc, [chainID]: [] }), {});
 
@@ -64,7 +65,7 @@ export const requestsAtom = atom(
     const fetchChainIds: number[] = [];
     const fetchPromises: Promise<ReturnType<sdkReturnType["Requests"]>>[] = [];
 
-    chainStacks = SUPPORTED_CHAIN_IDS.reduce(
+    chainStacks = supportedChainIds.reduce(
       (acc, chainID) => ({
         ...acc,
         [chainID]:
@@ -75,7 +76,7 @@ export const requestsAtom = atom(
       chainStacks
     );
 
-    for (const chainID of SUPPORTED_CHAIN_IDS) {
+    for (const chainID of supportedChainIds) {
       if (fromChain !== "all" && fromChain !== chainID) continue;
 
       const displayedForChain = get(requestsAtom).filter(

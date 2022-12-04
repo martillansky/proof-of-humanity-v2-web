@@ -1,5 +1,6 @@
+import { ChainId } from "enums/ChainId";
 import { atom } from "jotai";
-import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { supportedChainIds } from "constants/chains";
 import { HUMANITIES_DISPLAY_BATCH } from "constants/misc";
 import { HumanitiesQuery } from "generated/graphql";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
@@ -24,7 +25,7 @@ const normalizeHumanities = (
     []
   );
 
-const initialChainStacks = SUPPORTED_CHAIN_IDS.reduce(
+const initialChainStacks = supportedChainIds.reduce(
   (acc, chainID) => ({ ...acc, [chainID]: [] }),
   {}
 );
@@ -60,7 +61,7 @@ export const humanitiesAtom = atom(
     const fetchPromises: Promise<ReturnType<sdkReturnType["Humanities"]>>[] =
       [];
 
-    chainStacks = SUPPORTED_CHAIN_IDS.reduce(
+    chainStacks = supportedChainIds.reduce(
       (acc, chainID) => ({
         ...acc,
         [chainID]:
@@ -71,7 +72,7 @@ export const humanitiesAtom = atom(
       chainStacks
     );
 
-    for (const chainID of SUPPORTED_CHAIN_IDS) {
+    for (const chainID of supportedChainIds) {
       if (fromChain !== "all" && fromChain !== chainID) continue;
 
       const displayedForChain = get(humanitiesAtom).filter(

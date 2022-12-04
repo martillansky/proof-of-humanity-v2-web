@@ -9,9 +9,9 @@ import Label from "components/Label";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
 import Uploader from "components/Uploader";
-import useChangeChain from "hooks/useChangeChain";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
 import useSuggestedChain from "hooks/useSuggestedChain";
+import useSwitchChain from "hooks/useSwitchChain";
 import { EvidenceFile } from "types/docs";
 import { ipfs, uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
@@ -32,10 +32,10 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const changeChain = useChangeChain();
+  const switchChain = useSwitchChain();
 
   const submit = async () => {
-    if (await changeChain()) return;
+    if (!chainId || (await switchChain(chainId))) return;
 
     const evidence: EvidenceFile = { name: title, description };
 

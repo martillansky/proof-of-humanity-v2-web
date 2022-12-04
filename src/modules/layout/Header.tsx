@@ -1,31 +1,30 @@
 import cn from "classnames";
-import { useEffect, useState } from "react";
+import { ChainId } from "enums/ChainId";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMeQuery } from "api/useMeQuery";
 import ALink from "components/ALink";
 import Modal from "components/Modal";
 import Popover from "components/Popover";
-import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { CHAIN, supportedChainIds } from "constants/chains";
 import { MeQuery } from "generated/graphql";
-import useChangeChain from "hooks/useChangeChain";
-import useConnector from "hooks/useConnector";
+import useSwitchChain from "hooks/useSwitchChain";
 import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
 import {
-  ConnectionMapping,
-  SUPPORTED_CONNECTIONS,
-  getConnectionName,
+  SupportedWallets,
+  WALLET_LIST,
+  getIsMetaMask,
+  injected,
 } from "utils/connectors";
 import { prettifyId } from "utils/identifier";
 import ProofOfHumanityLogo from "../../assets/svg/ProofOfHumanityLogo.svg";
 
-const DISPLAYED_CHAINS = SUPPORTED_CHAIN_IDS;
-
 const Header: React.FC = () => {
-  const { chainId, isActive, account, disconnect } = useWeb3();
-  const { connectionType, setConnectionType } = useConnector();
+  const { active, activate, chainId, account, connector, deactivate } =
+    useWeb3();
 
-  const changeChain = useChangeChain();
+  const switchChain = useSwitchChain();
   const me = useMeQuery(account);
 
   const [humanity, setHumanity] = useState<string>();
@@ -37,11 +36,11 @@ const Header: React.FC = () => {
   useEffect(() => {
     if (!me) return;
 
-    const homeChain = SUPPORTED_CHAIN_IDS.find((chain) => me[chain]?.humanity);
+    const homeChain = supportedChainIds.find((chain) => me[chain]?.humanity);
 
     if (homeChain) return setHumanity(prettifyId(me[homeChain]!.humanity!.id));
 
-    const requestChain = SUPPORTED_CHAIN_IDS.find(
+    const requestChain = supportedChainIds.find(
       (chain) => me[chain]?.currentRequest
     );
 
@@ -51,6 +50,18 @@ const Header: React.FC = () => {
         data: me[requestChain]!.currentRequest!,
       });
   }, [!!me]);
+
+  const connectorName = useMemo(
+    () =>
+      Object.keys(SupportedWallets)
+        .filter(
+          (k) =>
+            SupportedWallets[k].connector === connector &&
+            (connector !== injected || getIsMetaMask() === (k === "METAMASK"))
+        )
+        .map((k) => SupportedWallets[k].name)[0],
+    [connector]
+  );
 
   return (
     <nav
@@ -107,10 +118,10 @@ const Header: React.FC = () => {
                          text-white text-sm font-semibold"
               // onClick={() => injected.connector.activate()}
             >
-              {isActive && !!account ? (
+              {active && !!account ? (
                 <>
                   <div className="dot mr-1 bg-white" />
-                  {SUPPORTED_CHAIN_IDS.find((c) => c === chainId) ? (
+                  {supportedChainIds.find((c) => c === chainId) ? (
                     CHAIN[chainId as ChainId].NAME
                   ) : (
                     <>Unsupported</>
@@ -125,13 +136,13 @@ const Header: React.FC = () => {
             </button>
           }
         >
-          {isActive ? (
+          {active ? (
             <>
               <span className="mb-2 centered uppercase font-semibold">
                 Supported chains
               </span>
               <div className="grid grid-cols-2 gap-4">
-                {DISPLAYED_CHAINS.map((chain) => {
+                {supportedChainIds.map((chain) => {
                   const ChainLogo = CHAIN[chain].Logo;
                   return (
                     <button
@@ -140,7 +151,7 @@ const Header: React.FC = () => {
                         "p-4 flex flex-col items-center border cursor-pointer",
                         { "bg-slate-100": chain === chainId }
                       )}
-                      onClick={() => changeChain(chain)}
+                      onClick={() => switchChain(chain)}
                     >
                       <ChainLogo className="w-8 h-8 mb-2" />
                       {CHAIN[chain].NAME}
@@ -150,12 +161,8 @@ const Header: React.FC = () => {
               </div>
 
               <div className="p-4 mt-8 flex justify-between cursor-pointer">
-                {connectionType && (
-                  <span>
-                    Connected with {getConnectionName(connectionType)}
-                  </span>
-                )}
-                <button className="text-red-500" onClick={disconnect}>
+                {connector && <span>Connected with {connectorName}</span>}
+                <button className="text-red-500" onClick={deactivate}>
                   Disconnect
                 </button>
               </div>
@@ -166,16 +173,16 @@ const Header: React.FC = () => {
                 Choose a wallet to connect with
               </span>
               <div className="grid grid-cols-2">
-                {SUPPORTED_CONNECTIONS.map((connection) => (
+                {WALLET_LIST.map((wallet) => (
                   <button
-                    key={connection}
+                    key={wallet}
                     className="p-4 m-2 border cursor-pointer"
                     onClick={async () => {
-                      await ConnectionMapping[connection].connector.activate();
-                      setConnectionType(connection);
+                      const { connector } = SupportedWallets[wallet];
+                      if (connector) activate(connector);
                     }}
                   >
-                    {getConnectionName(connection)}
+                    {wallet}
                   </button>
                 ))}
               </div>

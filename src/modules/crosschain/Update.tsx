@@ -1,9 +1,11 @@
+import { ChainId } from "enums/ChainId";
+import { PoHContract } from "enums/PoHContract";
 import React from "react";
 import { useParams } from "react-router-dom";
 import useContractData from "api/useContractData";
 import Modal from "components/Modal";
-import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { CONTRACT, Contracts } from "constants/contracts";
+import { CHAIN, supportedChainIds } from "constants/chains";
+import { CONTRACT } from "constants/contracts";
 import { HumanityQuery } from "generated/graphql";
 import { useUpdateHumanity } from "hooks/useCrossChainPoH";
 import { machinifyId } from "utils/identifier";
@@ -37,7 +39,7 @@ const Update: React.FC<UpdateInterface> = ({
         </span>
 
         <div>
-          {SUPPORTED_CHAIN_IDS.map((chainId) => {
+          {supportedChainIds.map((chainId) => {
             const ChainLogo = CHAIN[chainId].Logo;
             return (
               <div
@@ -74,7 +76,7 @@ const Update: React.FC<UpdateInterface> = ({
                         ].crossChainGateways.find(
                           (gateway) =>
                             gateway.foreignProxy ===
-                            CONTRACT[Contracts.CROSS_CHAIN_POH][
+                            CONTRACT[PoHContract.CROSS_CHAIN_POH][
                               chainId
                             ].toLowerCase()
                         );

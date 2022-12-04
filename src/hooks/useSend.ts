@@ -1,10 +1,10 @@
 import { TransactionReceipt } from "@ethersproject/providers";
+import { ChainId } from "enums/ChainId";
 import { Contract, ContractTransaction } from "ethers";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
-import { ChainId } from "constants/chains";
-import useChangeChain from "./useChangeChain";
 import useSuggestedChain from "./useSuggestedChain";
+import useSwitchChain from "./useSwitchChain";
 
 interface TransactionEvents {
   withToast?: boolean;
@@ -23,7 +23,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
   contract: C | null,
   method: F
 ): SendFunc<C, F> => {
-  const changeChain = useChangeChain();
+  const switchChain = useSwitchChain();
   const suggestedChain = useSuggestedChain();
 
   const send = useCallback<SendFunc<C, F>>(
@@ -45,10 +45,10 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         params = params.slice(0, -1) as any;
       }
 
-      if (await changeChain(chain)) return;
-
       try {
         if (!contract) return;
+
+        if (await switchChain(chain)) return;
 
         onPending && onPending();
         withToast && toast.info("Sending transaction");

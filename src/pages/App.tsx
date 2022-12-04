@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import useWeb3 from "hooks/useWeb3";
 import Layout from "modules/layout";
 import Claim from "./Claim";
 import Home from "./Home";
@@ -24,43 +23,9 @@ const App: React.FC = () => (
       </Route>
       <Route path="humanities" element={<Humanities />} />
       <Route path="humanity/:humanity" element={<Humanity />} />
-      <Route path="sig" element={<SigPage />} />
       <Route path="*" element={<h1>Page not found</h1>} />
     </Route>
   </Routes>
 );
 
 export default App;
-
-const SigPage: React.FC = () => {
-  const { provider } = useWeb3();
-
-  const run = () => {
-    console.log("hello");
-    if (!provider) return;
-    provider.getSigner()._signTypedData(
-      { name: "Proof of Humanity", chainId: 1, verifyingContract: "0x0" },
-      {
-        IsHumanVoucher: [
-          { name: "vouchedHuman", type: "address" },
-          { name: "humanityId", type: "uint160" },
-          { name: "voucherExpirationTimestamp", type: "uint256" },
-        ],
-      },
-      {
-        vouchedHuman: "0xabc",
-        humanityId: "123",
-        voucherExpirationTimestamp: 0,
-      }
-    );
-  };
-
-  return (
-    <button
-      onClick={run}
-      className="m-8 p-8 border-2 text-xl text-white bg-teal-800 font-bold"
-    >
-      CLICK :)
-    </button>
-  );
-};

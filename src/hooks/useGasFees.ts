@@ -1,7 +1,7 @@
+import { Web3ErrorCode } from "enums/Web3ErrorCode";
 import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { Web3ErrorCode } from "constants/web3";
 import { ProofOfHumanity } from "generated/contracts";
 import useProofOfHumanity from "./useProofOfHumanity";
 

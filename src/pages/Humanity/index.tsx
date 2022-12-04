@@ -1,3 +1,5 @@
+import { ChainId } from "enums/ChainId";
+import { PoHContract } from "enums/PoHContract";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
@@ -11,8 +13,8 @@ import Modal from "components/Modal";
 import PageLoader from "components/PageLoader";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
-import { CHAIN, ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
-import { CONTRACT, Contracts } from "constants/contracts";
+import { CHAIN, supportedChainIds } from "constants/chains";
+import { CONTRACT } from "constants/contracts";
 import { Status } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
 import PendingRequest from "modules/PendingRequest";
@@ -64,7 +66,7 @@ const Humanity: React.FC = () => {
   const updateTransferState = async () => {
     if (!humanityAllChains || !gateways) return;
 
-    const lastTransferChain = SUPPORTED_CHAIN_IDS.sort((chain1, chain2) => {
+    const lastTransferChain = supportedChainIds.sort((chain1, chain2) => {
       const out1 = humanityAllChains[chain1]?.outTransfer;
       const out2 = humanityAllChains[chain2]?.outTransfer;
       return out2
@@ -85,13 +87,13 @@ const Humanity: React.FC = () => {
       foreignProxy,
       transferTimestamp,
       senderChainId: lastTransferChain,
-      receivingChainId: SUPPORTED_CHAIN_IDS.find(
+      receivingChainId: supportedChainIds.find(
         (chainId) =>
-          CONTRACT[Contracts.CROSS_CHAIN_POH][chainId].toLowerCase() ===
+          CONTRACT[PoHContract.CROSS_CHAIN_POH][chainId].toLowerCase() ===
           foreignProxy
       )!,
-      received: !!SUPPORTED_CHAIN_IDS.find(
-        (c) => CONTRACT[Contracts.CROSS_CHAIN_POH][c] === foreignProxy
+      received: !!supportedChainIds.find(
+        (c) => CONTRACT[PoHContract.CROSS_CHAIN_POH][c] === foreignProxy
       ),
     });
   };
@@ -102,12 +104,12 @@ const Humanity: React.FC = () => {
     console.log({ humanityAllChains });
 
     setHomeChain(
-      SUPPORTED_CHAIN_IDS.find(
+      supportedChainIds.find(
         (chain) => humanityAllChains[chain]?.humanity?.claimed
       )
     );
 
-    const lastEvChain = SUPPORTED_CHAIN_IDS.sort((chain1, chain2) => {
+    const lastEvChain = supportedChainIds.sort((chain1, chain2) => {
       const req1 = humanityAllChains[chain1]?.humanity?.winnerClaimRequest[0];
       const req2 = humanityAllChains[chain2]?.humanity?.winnerClaimRequest[0];
       return req2 ? (req1 ? req2.resolutionTime - req1.resolutionTime : 1) : -1;
@@ -120,7 +122,7 @@ const Humanity: React.FC = () => {
     );
 
     setPendingRequests(
-      SUPPORTED_CHAIN_IDS.reduce<PendingRequestType[]>(
+      supportedChainIds.reduce<PendingRequestType[]>(
         (acc, chain) => [
           ...acc,
           ...(humanityAllChains[chain].humanity

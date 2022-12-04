@@ -1,5 +1,6 @@
+import { ChainId } from "enums/ChainId";
 import useSWR from "swr";
-import { ChainId, SUPPORTED_CHAIN_IDS } from "constants/chains";
+import { supportedChainIds } from "constants/chains";
 import { ContractQuery } from "generated/graphql";
 import { sdk } from ".";
 
@@ -13,9 +14,9 @@ function useContractData(
         .data
     : useSWR(["Contract"], async () => {
         const res = await Promise.all(
-          SUPPORTED_CHAIN_IDS.map((c) => sdk[c]["Contract"]())
+          supportedChainIds.map((c) => sdk[c]["Contract"]())
         );
-        return SUPPORTED_CHAIN_IDS.reduce(
+        return supportedChainIds.reduce(
           (acc, chain, i) => ({ ...acc, [chain]: res[i] }),
           {} as Record<ChainId, ContractQuery>
         );
