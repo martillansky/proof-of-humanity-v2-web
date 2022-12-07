@@ -15,7 +15,7 @@ const useSwitchChain = (forNetwork = false) => {
   const switchChain = useCallback(
     async (targetChain: ChainId) => {
       if (!library || !library?.provider) throw new Error("Provider error");
-      if (chainId === targetChain) return false;
+      if (!targetChain || chainId === targetChain) return false;
 
       const { provider } = library;
       if (!provider.request)
