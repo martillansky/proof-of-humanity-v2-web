@@ -8,22 +8,32 @@ query Humanity($id: ID!) {
       id
       name
     }
-    nbPendingRequests
     pendingRequests: requests(where: { status_not: Resolved }) {
       status
       index
-      registration
+      revocation
+      requester
+      evidence(orderBy: creationTime, first: 1) {
+        URI
+      }
+    }
+    pastRequests: requests(where: { status: Resolved }) {
+      legacy
+      status
+      index
+      revocation
       requester
       evidence(orderBy: creationTime, first: 1) {
         URI
       }
     }
     winnerClaimRequest: requests(
-      where: { status: Resolved, registration: true, requesterLost: false }
+      where: { status: Resolved, revocation: false, requesterLost: false }
       orderBy: resolutionTime
       orderDirection: desc
       first: 1
     ) {
+      legacy
       index
       resolutionTime
       evidence(orderBy: creationTime, first: 1) {

@@ -18,16 +18,16 @@ export const STATUS_TO_COLOR: Record<Status, string> = {
 // claim
 // challenged
 
-export const getColorForStatus = (status: Status, registration: boolean) => {
+export const getColorForStatus = (status: Status, revocation: boolean) => {
   switch (status) {
     case Status.Vouching:
       return "vouching";
     case Status.Resolving:
-      return registration ? "claim" : "revocation";
+      return revocation ? "revocation" : "claim";
     case Status.Disputed:
       return "challenged";
     case Status.Resolved:
-      return registration ? "registered" : "removed";
+      return revocation ? "removed" : "registered";
     case Status.Withdrawn:
       return "withdrawn";
   }

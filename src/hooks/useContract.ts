@@ -11,6 +11,7 @@ const useContract = <T extends BaseContract = Contract>(
   const { account, chainId, library } = useWeb3(onlyNetwork);
 
   return useMemo(() => {
+    console.log({ library, chainId });
     if (!library || !chainId) return null;
 
     console.log({ contract, chainId, address: CONTRACT[contract][chainId] });

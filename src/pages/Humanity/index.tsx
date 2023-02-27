@@ -3,7 +3,10 @@ import { PoHContract } from "enums/PoHContract";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
-import { PendingRequest as PendingRequestType } from "api/types";
+import {
+  PastRequest as PastRequestType,
+  PendingRequest as PendingRequestType,
+} from "api/types";
 import { useGateways } from "api/useGateways";
 import { useHumanity } from "api/useHumanity";
 import ProofOfHumanityLogo from "assets/svg/ProofOfHumanityLogo.svg";
@@ -43,6 +46,7 @@ const Humanity: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<PendingRequestType[]>(
     []
   );
+  const [pastRequests, setPastRequests] = useState<PendingRequestType[]>([]);
   const [transferState, setTransferState] = useState<TransferState>();
   const gateways = useGateways();
 
@@ -61,8 +65,6 @@ const Humanity: React.FC = () => {
     ? `${registration.firstName} ${registration.lastName}`
     : registration?.name;
 
-  console.log({ transferState });
-
   const updateTransferState = async () => {
     if (!humanityAllChains || !gateways) return;
 
@@ -76,7 +78,10 @@ const Humanity: React.FC = () => {
         : -1;
     })[0];
 
-    if (!lastTransferChain || !humanityAllChains[lastTransferChain].outTransfer)
+    if (
+      !lastTransferChain ||
+      !humanityAllChains[lastTransferChain]?.outTransfer
+    )
       return;
 
     const { transferHash, foreignProxy, transferTimestamp } =
@@ -127,11 +132,22 @@ const Humanity: React.FC = () => {
           ...acc,
           ...(humanityAllChains[chain].humanity
             ? humanityAllChains[chain]!.humanity!.pendingRequests.filter(
-                ({ status }) => status !== Status.Withdrawn
-              ).map((req) => ({
-                ...req,
-                chainId: chain,
-              }))
+                ({ status }: { status: Status }) => status !== Status.Withdrawn
+              ).map((req: PendingRequestType) => ({ ...req, chainId: chain }))
+            : []),
+        ],
+        []
+      )
+    );
+
+    setPastRequests(
+      supportedChainIds.reduce<PastRequestType[]>(
+        (acc, chain) => [
+          ...acc,
+          ...(humanityAllChains[chain].humanity
+            ? humanityAllChains[chain]!.humanity!.pastRequests.map(
+                (req: PastRequestType) => ({ ...req, chainId: chain })
+              )
             : []),
         ],
         []
@@ -145,8 +161,6 @@ const Humanity: React.FC = () => {
   if (!humanityAllChains) return <PageLoader />;
 
   const HomeChainLogo = (homeChain && CHAIN[homeChain].Logo)!;
-
-  // console.log("123456", { humanityAllChains });
 
   return (
     <div className="content">
@@ -203,16 +217,19 @@ const Humanity: React.FC = () => {
                     />
                   </div>
 
-                  <Link
-                    className="mt-1 text-theme underline underline-offset-2 font-semibold"
-                    to={`/request/${CHAIN[
-                      lastEvidenceChain
-                    ].NAME.toLowerCase()}/${humanityId}/${
-                      winnerClaimRequest!.index
-                    }`}
-                  >
-                    See winner claim request ➜
-                  </Link>
+                  {winnerClaimRequest && (
+                    <Link
+                      className="mt-1 text-theme underline underline-offset-2 font-semibold"
+                      to={`/request/${CHAIN[
+                        lastEvidenceChain
+                      ].NAME.toLowerCase()}/${humanityId}/${
+                        (winnerClaimRequest.legacy ? -1 : 1) *
+                        winnerClaimRequest.index
+                      }`}
+                    >
+                      See winner claim request ➜
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
@@ -258,11 +275,19 @@ const Humanity: React.FC = () => {
         )}
       </div>
 
-      <div className="paper p-4 mt-4 mb-2 flex justify-between">
+      <div className="paper p-4 mt-4 mb-1 flex justify-between">
         {pendingRequests.length} pending request
         {pendingRequests.length !== 1 && "s"}
       </div>
       {pendingRequests.map((req, index) => (
+        <PendingRequest key={index} humanity={humanityId} request={req} />
+      ))}
+
+      <div className="paper p-4 mt-8 mb-1 flex justify-between">
+        {pastRequests.length} past resolved request
+        {pastRequests.length !== 1 && "s"}
+      </div>
+      {pastRequests.map((req, index) => (
         <PendingRequest key={index} humanity={humanityId} request={req} />
       ))}
     </div>

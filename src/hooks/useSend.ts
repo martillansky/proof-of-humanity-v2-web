@@ -28,6 +28,7 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
 
   const send = useCallback<SendFunc<C, F>>(
     async (...params) => {
+      console.log({ contract, method, params });
       // TODO fix for when there is no txEvents
       const txEvents = params.at(-1) as TransactionEvents | undefined;
       let { chain, withToast, onConfirm, onError, onMined, onPending } =

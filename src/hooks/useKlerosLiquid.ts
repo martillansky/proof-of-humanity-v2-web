@@ -13,7 +13,10 @@ export const useArbitrationCost = (
 ) => useCall(useKlerosLiquid(), "arbitrationCost", params);
 export const useAppealCost = (
   params: Parameters<KlerosLiquid["appealCost"]> | null
-) => useCall(useKlerosLiquid(), "appealCost", params);
+) => {
+  console.log({ params });
+  return useCall(useKlerosLiquid(), "appealCost", params);
+};
 export const useAppealPeriod = (
   params: Parameters<KlerosLiquid["appealPeriod"]> | null
 ) => useCall(useKlerosLiquid(), "appealPeriod", params);

@@ -49,7 +49,7 @@ export const CHAIN = {
   },
   [ChainId.GOERLI]: {
     NAME: "Goerli",
-    Logo: TestnetLogo,
+    Logo: EthereumLogo,
     RPC: RPC[ChainId.GOERLI],
     EXPLORER: "https://goerli.etherscan.io",
     CURRENCY: ETH,

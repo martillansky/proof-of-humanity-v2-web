@@ -1,8 +1,9 @@
 query Request($id: ID!) {
   request(id: $id) {
+    legacy
     status
     index
-    registration
+    revocation
     requester
     creationTime
     lastStatusChange
@@ -10,7 +11,7 @@ query Request($id: ID!) {
       id
       claimed
       winnerClaimRequest: requests(
-        where: { status: Resolved, registration: true }
+        where: { status: Resolved, revocation: false }
         orderBy: resolutionTime
         orderDirection: desc
         first: 1
@@ -52,7 +53,7 @@ query Request($id: ID!) {
       disputeId
       challenger
       nbRounds
-      rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
+      rounds(orderBy: creationTime) {
         requesterPaid
         challengerPaid
         requesterFunds

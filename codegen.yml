@@ -1,5 +1,5 @@
 overwrite: true
-schema: "https://api.thegraph.com/subgraphs/name/andreimvp/poh-goerli"
+schema: "https://api.thegraph.com/subgraphs/name/andreimvp/poh-goerli-ext"
 documents: "src/**/*.graphql"
 generates:
   ./src/generated/graphql.ts:

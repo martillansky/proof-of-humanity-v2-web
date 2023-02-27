@@ -1,3 +1,4 @@
+import { ReasonEnum } from "enums/Reason";
 import { useState } from "react";
 import { RequestQueryItem } from "api/types";
 import DocumentIcon from "assets/svg/NoteMajor.svg";
@@ -29,7 +30,8 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
   const arbitrationCost = useArbitrationCost();
 
   const submit = async () => {
-    if (!reason || !justification || !arbitrationCost) return;
+    if ((request.revocation === !reason && !justification) || !arbitrationCost)
+      return;
 
     loading.start("Uploading evidence");
 
@@ -45,12 +47,18 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
 
     loading.start("Executing transaction");
 
-    challengeRequest(request.humanity.id, request.index, reason, evidenceUri, {
-      value: arbitrationCost,
-    });
+    challengeRequest(
+      request.humanity.id,
+      request.index,
+      request.revocation ? 0 : ReasonEnum[reason!],
+      evidenceUri,
+      { value: arbitrationCost }
+    );
 
     loading.stop();
   };
+
+  console.log({ revocation: request.revocation, reason });
 
   return (
     <Modal
@@ -74,33 +82,37 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
           <TimeAgo time={request.arbitratorData.metaEvidenceUpdateTime} />
         </span>
 
-        <Label>Select challenging reason</Label>
-        <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-2">
-          <ReasonCard
-            reason={Reason.IncorrectSubmission}
-            text={"Incorrect Submission"}
-            currentReason={reason}
-            setReason={setReason}
-          />
-          <ReasonCard
-            reason={Reason.Deceased}
-            text={"Deceased"}
-            currentReason={reason}
-            setReason={setReason}
-          />
-          <ReasonCard
-            reason={Reason.Duplicate}
-            text={"Duplicate"}
-            currentReason={reason}
-            setReason={setReason}
-          />
-          <ReasonCard
-            reason={Reason.DoesNotExist}
-            text={"Does Not Exist"}
-            currentReason={reason}
-            setReason={setReason}
-          />
-        </div>
+        {!request.revocation && (
+          <>
+            <Label>Select challenging reason</Label>
+            <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-2">
+              <ReasonCard
+                reason={Reason.IncorrectSubmission}
+                text={"Incorrect Submission"}
+                currentReason={reason}
+                setReason={setReason}
+              />
+              <ReasonCard
+                reason={Reason.Deceased}
+                text={"Deceased"}
+                currentReason={reason}
+                setReason={setReason}
+              />
+              <ReasonCard
+                reason={Reason.Duplicate}
+                text={"Duplicate"}
+                currentReason={reason}
+                setReason={setReason}
+              />
+              <ReasonCard
+                reason={Reason.DoesNotExist}
+                text={"Does Not Exist"}
+                currentReason={reason}
+                setReason={setReason}
+              />
+            </div>
+          </>
+        )}
 
         <Field
           textarea
@@ -114,7 +126,7 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
         </div>
 
         <button
-          disabled={!reason || !justification}
+          disabled={request.revocation !== !reason || !justification}
           className="btn-main mt-12"
           onClick={submit}
         >

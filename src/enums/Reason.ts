@@ -1,4 +1,4 @@
-export enum Reason {
+export enum ReasonEnum {
   None,
   IncorrectSubmission,
   Deceased,

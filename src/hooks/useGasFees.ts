@@ -24,7 +24,7 @@ export const useGasFees = <F extends keyof ProofOfHumanity["callStatic"]>(
       !error.error ||
       error.error.code !== Web3ErrorCode.EXECUTION_REVERTED
     )
-      return;
+      return console.error(error);
     setEstimationError(true);
   }, [error]);
 

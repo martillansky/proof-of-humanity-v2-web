@@ -1,6 +1,6 @@
 import { ChainId } from "enums/ChainId";
 import { BigNumber } from "ethers";
-import { concat, keccak256 } from "ethers/lib/utils";
+import { concat, keccak256, toUtf8Bytes } from "ethers/lib/utils";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
@@ -24,6 +24,7 @@ import {
   useRequestTotalCost,
   useWithdrawRequest,
 } from "hooks/useProofOfHumanity";
+import Appeal from "modules/appeal";
 import Challenge from "modules/challenge";
 import EvidenceSection from "modules/evidence/Section";
 import FundButton from "modules/funding/Button";
@@ -33,13 +34,20 @@ import { machinifyId, shortenId } from "utils/identifier";
 import { ipfs } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 
-const genRequestId = (humanityId: string, index: string) =>
-  keccak256(
-    concat([machinifyId(humanityId!), BigNumber.from(index).toHexString()])
+const genRequestId = (humanityId: string, index: number) => {
+  const requestId = keccak256(
+    concat([
+      machinifyId(humanityId),
+      index ? BigNumber.from(Math.abs(index)).toHexString() : "0x00000000",
+    ])
   );
+  return index < 0
+    ? keccak256(concat([requestId, toUtf8Bytes("legacy")]))
+    : requestId;
+};
 
 const Request: React.FC = () => {
-  const { humanity, index, chain, old } = useParams();
+  const { humanity, index, chain } = useParams();
 
   const chainId = useMemo<ChainId | undefined>(
     () => chain && ChainId[chain.toUpperCase()],
@@ -48,18 +56,21 @@ const Request: React.FC = () => {
 
   const contractData = useContractData(chainId!);
 
-  const requestId = useMemo(() => genRequestId(humanity!, index!), []);
+  const requestId = useMemo(
+    () => humanity && index && genRequestId(humanity, +index),
+    []
+  );
+
+  console.log({ requestId });
 
   const request = useRequest(chainId, requestId);
   const { totalCount, getRequestValidVouches } = useVouches(chainId, requestId);
 
-  console.log({ request });
-
   const [evidence] = useIPFS<EvidenceFileInterface>(
     request &&
-      (request.registration
-        ? request
-        : request?.humanity.winnerClaimRequest[0]
+      (request.revocation
+        ? request?.humanity.winnerClaimRequest[0]
+        : request
       ).evidence.at(-1)?.URI
   );
   const [registration] = useIPFS<RegistrationFileInterface>(evidence?.fileURI);
@@ -81,12 +92,12 @@ const Request: React.FC = () => {
 
   const ChainLogo = CHAIN[chainId].Logo;
 
-  const isV1 = old === "v1";
   const fullName = registration.firstName
     ? `${registration.firstName} ${registration.lastName}`
     : registration.name;
-  const funded = !isV1 && request.challenges[0].rounds[0].requesterFunds;
-  const statusColor = getColorForStatus(request.status, request.registration);
+  const funded =
+    !request.legacy && request.challenges[0].rounds[0].requesterFunds;
+  const statusColor = getColorForStatus(request.status, request.revocation);
 
   const currentReason = request.challenges.at(-1)?.reason;
 
@@ -98,7 +109,7 @@ const Request: React.FC = () => {
     >
       <div className="p-4 border flex justify-between rounded shadow bg-white">
         <span className="flex">
-          {request.registration ? <>Claim</> : <>Revocation</>} request
+          {request.revocation ? <>Revocation</> : <>Claim</>} request
         </span>
         <div className="flex items-center">
           <span className={`text-status-${statusColor}`}>{request.status}</span>
@@ -120,112 +131,115 @@ const Request: React.FC = () => {
             <Link to={`/humanity/${humanity}`}>{shortenId(humanity)} ➜</Link>
           </div>
 
-          {isV1 && (
-            <ALink
-              href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
-              className="text-center font-semibold text-blue-500"
-            >
-              This is a profile registered on the old contract. Check it out
-              there.
-            </ALink>
-          )}
-
-          {!isV1 && request.status == Status.Vouching && (
+          {request.legacy ? (
             <>
-              <Label>
-                Vouches:{" "}
-                <strong>
-                  {totalCount} /{" "}
-                  {contractData?.contract?.requiredNumberOfVouches}
-                </strong>
-              </Label>
+              <ALink
+                href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
+                className="text-center font-semibold text-blue-500"
+              >
+                This is a profile registered on the old contract. Navigate to
+                the old interface to withdraw or challenge.
+              </ALink>
+            </>
+          ) : (
+            <>
+              {request.status == Status.Vouching && (
+                <>
+                  <Label>
+                    Vouches:{" "}
+                    <strong>
+                      {totalCount} /{" "}
+                      {contractData?.contract?.requiredNumberOfVouches}
+                    </strong>
+                  </Label>
 
-              <VouchButton request={request} />
+                  <VouchButton request={request} />
 
-              {totalCost && (
-                <span className="font-semibold">
-                  Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
-                </span>
+                  {totalCost && (
+                    <span className="font-semibold">
+                      Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
+                    </span>
+                  )}
+
+                  <FundButton
+                    totalCost={totalCost}
+                    funded={funded}
+                    request={request}
+                  />
+
+                  {request.claimer &&
+                    contractData?.contract &&
+                    request.claimer.vouchesReceived.length >=
+                      Number(contractData.contract.requiredNumberOfVouches) && (
+                      <>
+                        <button
+                          className="btn-main mb-2"
+                          onClick={async () => {
+                            const validVouches = await getRequestValidVouches(
+                              contractData.contract!.requiredNumberOfVouches
+                            );
+                            await advanceState(
+                              request.requester,
+                              validVouches.onChain,
+                              validVouches.offChain
+                            );
+                          }}
+                        >
+                          Advance state
+                        </button>
+
+                        <button
+                          className="btn-main mb-2"
+                          onClick={async () => {
+                            await withdrawRequest();
+                          }}
+                        >
+                          Withdraw request
+                        </button>
+                      </>
+                    )}
+                </>
               )}
 
-              <FundButton
-                totalCost={totalCost}
-                funded={funded}
-                request={request}
-              />
+              {request.status == Status.Resolving && challengePeriodEnd && (
+                <>
+                  <button
+                    className="btn-main mb-2"
+                    onClick={async () =>
+                      await executeRequest(request.humanity.id, index)
+                    }
+                    disabled={challengePeriodEnd > Date.now() / 1000}
+                  >
+                    Execute request
+                  </button>
 
-              {request.claimer &&
-                contractData?.contract &&
-                request.claimer.vouchesReceived.length >=
-                  Number(contractData.contract.requiredNumberOfVouches) && (
-                  <>
-                    <button
-                      className="btn-main mb-2"
-                      onClick={async () => {
-                        const validVouches = await getRequestValidVouches(
-                          contractData.contract!.requiredNumberOfVouches
-                        );
-                        await advanceState(
-                          request.requester,
-                          validVouches.onChain,
-                          validVouches.offChain
-                        );
-                      }}
-                    >
-                      Advance state
-                    </button>
+                  <Label>
+                    Challenge period end:{" "}
+                    {challengePeriodEnd && (
+                      <TimeAgo time={challengePeriodEnd} />
+                    )}
+                  </Label>
 
-                    <button
-                      className="btn-main mb-2"
-                      onClick={async () => {
-                        await withdrawRequest();
-                      }}
-                    >
-                      Withdraw request
-                    </button>
-                  </>
+                  <Challenge request={request} />
+                </>
+              )}
+
+              {request.status == Status.Disputed &&
+                request.challenges.length && (
+                  <div>
+                    {request.challenges.map((challenge, i) => (
+                      <ALink
+                        href={`https://resolve.kleros.io/cases/${challenge.disputeId}`}
+                        className="text-blue-500 underline underline-offset-2"
+                      >
+                        #{challenge.disputeId}:{" "}
+                        {request.revocation ? "Challenge" : currentReason}
+                      </ALink>
+                    ))}
+                  </div>
                 )}
             </>
           )}
-
-          {!isV1 &&
-            request.status == Status.Resolving &&
-            challengePeriodEnd && (
-              <>
-                <button
-                  className="btn-main mb-2"
-                  onClick={async () =>
-                    await executeRequest(request.humanity.id, index)
-                  }
-                  disabled={challengePeriodEnd > Date.now() / 1000}
-                >
-                  Execute request
-                </button>
-
-                <Label>
-                  Challenge period end:{" "}
-                  {challengePeriodEnd && <TimeAgo time={challengePeriodEnd} />}
-                </Label>
-
-                <Challenge request={request} />
-              </>
-            )}
-
-          {!isV1 &&
-            request.status == Status.Disputed &&
-            request.challenges.length && (
-              <div>
-                {request.challenges.map((challenge, i) => (
-                  <ALink
-                    href={`https://resolve.kleros.io/cases/${challenge.disputeId}`}
-                    className="text-blue-500 underline underline-offset-2"
-                  >
-                    #{challenge.disputeId}:{" "}
-                    {request.registration ? currentReason : "Challenge"}
-                  </ALink>
-                ))}
-              </div>
-            )}
 
           <Label>
             Last status change: <TimeAgo time={request.lastStatusChange} />
@@ -244,9 +258,9 @@ const Request: React.FC = () => {
           <div className="flex mb-4">
             <Identicon
               address={
-                request.registration
-                  ? request.requester
-                  : request.humanity.winnerClaimRequest[0].requester
+                request.revocation
+                  ? request.humanity.winnerClaimRequest[0].requester
+                  : request.requester
               }
             />
             <ALink
@@ -261,7 +275,11 @@ const Request: React.FC = () => {
         </div>
       </div>
 
-      {/* <Accordion title="Appeal">Appeal here</Accordion> */}
+      <Appeal
+        // humanityId={request.humanity.id}
+        // requestIndex={index}
+        request={request}
+      />
 
       <EvidenceSection
         humanityId={request.humanity.id}

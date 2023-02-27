@@ -27,7 +27,7 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
   const [data] = useIPFS<RegistrationFileInterface>(evidenceURI?.fileURI);
 
   const ChainLogo = CHAIN[request.chainId].Logo;
-  const statusColor = getColorForStatus(request.status, request.registration);
+  const statusColor = getColorForStatus(request.status, request.revocation);
 
   return (
     <Link
@@ -35,7 +35,7 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
         request.index
       }`}
       className={cn(
-        "paper h-20 px-4 my-2",
+        "paper h-20 px-4 my-1",
         "grid grid-flow-col gap items-center",
         "font-semibold cursor-pointer",
         "border-status-" + statusColor
@@ -51,7 +51,7 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
       </div>
 
       <span className={`justify-self-center text-status-${statusColor}`}>
-        {camelToTitle(queryToStatus(request.status, request.registration))}
+        {camelToTitle(queryToStatus(request.status, request.revocation))}
       </span>
 
       <span className="centered justify-self-end">

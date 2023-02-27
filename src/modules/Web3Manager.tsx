@@ -36,7 +36,9 @@ const Web3Connection = ({ children }: { children: JSX.Element }) => {
     switchChainForNetwork(chainId);
   }, [chainId, switchChainForNetwork]);
 
-  if (!triedEager) return null;
+  console.log({ triedEager, active, networkError });
+
+  // if (!triedEager) return null;
 
   if (!active && networkError)
     return (

@@ -10,9 +10,9 @@ import { timeAgo } from "utils/time";
 const Content: React.FC<{ request: RequestInterface }> = ({ request }) => {
   const [evidenceURI] = useIPFS<EvidenceFileInterface>(
     request &&
-      (request.registration
-        ? request
-        : request?.humanity.winnerClaimRequest[0]
+      (request.revocation
+        ? request?.humanity.winnerClaimRequest[0]
+        : request
       ).evidence.at(-1)?.URI,
     { suspense: true }
   );

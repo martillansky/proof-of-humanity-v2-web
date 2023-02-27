@@ -7,9 +7,10 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
     orderDirection: desc
   ) {
     id
+    legacy
     index
     status
-    registration
+    revocation
     creationTime
     requester
     claimer {
@@ -21,7 +22,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
       nbRequests
       claimed
       winnerClaimRequest: requests(
-        where: { status: Resolved, registration: true }
+        where: { status: Resolved, revocation: false }
         orderBy: resolutionTime
         orderDirection: desc
         first: 1

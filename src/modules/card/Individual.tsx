@@ -12,16 +12,16 @@ import { ErrorFallback, LoadingFallback } from "./misc";
 
 const Card: React.FC<{ request: RequestInterface }> = ({ request }) => {
   const status = useMemo(
-    () => queryToStatus(request.status, request.registration),
+    () => queryToStatus(request.status, request.revocation),
     [request]
   );
-  const statusColor = getColorForStatus(request.status, request.registration);
+  const statusColor = getColorForStatus(request.status, request.revocation);
 
   return (
     <Link
       to={`/request/${CHAIN[request.chainID].NAME.toLowerCase()}/${prettifyId(
         request.humanity.id
-      )}/${request.index}${request.old ? "/v1" : ""}`}
+      )}/${(request.legacy ? -1 : 1) * request.index}`}
       className="h-84 rounded border shadow-sm flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
       <div className="justify-between bg-shade-50 font-light">

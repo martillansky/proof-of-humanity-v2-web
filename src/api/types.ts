@@ -7,3 +7,7 @@ export type RequestsQueryItem = ArrayElement<RequestsQuery["requests"]>;
 export type PendingRequest = ArrayElement<
   NonNullable<HumanityQuery["humanity"]>["pendingRequests"]
 > & { chainId: ChainId };
+
+export type PastRequest = ArrayElement<
+  NonNullable<HumanityQuery["humanity"]>["pastRequests"]
+> & { chainId: ChainId };
