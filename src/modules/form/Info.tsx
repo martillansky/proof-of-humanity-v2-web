@@ -9,7 +9,7 @@ const Info: React.FC = () => {
   const {
     tookNotice,
     setTookNotice,
-    state: { humanityId, name, bio },
+    state: { humanityId, name },
     dispatch,
   } = useFormContext();
 
@@ -33,25 +33,25 @@ const Info: React.FC = () => {
       </span>
 
       <Field label="Connected wallet" value={account} disabled />
-      <Field
+      {/* <Field
         disabled
         label="Humanity you claim"
         placeholder="ID of the humanity you want to claim"
         value={humanityId}
         onChange={(e) => dispatch({ type: "SOUL_ID", payload: e.target.value })}
-      />
+      /> */}
       <Field
         label="Display Name"
         placeholder="name by which you are known"
         value={name}
         onChange={(e) => dispatch({ type: "NAME", payload: e.target.value })}
       />
-      <Field
+      {/* <Field
         label="Short bio"
         placeholder="short bio (ex: cypherpunk, smart contract developer)"
         value={bio}
         onChange={(e) => dispatch({ type: "BIO", payload: e.target.value })}
-      />
+      /> */}
 
       <div className="mt-8 mb-16 flex items-center cursor-pointer">
         <input

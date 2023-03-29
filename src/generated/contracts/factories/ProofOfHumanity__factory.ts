@@ -26,31 +26,6 @@ const _abi = [
         name: "disputeId",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "enum ProofOfHumanity.Party",
-        name: "side",
-        type: "uint8",
-      },
-    ],
-    name: "AppealContribution",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "contract IArbitrator",
-        name: "arbitrator",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "disputeId",
-        type: "uint256",
-      },
     ],
     name: "AppealCreated",
     type: "event",
@@ -97,6 +72,92 @@ const _abi = [
       },
     ],
     name: "ChallengePeriodRestart",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "name",
+        type: "string",
+      },
+    ],
+    name: "ClaimRequest",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "challengeId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "round",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "contributor",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "contribution",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "enum ProofOfHumanity.Party",
+        name: "side",
+        type: "uint8",
+      },
+    ],
+    name: "Contribution",
     type: "event",
   },
   {
@@ -204,12 +265,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "beneficiary",
-        type: "address",
-      },
-      {
-        indexed: false,
         internalType: "bytes20",
         name: "humanityId",
         type: "bytes20",
@@ -232,6 +287,12 @@ const _abi = [
         name: "round",
         type: "uint256",
       },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "beneficiary",
+        type: "address",
+      },
     ],
     name: "FeesAndRewardsWithdrawn",
     type: "event",
@@ -253,13 +314,7 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "requester",
-        type: "address",
-      },
-      {
-        indexed: true,
+        indexed: false,
         internalType: "bytes20",
         name: "humanityId",
         type: "bytes20",
@@ -270,20 +325,8 @@ const _abi = [
         name: "requestId",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "name",
-        type: "string",
-      },
     ],
-    name: "HumanityClaim",
+    name: "HumanityClaimed",
     type: "event",
   },
   {
@@ -315,13 +358,7 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "requester",
-        type: "address",
-      },
-      {
-        indexed: true,
+        indexed: false,
         internalType: "bytes20",
         name: "humanityId",
         type: "bytes20",
@@ -332,55 +369,18 @@ const _abi = [
         name: "requestId",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
-      },
     ],
-    name: "HumanityRenewal",
+    name: "HumanityRevoked",
     type: "event",
   },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "requester",
-        type: "address",
-      },
       {
         indexed: true,
         internalType: "bytes20",
         name: "humanityId",
         type: "bytes20",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "requestId",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
-      },
-    ],
-    name: "HumanityRevocation",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "human",
-        type: "address",
       },
     ],
     name: "HumanityRevokedManually",
@@ -409,6 +409,37 @@ const _abi = [
       },
     ],
     name: "MetaEvidence",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
+      },
+    ],
+    name: "RenewalRequest",
     type: "event",
   },
   {
@@ -453,44 +484,18 @@ const _abi = [
       },
       {
         indexed: false,
+        internalType: "uint256",
+        name: "disputeId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
         internalType: "string",
         name: "evidence",
         type: "string",
       },
     ],
     name: "RequestChallenged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "claimer",
-        type: "address",
-      },
-    ],
-    name: "RequestContribution",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "bytes20",
-        name: "humanityId",
-        type: "bytes20",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "requestId",
-        type: "uint256",
-      },
-    ],
-    name: "RequestExecuted",
     type: "event",
   },
   {
@@ -523,6 +528,37 @@ const _abi = [
       },
     ],
     name: "RequiredNumberOfVouchesChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "requester",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "evidence",
+        type: "string",
+      },
+    ],
+    name: "RevocationRequest",
     type: "event",
   },
   {
@@ -594,13 +630,13 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "voucher",
+        name: "voucherAccount",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "vouched",
+        name: "claimer",
         type: "address",
       },
       {
@@ -618,14 +654,39 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "bytes20",
+        name: "voucherHumanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: true,
+        internalType: "bytes20",
+        name: "vouchedHumanityId",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+    ],
+    name: "VouchRegistered",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
-        name: "voucher",
+        name: "voucherAccount",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "vouched",
+        name: "claimer",
         type: "address",
       },
       {
@@ -667,7 +728,7 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_human",
+        name: "_account",
         type: "address",
       },
       {
@@ -750,6 +811,25 @@ const _abi = [
         internalType: "bytes",
         name: "arbitratorExtraData",
         type: "bytes",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes20",
+        name: "_humanityId",
+        type: "bytes20",
+      },
+    ],
+    name: "boundTo",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -966,7 +1046,7 @@ const _abi = [
         type: "string",
       },
     ],
-    name: "claimHumanity",
+    name: "claimHumanityDefault",
     outputs: [],
     stateMutability: "payable",
     type: "function",
@@ -1067,9 +1147,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_claimer",
-        type: "address",
+        internalType: "bytes20",
+        name: "_humanityId",
+        type: "bytes20",
+      },
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
       },
     ],
     name: "fundRequest",
@@ -1218,9 +1303,9 @@ const _abi = [
         type: "bool",
       },
       {
-        internalType: "uint64",
+        internalType: "uint48",
         name: "nbPendingRequests",
-        type: "uint64",
+        type: "uint48",
       },
       {
         internalType: "uint64",
@@ -1282,7 +1367,7 @@ const _abi = [
     outputs: [
       {
         internalType: "bool",
-        name: "requesterLost",
+        name: "punishedVouch",
         type: "bool",
       },
       {
@@ -1302,7 +1387,7 @@ const _abi = [
       },
       {
         internalType: "uint64",
-        name: "challengePeriodEnd",
+        name: "challengePeriodStart",
         type: "uint64",
       },
       {
@@ -1405,7 +1490,7 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "_owner",
+        name: "_account",
         type: "address",
       },
       {
@@ -1442,15 +1527,15 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "",
+        name: "_account",
         type: "address",
       },
     ],
-    name: "humans",
+    name: "humanityOf",
     outputs: [
       {
         internalType: "bytes20",
-        name: "",
+        name: "humanityId",
         type: "bytes20",
       },
     ],
@@ -1551,7 +1636,7 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_humanId",
+        name: "_account",
         type: "address",
       },
     ],
@@ -1606,7 +1691,7 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_human",
+        name: "_account",
         type: "address",
       },
       {
@@ -1694,7 +1779,7 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_humanId",
+        name: "_account",
         type: "address",
       },
     ],

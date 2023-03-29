@@ -5,12 +5,6 @@ export interface EvidenceFile {
 }
 
 export interface RegistrationFile {
-  name?: string;
-  firstName?: string;
-  lastName?: string;
-  language?: string;
-  bio?: string;
-  videoType: string;
   photo: string;
   video: string;
 }

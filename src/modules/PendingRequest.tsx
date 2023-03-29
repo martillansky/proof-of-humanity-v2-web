@@ -1,13 +1,13 @@
 import cn from "classnames";
 import React from "react";
 import { Link } from "react-router-dom";
-import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import { PendingRequest as PendingRequestType } from "api/types";
 import Image from "components/Image";
 import { CHAIN } from "constants/chains";
 import { getColorForStatus } from "constants/misc";
 import { queryToStatus } from "constants/requests";
 import useIPFS from "hooks/useIPFS";
+import { EvidenceFile, RegistrationFile } from "types/docs";
 import { shortenAddress } from "utils/address";
 import { camelToTitle } from "utils/case";
 import { ipfs } from "utils/ipfs";
@@ -21,10 +21,8 @@ const PendingRequest: React.FC<PendingRequestProps> = ({
   humanity,
   request,
 }) => {
-  const [evidenceURI] = useIPFS<EvidenceFileInterface>(
-    request.evidence[0]?.URI
-  );
-  const [data] = useIPFS<RegistrationFileInterface>(evidenceURI?.fileURI);
+  const [evidenceURI] = useIPFS<EvidenceFile>(request.evidence[0]?.URI);
+  const [data] = useIPFS<RegistrationFile>(evidenceURI?.fileURI);
 
   const ChainLogo = CHAIN[request.chainId].Logo;
   const statusColor = getColorForStatus(request.status, request.revocation);

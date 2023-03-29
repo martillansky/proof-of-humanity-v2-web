@@ -54,6 +54,8 @@ const Home: React.FC = () => {
           placeholder="Search (case sensitive)"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        {/* <Modal trigger={<button className="p-2 border">Filters</button>}> */}
+        {/* <div className="paper p-4"> */}
         <Dropdown title={camelToTitle(statusFilter)}>
           {statusFilters.map((status) => (
             <DropdownItem
@@ -74,15 +76,17 @@ const Home: React.FC = () => {
             onSelect={() => setChainFilter("all")}
             name={"all"}
           />
-          {supportedChainIds.map((chainID) => (
+          {supportedChainIds.map((chainId) => (
             <DropdownItem
-              key={chainID}
-              selected={chainFilter === chainID}
-              onSelect={() => setChainFilter(chainID)}
-              name={CHAIN[chainID].NAME}
+              key={chainId}
+              selected={chainFilter === chainId}
+              onSelect={() => setChainFilter(chainId)}
+              name={CHAIN[chainId].NAME}
             />
           ))}
         </Dropdown>
+        {/* </div> */}
+        {/* </Modal> */}
       </div>
 
       <CardList requests={requests} />

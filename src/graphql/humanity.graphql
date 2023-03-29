@@ -9,20 +9,33 @@ query Humanity($id: ID!) {
       name
     }
     pendingRequests: requests(where: { status_not: Resolved }) {
+      id
+      legacy
+      creationTime
       status
       index
       revocation
       requester
+      claimer {
+        id
+        name
+      }
       evidence(orderBy: creationTime, first: 1) {
         URI
       }
     }
     pastRequests: requests(where: { status: Resolved }) {
+      id
       legacy
+      creationTime
       status
       index
       revocation
       requester
+      claimer {
+        id
+        name
+      }
       evidence(orderBy: creationTime, first: 1) {
         URI
       }

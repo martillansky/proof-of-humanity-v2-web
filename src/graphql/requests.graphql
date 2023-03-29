@@ -27,7 +27,6 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
         orderDirection: desc
         first: 1
       ) {
-        index
         evidence(orderBy: creationTime, first: 1) {
           URI
         }

@@ -88,8 +88,10 @@ export const CHAIN_SETTING = {
   ...chainSetting(ChainId.GNOSIS),
 };
 
-export const FALLBACK_CHAIN = ChainId.GOERLI;
+export const supportedChainIds = [ChainId.GNOSIS];
 
-export const supportedChainIds = [ChainId.GOERLI, ChainId.OPGOERLI];
+export const FALLBACK_CHAIN = ChainId.GNOSIS;
 
 export const VDB_CHAIN = ChainId.GOERLI;
+
+export const TOKEN_CHAIN = ChainId.GNOSIS;

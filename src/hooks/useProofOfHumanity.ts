@@ -1,21 +1,13 @@
-import { PoHContract } from "enums/PoHContract";
 import { ProofOfHumanity } from "generated/contracts";
 import useCall from "./useCall";
-import useContract from "./useContract";
+import { useProofOfHumanity } from "./useContract";
 import { useArbitrationCost as useKLARbitrationCost } from "./useKlerosLiquid";
 import useSend from "./useSend";
-
-const useProofOfHumanity = (onlyNetwork = false) =>
-  useContract<ProofOfHumanity>(PoHContract.PROOF_OF_HUMANITY, onlyNetwork);
-
-export default useProofOfHumanity;
 
 export const useClaimHumanity = (defaultId?: boolean) =>
   useSend(
     useProofOfHumanity(),
-    defaultId
-      ? "claimHumanity(string,string)"
-      : "claimHumanity(bytes20,string,string)"
+    defaultId ? "claimHumanityDefault" : "claimHumanity"
   );
 export const useRevokeHumanity = () =>
   useSend(useProofOfHumanity(), "revokeHumanity");
@@ -45,6 +37,8 @@ export const useSubmitEvidence = () =>
 export const useIsHuman = (
   params: Parameters<ProofOfHumanity["isHuman"]> | null
 ) => useCall(useProofOfHumanity(true), "isHuman", params);
+export const useHumanityOf = (account?: string | null) =>
+  useCall(useProofOfHumanity(true), "humanityOf", account ? [account] : null);
 export const useVouches = (
   params: Parameters<ProofOfHumanity["vouches"]> | null
 ) => useCall(useProofOfHumanity(true), "vouches", params);

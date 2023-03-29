@@ -51,6 +51,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     "addVouch(address,bytes20)": FunctionFragment;
     "advanceState(address,address[],(uint64,uint8,bytes32,bytes32)[])": FunctionFragment;
     "arbitratorDataList(uint256)": FunctionFragment;
+    "boundTo(bytes20)": FunctionFragment;
     "challengePeriodDuration()": FunctionFragment;
     "challengeRequest(bytes20,uint64,uint8,string)": FunctionFragment;
     "changeArbitrator(address,bytes)": FunctionFragment;
@@ -62,12 +63,12 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     "changeRequiredNumberOfVouches(uint64)": FunctionFragment;
     "changeStakeMultipliers(uint256,uint256,uint256)": FunctionFragment;
     "claimHumanity(bytes20,string,string)": FunctionFragment;
-    "claimHumanity(string,string)": FunctionFragment;
+    "claimHumanityDefault(string,string)": FunctionFragment;
     "crossChainProofOfHumanity()": FunctionFragment;
     "disputeIdToData(address,uint256)": FunctionFragment;
     "executeRequest(bytes20,uint256)": FunctionFragment;
     "fundAppeal(bytes20,uint256,uint256,uint8)": FunctionFragment;
-    "fundRequest(address)": FunctionFragment;
+    "fundRequest(bytes20,uint256)": FunctionFragment;
     "getArbitratorDataListCount()": FunctionFragment;
     "getChallengeInfo(bytes20,uint256,uint256)": FunctionFragment;
     "getClaimerRequestId(address)": FunctionFragment;
@@ -79,7 +80,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     "governor()": FunctionFragment;
     "grantManually(bytes20,address,uint64)": FunctionFragment;
     "humanityLifespan()": FunctionFragment;
-    "humans(address)": FunctionFragment;
+    "humanityOf(address)": FunctionFragment;
     "initialize(address,bytes,string,string,uint256,uint64,uint64,uint64,uint256[3],uint64)": FunctionFragment;
     "initialized()": FunctionFragment;
     "isClaimed(bytes20)": FunctionFragment;
@@ -107,6 +108,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
       | "addVouch"
       | "advanceState"
       | "arbitratorDataList"
+      | "boundTo"
       | "challengePeriodDuration"
       | "challengeRequest"
       | "changeArbitrator"
@@ -117,8 +119,8 @@ export interface ProofOfHumanityInterface extends utils.Interface {
       | "changeRequestBaseDeposit"
       | "changeRequiredNumberOfVouches"
       | "changeStakeMultipliers"
-      | "claimHumanity(bytes20,string,string)"
-      | "claimHumanity(string,string)"
+      | "claimHumanity"
+      | "claimHumanityDefault"
       | "crossChainProofOfHumanity"
       | "disputeIdToData"
       | "executeRequest"
@@ -135,7 +137,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
       | "governor"
       | "grantManually"
       | "humanityLifespan"
-      | "humans"
+      | "humanityOf"
       | "initialize"
       | "initialized"
       | "isClaimed"
@@ -173,6 +175,10 @@ export interface ProofOfHumanityInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "arbitratorDataList",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "boundTo",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "challengePeriodDuration",
@@ -228,7 +234,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "claimHumanity(bytes20,string,string)",
+    functionFragment: "claimHumanity",
     values: [
       PromiseOrValue<BytesLike>,
       PromiseOrValue<string>,
@@ -236,7 +242,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "claimHumanity(string,string)",
+    functionFragment: "claimHumanityDefault",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -262,7 +268,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "fundRequest",
-    values: [PromiseOrValue<string>]
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "getArbitratorDataListCount",
@@ -325,7 +331,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "humans",
+    functionFragment: "humanityOf",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -451,6 +457,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     functionFragment: "arbitratorDataList",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "boundTo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "challengePeriodDuration",
     data: BytesLike
@@ -492,11 +499,11 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "claimHumanity(bytes20,string,string)",
+    functionFragment: "claimHumanity",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "claimHumanity(string,string)",
+    functionFragment: "claimHumanityDefault",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -557,7 +564,7 @@ export interface ProofOfHumanityInterface extends utils.Interface {
     functionFragment: "humanityLifespan",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "humans", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "humanityOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "initialized",
@@ -625,82 +632,71 @@ export interface ProofOfHumanityInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "AppealContribution(address,uint256,uint8)": EventFragment;
     "AppealCreated(address,uint256)": EventFragment;
     "ArbitratorChanged(address,bytes)": EventFragment;
     "ChallengePeriodRestart(bytes20,uint256,uint256)": EventFragment;
+    "ClaimRequest(address,bytes20,uint256,string,string)": EventFragment;
+    "Contribution(bytes20,uint256,uint256,uint256,address,uint256,uint8)": EventFragment;
     "CrossChainProxyChanged(address)": EventFragment;
     "Dispute(address,uint256,uint256,uint256)": EventFragment;
     "DurationsChanged(uint64,uint64,uint64)": EventFragment;
     "Evidence(address,uint256,address,string)": EventFragment;
-    "FeesAndRewardsWithdrawn(address,bytes20,uint256,uint256,uint256)": EventFragment;
+    "FeesAndRewardsWithdrawn(bytes20,uint256,uint256,uint256,address)": EventFragment;
     "GovernorChanged(address)": EventFragment;
-    "HumanityClaim(address,bytes20,uint256,string,string)": EventFragment;
+    "HumanityClaimed(bytes20,uint256)": EventFragment;
     "HumanityGrantedManually(bytes20,address,uint64)": EventFragment;
-    "HumanityRenewal(address,bytes20,uint256,string)": EventFragment;
-    "HumanityRevocation(address,bytes20,uint256,string)": EventFragment;
-    "HumanityRevokedManually(address)": EventFragment;
+    "HumanityRevoked(bytes20,uint256)": EventFragment;
+    "HumanityRevokedManually(bytes20)": EventFragment;
     "Initialized()": EventFragment;
     "MetaEvidence(uint256,string)": EventFragment;
+    "RenewalRequest(address,bytes20,uint256,string)": EventFragment;
     "RequestBaseDepositChanged(uint256)": EventFragment;
-    "RequestChallenged(bytes20,uint256,uint256,uint8,string)": EventFragment;
-    "RequestContribution(address)": EventFragment;
-    "RequestExecuted(bytes20,uint256)": EventFragment;
+    "RequestChallenged(bytes20,uint256,uint256,uint8,uint256,string)": EventFragment;
     "RequestWithdrawn(bytes20,uint256)": EventFragment;
     "RequiredNumberOfVouchesChanged(uint64)": EventFragment;
+    "RevocationRequest(address,bytes20,uint256,string)": EventFragment;
     "Ruling(address,uint256,uint256)": EventFragment;
     "StakeMultipliersChanged(uint256,uint256,uint256)": EventFragment;
     "StateAdvanced(address)": EventFragment;
     "VouchAdded(address,address,bytes20)": EventFragment;
+    "VouchRegistered(bytes20,bytes20,uint256)": EventFragment;
     "VouchRemoved(address,address,bytes20)": EventFragment;
     "VouchesProcessed(bytes20,uint256,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "AppealContribution"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AppealCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ArbitratorChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ChallengePeriodRestart"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ClaimRequest"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Contribution"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CrossChainProxyChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Dispute"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "DurationsChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Evidence"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeesAndRewardsWithdrawn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "GovernorChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "HumanityClaim"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "HumanityClaimed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "HumanityGrantedManually"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "HumanityRenewal"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "HumanityRevocation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "HumanityRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "HumanityRevokedManually"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MetaEvidence"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RenewalRequest"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RequestBaseDepositChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RequestChallenged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestContribution"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RequestWithdrawn"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "RequiredNumberOfVouchesChanged"
   ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RevocationRequest"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Ruling"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "StakeMultipliersChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "StateAdvanced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VouchAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "VouchRegistered"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VouchRemoved"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VouchesProcessed"): EventFragment;
 }
-
-export interface AppealContributionEventObject {
-  arbitrator: string;
-  disputeId: BigNumber;
-  side: number;
-}
-export type AppealContributionEvent = TypedEvent<
-  [string, BigNumber, number],
-  AppealContributionEventObject
->;
-
-export type AppealContributionEventFilter =
-  TypedEventFilter<AppealContributionEvent>;
 
 export interface AppealCreatedEventObject {
   arbitrator: string;
@@ -737,6 +733,36 @@ export type ChallengePeriodRestartEvent = TypedEvent<
 
 export type ChallengePeriodRestartEventFilter =
   TypedEventFilter<ChallengePeriodRestartEvent>;
+
+export interface ClaimRequestEventObject {
+  requester: string;
+  humanityId: string;
+  requestId: BigNumber;
+  evidence: string;
+  name: string;
+}
+export type ClaimRequestEvent = TypedEvent<
+  [string, string, BigNumber, string, string],
+  ClaimRequestEventObject
+>;
+
+export type ClaimRequestEventFilter = TypedEventFilter<ClaimRequestEvent>;
+
+export interface ContributionEventObject {
+  humanityId: string;
+  requestId: BigNumber;
+  challengeId: BigNumber;
+  round: BigNumber;
+  contributor: string;
+  contribution: BigNumber;
+  side: number;
+}
+export type ContributionEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber, string, BigNumber, number],
+  ContributionEventObject
+>;
+
+export type ContributionEventFilter = TypedEventFilter<ContributionEvent>;
 
 export interface CrossChainProxyChangedEventObject {
   crossChainProofOfHumanity: string;
@@ -789,14 +815,14 @@ export type EvidenceEvent = TypedEvent<
 export type EvidenceEventFilter = TypedEventFilter<EvidenceEvent>;
 
 export interface FeesAndRewardsWithdrawnEventObject {
-  beneficiary: string;
   humanityId: string;
   requestId: BigNumber;
   challengeId: BigNumber;
   round: BigNumber;
+  beneficiary: string;
 }
 export type FeesAndRewardsWithdrawnEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber],
+  [string, BigNumber, BigNumber, BigNumber, string],
   FeesAndRewardsWithdrawnEventObject
 >;
 
@@ -813,19 +839,16 @@ export type GovernorChangedEvent = TypedEvent<
 
 export type GovernorChangedEventFilter = TypedEventFilter<GovernorChangedEvent>;
 
-export interface HumanityClaimEventObject {
-  requester: string;
+export interface HumanityClaimedEventObject {
   humanityId: string;
   requestId: BigNumber;
-  evidence: string;
-  name: string;
 }
-export type HumanityClaimEvent = TypedEvent<
-  [string, string, BigNumber, string, string],
-  HumanityClaimEventObject
+export type HumanityClaimedEvent = TypedEvent<
+  [string, BigNumber],
+  HumanityClaimedEventObject
 >;
 
-export type HumanityClaimEventFilter = TypedEventFilter<HumanityClaimEvent>;
+export type HumanityClaimedEventFilter = TypedEventFilter<HumanityClaimedEvent>;
 
 export interface HumanityGrantedManuallyEventObject {
   humanityId: string;
@@ -840,35 +863,19 @@ export type HumanityGrantedManuallyEvent = TypedEvent<
 export type HumanityGrantedManuallyEventFilter =
   TypedEventFilter<HumanityGrantedManuallyEvent>;
 
-export interface HumanityRenewalEventObject {
-  requester: string;
+export interface HumanityRevokedEventObject {
   humanityId: string;
   requestId: BigNumber;
-  evidence: string;
 }
-export type HumanityRenewalEvent = TypedEvent<
-  [string, string, BigNumber, string],
-  HumanityRenewalEventObject
+export type HumanityRevokedEvent = TypedEvent<
+  [string, BigNumber],
+  HumanityRevokedEventObject
 >;
 
-export type HumanityRenewalEventFilter = TypedEventFilter<HumanityRenewalEvent>;
-
-export interface HumanityRevocationEventObject {
-  requester: string;
-  humanityId: string;
-  requestId: BigNumber;
-  evidence: string;
-}
-export type HumanityRevocationEvent = TypedEvent<
-  [string, string, BigNumber, string],
-  HumanityRevocationEventObject
->;
-
-export type HumanityRevocationEventFilter =
-  TypedEventFilter<HumanityRevocationEvent>;
+export type HumanityRevokedEventFilter = TypedEventFilter<HumanityRevokedEvent>;
 
 export interface HumanityRevokedManuallyEventObject {
-  human: string;
+  humanityId: string;
 }
 export type HumanityRevokedManuallyEvent = TypedEvent<
   [string],
@@ -894,6 +901,19 @@ export type MetaEvidenceEvent = TypedEvent<
 
 export type MetaEvidenceEventFilter = TypedEventFilter<MetaEvidenceEvent>;
 
+export interface RenewalRequestEventObject {
+  requester: string;
+  humanityId: string;
+  requestId: BigNumber;
+  evidence: string;
+}
+export type RenewalRequestEvent = TypedEvent<
+  [string, string, BigNumber, string],
+  RenewalRequestEventObject
+>;
+
+export type RenewalRequestEventFilter = TypedEventFilter<RenewalRequestEvent>;
+
 export interface RequestBaseDepositChangedEventObject {
   requestBaseDeposit: BigNumber;
 }
@@ -910,37 +930,16 @@ export interface RequestChallengedEventObject {
   requestId: BigNumber;
   challengeId: BigNumber;
   reason: number;
+  disputeId: BigNumber;
   evidence: string;
 }
 export type RequestChallengedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, number, string],
+  [string, BigNumber, BigNumber, number, BigNumber, string],
   RequestChallengedEventObject
 >;
 
 export type RequestChallengedEventFilter =
   TypedEventFilter<RequestChallengedEvent>;
-
-export interface RequestContributionEventObject {
-  claimer: string;
-}
-export type RequestContributionEvent = TypedEvent<
-  [string],
-  RequestContributionEventObject
->;
-
-export type RequestContributionEventFilter =
-  TypedEventFilter<RequestContributionEvent>;
-
-export interface RequestExecutedEventObject {
-  humanityId: string;
-  requestId: BigNumber;
-}
-export type RequestExecutedEvent = TypedEvent<
-  [string, BigNumber],
-  RequestExecutedEventObject
->;
-
-export type RequestExecutedEventFilter = TypedEventFilter<RequestExecutedEvent>;
 
 export interface RequestWithdrawnEventObject {
   humanityId: string;
@@ -964,6 +963,20 @@ export type RequiredNumberOfVouchesChangedEvent = TypedEvent<
 
 export type RequiredNumberOfVouchesChangedEventFilter =
   TypedEventFilter<RequiredNumberOfVouchesChangedEvent>;
+
+export interface RevocationRequestEventObject {
+  requester: string;
+  humanityId: string;
+  requestId: BigNumber;
+  evidence: string;
+}
+export type RevocationRequestEvent = TypedEvent<
+  [string, string, BigNumber, string],
+  RevocationRequestEventObject
+>;
+
+export type RevocationRequestEventFilter =
+  TypedEventFilter<RevocationRequestEvent>;
 
 export interface RulingEventObject {
   _arbitrator: string;
@@ -998,8 +1011,8 @@ export type StateAdvancedEvent = TypedEvent<[string], StateAdvancedEventObject>;
 export type StateAdvancedEventFilter = TypedEventFilter<StateAdvancedEvent>;
 
 export interface VouchAddedEventObject {
-  voucher: string;
-  vouched: string;
+  voucherAccount: string;
+  claimer: string;
   humanityId: string;
 }
 export type VouchAddedEvent = TypedEvent<
@@ -1009,9 +1022,21 @@ export type VouchAddedEvent = TypedEvent<
 
 export type VouchAddedEventFilter = TypedEventFilter<VouchAddedEvent>;
 
+export interface VouchRegisteredEventObject {
+  voucherHumanityId: string;
+  vouchedHumanityId: string;
+  requestId: BigNumber;
+}
+export type VouchRegisteredEvent = TypedEvent<
+  [string, string, BigNumber],
+  VouchRegisteredEventObject
+>;
+
+export type VouchRegisteredEventFilter = TypedEventFilter<VouchRegisteredEvent>;
+
 export interface VouchRemovedEventObject {
-  voucher: string;
-  vouched: string;
+  voucherAccount: string;
+  claimer: string;
   humanityId: string;
 }
 export type VouchRemovedEvent = TypedEvent<
@@ -1062,7 +1087,7 @@ export interface ProofOfHumanity extends BaseContract {
 
   functions: {
     addVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -1084,6 +1109,11 @@ export interface ProofOfHumanity extends BaseContract {
         arbitratorExtraData: string;
       }
     >;
+
+    boundTo(
+      _humanityId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     challengePeriodDuration(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -1141,14 +1171,14 @@ export interface ProofOfHumanity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    "claimHumanity(bytes20,string,string)"(
+    claimHumanity(
       _humanityId: PromiseOrValue<BytesLike>,
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    "claimHumanity(string,string)"(
+    claimHumanityDefault(
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1183,7 +1213,8 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<ContractTransaction>;
 
     fundRequest(
-      _claimer: PromiseOrValue<string>,
+      _humanityId: PromiseOrValue<BytesLike>,
+      _requestId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1226,10 +1257,10 @@ export interface ProofOfHumanity extends BaseContract {
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, boolean, BigNumber, BigNumber, string, BigNumber] & {
+      [boolean, boolean, number, BigNumber, string, BigNumber] & {
         vouching: boolean;
         pendingRevocation: boolean;
-        nbPendingRequests: BigNumber;
+        nbPendingRequests: number;
         expirationTime: BigNumber;
         owner: string;
         nbRequests: BigNumber;
@@ -1258,11 +1289,11 @@ export interface ProofOfHumanity extends BaseContract {
         number,
         number
       ] & {
-        requesterLost: boolean;
+        punishedVouch: boolean;
         usedReasons: number;
         arbitratorDataId: number;
         lastChallengeId: number;
-        challengePeriodEnd: BigNumber;
+        challengePeriodStart: BigNumber;
         requester: string;
         ultimateChallenger: string;
         status: number;
@@ -1290,17 +1321,17 @@ export interface ProofOfHumanity extends BaseContract {
 
     grantManually(
       _humanityId: PromiseOrValue<BytesLike>,
-      _owner: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _expirationTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     humanityLifespan(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    humans(
-      arg0: PromiseOrValue<string>,
+    humanityOf(
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[string] & { humanityId: string }>;
 
     initialize(
       _arbitrator: PromiseOrValue<string>,
@@ -1328,7 +1359,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<[boolean]>;
 
     isHuman(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -1342,7 +1373,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<ContractTransaction>;
 
     removeVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -1365,7 +1396,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<ContractTransaction>;
 
     revokeManually(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1408,7 +1439,7 @@ export interface ProofOfHumanity extends BaseContract {
   };
 
   addVouch(
-    _human: PromiseOrValue<string>,
+    _account: PromiseOrValue<string>,
     _humanityId: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -1430,6 +1461,11 @@ export interface ProofOfHumanity extends BaseContract {
       arbitratorExtraData: string;
     }
   >;
+
+  boundTo(
+    _humanityId: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   challengePeriodDuration(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1487,14 +1523,14 @@ export interface ProofOfHumanity extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  "claimHumanity(bytes20,string,string)"(
+  claimHumanity(
     _humanityId: PromiseOrValue<BytesLike>,
     _evidence: PromiseOrValue<string>,
     _name: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  "claimHumanity(string,string)"(
+  claimHumanityDefault(
     _evidence: PromiseOrValue<string>,
     _name: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1529,7 +1565,8 @@ export interface ProofOfHumanity extends BaseContract {
   ): Promise<ContractTransaction>;
 
   fundRequest(
-    _claimer: PromiseOrValue<string>,
+    _humanityId: PromiseOrValue<BytesLike>,
+    _requestId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1572,10 +1609,10 @@ export interface ProofOfHumanity extends BaseContract {
     _humanityId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<
-    [boolean, boolean, BigNumber, BigNumber, string, BigNumber] & {
+    [boolean, boolean, number, BigNumber, string, BigNumber] & {
       vouching: boolean;
       pendingRevocation: boolean;
-      nbPendingRequests: BigNumber;
+      nbPendingRequests: number;
       expirationTime: BigNumber;
       owner: string;
       nbRequests: BigNumber;
@@ -1604,11 +1641,11 @@ export interface ProofOfHumanity extends BaseContract {
       number,
       number
     ] & {
-      requesterLost: boolean;
+      punishedVouch: boolean;
       usedReasons: number;
       arbitratorDataId: number;
       lastChallengeId: number;
-      challengePeriodEnd: BigNumber;
+      challengePeriodStart: BigNumber;
       requester: string;
       ultimateChallenger: string;
       status: number;
@@ -1636,15 +1673,15 @@ export interface ProofOfHumanity extends BaseContract {
 
   grantManually(
     _humanityId: PromiseOrValue<BytesLike>,
-    _owner: PromiseOrValue<string>,
+    _account: PromiseOrValue<string>,
     _expirationTime: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   humanityLifespan(overrides?: CallOverrides): Promise<BigNumber>;
 
-  humans(
-    arg0: PromiseOrValue<string>,
+  humanityOf(
+    _account: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -1674,7 +1711,7 @@ export interface ProofOfHumanity extends BaseContract {
   ): Promise<boolean>;
 
   isHuman(
-    _humanId: PromiseOrValue<string>,
+    _account: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -1688,7 +1725,7 @@ export interface ProofOfHumanity extends BaseContract {
   ): Promise<ContractTransaction>;
 
   removeVouch(
-    _human: PromiseOrValue<string>,
+    _account: PromiseOrValue<string>,
     _humanityId: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -1711,7 +1748,7 @@ export interface ProofOfHumanity extends BaseContract {
   ): Promise<ContractTransaction>;
 
   revokeManually(
-    _humanId: PromiseOrValue<string>,
+    _account: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1754,7 +1791,7 @@ export interface ProofOfHumanity extends BaseContract {
 
   callStatic: {
     addVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1776,6 +1813,11 @@ export interface ProofOfHumanity extends BaseContract {
         arbitratorExtraData: string;
       }
     >;
+
+    boundTo(
+      _humanityId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     challengePeriodDuration(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1833,14 +1875,14 @@ export interface ProofOfHumanity extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claimHumanity(bytes20,string,string)"(
+    claimHumanity(
       _humanityId: PromiseOrValue<BytesLike>,
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "claimHumanity(string,string)"(
+    claimHumanityDefault(
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -1875,7 +1917,8 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<void>;
 
     fundRequest(
-      _claimer: PromiseOrValue<string>,
+      _humanityId: PromiseOrValue<BytesLike>,
+      _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1918,10 +1961,10 @@ export interface ProofOfHumanity extends BaseContract {
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, boolean, BigNumber, BigNumber, string, BigNumber] & {
+      [boolean, boolean, number, BigNumber, string, BigNumber] & {
         vouching: boolean;
         pendingRevocation: boolean;
-        nbPendingRequests: BigNumber;
+        nbPendingRequests: number;
         expirationTime: BigNumber;
         owner: string;
         nbRequests: BigNumber;
@@ -1950,11 +1993,11 @@ export interface ProofOfHumanity extends BaseContract {
         number,
         number
       ] & {
-        requesterLost: boolean;
+        punishedVouch: boolean;
         usedReasons: number;
         arbitratorDataId: number;
         lastChallengeId: number;
-        challengePeriodEnd: BigNumber;
+        challengePeriodStart: BigNumber;
         requester: string;
         ultimateChallenger: string;
         status: number;
@@ -1982,15 +2025,15 @@ export interface ProofOfHumanity extends BaseContract {
 
     grantManually(
       _humanityId: PromiseOrValue<BytesLike>,
-      _owner: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _expirationTime: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     humanityLifespan(overrides?: CallOverrides): Promise<BigNumber>;
 
-    humans(
-      arg0: PromiseOrValue<string>,
+    humanityOf(
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -2020,7 +2063,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<boolean>;
 
     isHuman(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -2034,7 +2077,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<void>;
 
     removeVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2057,7 +2100,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<void>;
 
     revokeManually(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, string] & { expirationTime: BigNumber; humanityId: string }
@@ -2100,17 +2143,6 @@ export interface ProofOfHumanity extends BaseContract {
   };
 
   filters: {
-    "AppealContribution(address,uint256,uint8)"(
-      arbitrator?: null,
-      disputeId?: null,
-      side?: null
-    ): AppealContributionEventFilter;
-    AppealContribution(
-      arbitrator?: null,
-      disputeId?: null,
-      side?: null
-    ): AppealContributionEventFilter;
-
     "AppealCreated(address,uint256)"(
       arbitrator?: null,
       disputeId?: null
@@ -2139,6 +2171,40 @@ export interface ProofOfHumanity extends BaseContract {
       requestId?: null,
       challengeId?: null
     ): ChallengePeriodRestartEventFilter;
+
+    "ClaimRequest(address,bytes20,uint256,string,string)"(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null,
+      name?: null
+    ): ClaimRequestEventFilter;
+    ClaimRequest(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null,
+      name?: null
+    ): ClaimRequestEventFilter;
+
+    "Contribution(bytes20,uint256,uint256,uint256,address,uint256,uint8)"(
+      humanityId?: null,
+      requestId?: null,
+      challengeId?: null,
+      round?: null,
+      contributor?: null,
+      contribution?: null,
+      side?: null
+    ): ContributionEventFilter;
+    Contribution(
+      humanityId?: null,
+      requestId?: null,
+      challengeId?: null,
+      round?: null,
+      contributor?: null,
+      contribution?: null,
+      side?: null
+    ): ContributionEventFilter;
 
     "CrossChainProxyChanged(address)"(
       crossChainProofOfHumanity?: null
@@ -2184,38 +2250,32 @@ export interface ProofOfHumanity extends BaseContract {
       _evidence?: null
     ): EvidenceEventFilter;
 
-    "FeesAndRewardsWithdrawn(address,bytes20,uint256,uint256,uint256)"(
-      beneficiary?: null,
+    "FeesAndRewardsWithdrawn(bytes20,uint256,uint256,uint256,address)"(
       humanityId?: null,
       requestId?: null,
       challengeId?: null,
-      round?: null
+      round?: null,
+      beneficiary?: null
     ): FeesAndRewardsWithdrawnEventFilter;
     FeesAndRewardsWithdrawn(
-      beneficiary?: null,
       humanityId?: null,
       requestId?: null,
       challengeId?: null,
-      round?: null
+      round?: null,
+      beneficiary?: null
     ): FeesAndRewardsWithdrawnEventFilter;
 
     "GovernorChanged(address)"(governor?: null): GovernorChangedEventFilter;
     GovernorChanged(governor?: null): GovernorChangedEventFilter;
 
-    "HumanityClaim(address,bytes20,uint256,string,string)"(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null,
-      name?: null
-    ): HumanityClaimEventFilter;
-    HumanityClaim(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null,
-      name?: null
-    ): HumanityClaimEventFilter;
+    "HumanityClaimed(bytes20,uint256)"(
+      humanityId?: null,
+      requestId?: null
+    ): HumanityClaimedEventFilter;
+    HumanityClaimed(
+      humanityId?: null,
+      requestId?: null
+    ): HumanityClaimedEventFilter;
 
     "HumanityGrantedManually(bytes20,address,uint64)"(
       humanityId?: PromiseOrValue<BytesLike> | null,
@@ -2228,37 +2288,20 @@ export interface ProofOfHumanity extends BaseContract {
       expirationTime?: null
     ): HumanityGrantedManuallyEventFilter;
 
-    "HumanityRenewal(address,bytes20,uint256,string)"(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null
-    ): HumanityRenewalEventFilter;
-    HumanityRenewal(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null
-    ): HumanityRenewalEventFilter;
+    "HumanityRevoked(bytes20,uint256)"(
+      humanityId?: null,
+      requestId?: null
+    ): HumanityRevokedEventFilter;
+    HumanityRevoked(
+      humanityId?: null,
+      requestId?: null
+    ): HumanityRevokedEventFilter;
 
-    "HumanityRevocation(address,bytes20,uint256,string)"(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null
-    ): HumanityRevocationEventFilter;
-    HumanityRevocation(
-      requester?: PromiseOrValue<string> | null,
-      humanityId?: PromiseOrValue<BytesLike> | null,
-      requestId?: null,
-      evidence?: null
-    ): HumanityRevocationEventFilter;
-
-    "HumanityRevokedManually(address)"(
-      human?: PromiseOrValue<string> | null
+    "HumanityRevokedManually(bytes20)"(
+      humanityId?: PromiseOrValue<BytesLike> | null
     ): HumanityRevokedManuallyEventFilter;
     HumanityRevokedManually(
-      human?: PromiseOrValue<string> | null
+      humanityId?: PromiseOrValue<BytesLike> | null
     ): HumanityRevokedManuallyEventFilter;
 
     "Initialized()"(): InitializedEventFilter;
@@ -2273,6 +2316,19 @@ export interface ProofOfHumanity extends BaseContract {
       _evidence?: null
     ): MetaEvidenceEventFilter;
 
+    "RenewalRequest(address,bytes20,uint256,string)"(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null
+    ): RenewalRequestEventFilter;
+    RenewalRequest(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null
+    ): RenewalRequestEventFilter;
+
     "RequestBaseDepositChanged(uint256)"(
       requestBaseDeposit?: null
     ): RequestBaseDepositChangedEventFilter;
@@ -2280,11 +2336,12 @@ export interface ProofOfHumanity extends BaseContract {
       requestBaseDeposit?: null
     ): RequestBaseDepositChangedEventFilter;
 
-    "RequestChallenged(bytes20,uint256,uint256,uint8,string)"(
+    "RequestChallenged(bytes20,uint256,uint256,uint8,uint256,string)"(
       humanityId?: null,
       requestId?: null,
       challengeId?: null,
       reason?: null,
+      disputeId?: null,
       evidence?: null
     ): RequestChallengedEventFilter;
     RequestChallenged(
@@ -2292,22 +2349,9 @@ export interface ProofOfHumanity extends BaseContract {
       requestId?: null,
       challengeId?: null,
       reason?: null,
+      disputeId?: null,
       evidence?: null
     ): RequestChallengedEventFilter;
-
-    "RequestContribution(address)"(
-      claimer?: null
-    ): RequestContributionEventFilter;
-    RequestContribution(claimer?: null): RequestContributionEventFilter;
-
-    "RequestExecuted(bytes20,uint256)"(
-      humanityId?: null,
-      requestId?: null
-    ): RequestExecutedEventFilter;
-    RequestExecuted(
-      humanityId?: null,
-      requestId?: null
-    ): RequestExecutedEventFilter;
 
     "RequestWithdrawn(bytes20,uint256)"(
       humanityId?: null,
@@ -2324,6 +2368,19 @@ export interface ProofOfHumanity extends BaseContract {
     RequiredNumberOfVouchesChanged(
       requiredNumberOfVouches?: null
     ): RequiredNumberOfVouchesChangedEventFilter;
+
+    "RevocationRequest(address,bytes20,uint256,string)"(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null
+    ): RevocationRequestEventFilter;
+    RevocationRequest(
+      requester?: PromiseOrValue<string> | null,
+      humanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null,
+      evidence?: null
+    ): RevocationRequestEventFilter;
 
     "Ruling(address,uint256,uint256)"(
       _arbitrator?: PromiseOrValue<string> | null,
@@ -2351,24 +2408,35 @@ export interface ProofOfHumanity extends BaseContract {
     StateAdvanced(claimer?: null): StateAdvancedEventFilter;
 
     "VouchAdded(address,address,bytes20)"(
-      voucher?: PromiseOrValue<string> | null,
-      vouched?: PromiseOrValue<string> | null,
+      voucherAccount?: PromiseOrValue<string> | null,
+      claimer?: PromiseOrValue<string> | null,
       humanityId?: null
     ): VouchAddedEventFilter;
     VouchAdded(
-      voucher?: PromiseOrValue<string> | null,
-      vouched?: PromiseOrValue<string> | null,
+      voucherAccount?: PromiseOrValue<string> | null,
+      claimer?: PromiseOrValue<string> | null,
       humanityId?: null
     ): VouchAddedEventFilter;
 
+    "VouchRegistered(bytes20,bytes20,uint256)"(
+      voucherHumanityId?: PromiseOrValue<BytesLike> | null,
+      vouchedHumanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null
+    ): VouchRegisteredEventFilter;
+    VouchRegistered(
+      voucherHumanityId?: PromiseOrValue<BytesLike> | null,
+      vouchedHumanityId?: PromiseOrValue<BytesLike> | null,
+      requestId?: null
+    ): VouchRegisteredEventFilter;
+
     "VouchRemoved(address,address,bytes20)"(
-      voucher?: PromiseOrValue<string> | null,
-      vouched?: PromiseOrValue<string> | null,
+      voucherAccount?: PromiseOrValue<string> | null,
+      claimer?: PromiseOrValue<string> | null,
       humanityId?: null
     ): VouchRemovedEventFilter;
     VouchRemoved(
-      voucher?: PromiseOrValue<string> | null,
-      vouched?: PromiseOrValue<string> | null,
+      voucherAccount?: PromiseOrValue<string> | null,
+      claimer?: PromiseOrValue<string> | null,
       humanityId?: null
     ): VouchRemovedEventFilter;
 
@@ -2386,7 +2454,7 @@ export interface ProofOfHumanity extends BaseContract {
 
   estimateGas: {
     addVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -2400,6 +2468,11 @@ export interface ProofOfHumanity extends BaseContract {
 
     arbitratorDataList(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    boundTo(
+      _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2459,14 +2532,14 @@ export interface ProofOfHumanity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    "claimHumanity(bytes20,string,string)"(
+    claimHumanity(
       _humanityId: PromiseOrValue<BytesLike>,
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    "claimHumanity(string,string)"(
+    claimHumanityDefault(
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -2495,7 +2568,8 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<BigNumber>;
 
     fundRequest(
-      _claimer: PromiseOrValue<string>,
+      _humanityId: PromiseOrValue<BytesLike>,
+      _requestId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2551,15 +2625,15 @@ export interface ProofOfHumanity extends BaseContract {
 
     grantManually(
       _humanityId: PromiseOrValue<BytesLike>,
-      _owner: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _expirationTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     humanityLifespan(overrides?: CallOverrides): Promise<BigNumber>;
 
-    humans(
-      arg0: PromiseOrValue<string>,
+    humanityOf(
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2589,7 +2663,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<BigNumber>;
 
     isHuman(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2603,7 +2677,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<BigNumber>;
 
     removeVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -2626,7 +2700,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<BigNumber>;
 
     revokeManually(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2670,7 +2744,7 @@ export interface ProofOfHumanity extends BaseContract {
 
   populateTransaction: {
     addVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -2684,6 +2758,11 @@ export interface ProofOfHumanity extends BaseContract {
 
     arbitratorDataList(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    boundTo(
+      _humanityId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2745,14 +2824,14 @@ export interface ProofOfHumanity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    "claimHumanity(bytes20,string,string)"(
+    claimHumanity(
       _humanityId: PromiseOrValue<BytesLike>,
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    "claimHumanity(string,string)"(
+    claimHumanityDefault(
       _evidence: PromiseOrValue<string>,
       _name: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -2783,7 +2862,8 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     fundRequest(
-      _claimer: PromiseOrValue<string>,
+      _humanityId: PromiseOrValue<BytesLike>,
+      _requestId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2841,15 +2921,15 @@ export interface ProofOfHumanity extends BaseContract {
 
     grantManually(
       _humanityId: PromiseOrValue<BytesLike>,
-      _owner: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _expirationTime: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     humanityLifespan(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    humans(
-      arg0: PromiseOrValue<string>,
+    humanityOf(
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2879,7 +2959,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isHuman(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2895,7 +2975,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     removeVouch(
-      _human: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       _humanityId: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -2924,7 +3004,7 @@ export interface ProofOfHumanity extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     revokeManually(
-      _humanId: PromiseOrValue<string>,
+      _account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

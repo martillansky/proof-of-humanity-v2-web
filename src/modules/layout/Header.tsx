@@ -66,8 +66,7 @@ const Header: React.FC = () => {
   return (
     <nav
       className="px-8 pb-2 sm:pt-2
-                 w-full
-                 grid grid-cols-2 sm:grid-cols-3
+                 w-full flex justify-between
                  text-white text-lg
                  gradient shadow-sm"
     >
@@ -79,159 +78,161 @@ const Header: React.FC = () => {
         </div>
       </Link>
 
-      <div
-        className="my-2
-                   grid grid-cols-2 sm:grid-flow-col gap-2 sm:gap-16 xl:gap-32
-                   justify-items-center
-                   font-bold whitespace-nowrap"
-      >
-        <Link to="/">Requests</Link>
-        <Link to="/humanities">Humans</Link>
-        {/* {account && <Link to={`/humanity/${account}`}>Humanity</Link>} */}
-        {humanity ? (
-          <Link to={`/humanity/${humanity}`}>Me</Link>
-        ) : currentRequest ? (
-          <Link
-            to={`/request/${CHAIN[
-              currentRequest.chain
-            ].NAME.toLowerCase()}/${prettifyId(
-              currentRequest.data.humanity.id
-            )}/${currentRequest.data.index}`}
-          >
-            Me
-          </Link>
-        ) : (
-          account && <Link to="/claim">Claim</Link>
-        )}
-      </div>
+      <div className="flex flex-col sm:flex-row">
+        <div
+          className="my-2 sm:mr-12 flex gap-12
+                     font-bold whitespace-nowrap"
+        >
+          <Link to="/">Requests</Link>
+          {humanity ? (
+            <Link to={`/humanity/${humanity}`}>Me</Link>
+          ) : currentRequest ? (
+            <Link
+              to={`/request/${CHAIN[
+                currentRequest.chain
+              ].NAME.toLowerCase()}/${prettifyId(
+                currentRequest.data.humanity.id
+              )}/${currentRequest.data.index}`}
+            >
+              Me
+            </Link>
+          ) : (
+            account && <Link to="/claim">Claim</Link>
+          )}
+        </div>
 
-      <div
-        className="justify-self-center sm:justify-self-end col-span-2 sm:col-span-1
+        <div
+          className="justify-self-center sm:w-fit sm:justify-self-end col-span-2 sm:col-span-1
                    flex items-center"
-      >
-        <Modal
-          className="flex-col bg-white p-4 w-4/5 md:w-1/2"
-          trigger={
-            <button
-              className="mr-2 px-2 h-8 centered
+        >
+          <Modal
+            className="flex-col bg-white p-4 w-4/5 md:w-1/2"
+            trigger={
+              <button
+                className="mr-2 px-2 h-8 centered
                          border-2 border-white rounded bg-white/10
                          text-white text-sm font-semibold"
-              // onClick={() => injected.connector.activate()}
-            >
-              {active && !!account ? (
-                <>
-                  <div className="dot mr-1 bg-white" />
-                  {supportedChainIds.find((c) => c === chainId) ? (
-                    CHAIN[chainId as ChainId].NAME
-                  ) : (
-                    <>Unsupported</>
-                  )}
-                  <div className="w-0.5 h-full mx-2 bg-white" />
-                  {shortenAddress(account)}
-                  {/* {ens ?? shortenAddress(account)} */}
-                </>
-              ) : (
-                <>Connect Wallet</>
-              )}
-            </button>
-          }
-        >
-          {active ? (
-            <>
-              <span className="mb-2 centered uppercase font-semibold">
-                Supported chains
-              </span>
-              <div className="grid grid-cols-2 gap-4">
-                {supportedChainIds.map((chain) => {
-                  const ChainLogo = CHAIN[chain].Logo;
-                  return (
-                    <button
-                      key={chain}
-                      className={cn(
-                        "p-4 flex flex-col items-center border cursor-pointer",
-                        { "bg-slate-100": chain === chainId }
-                      )}
-                      onClick={() => switchChain(chain)}
-                    >
-                      <ChainLogo className="w-8 h-8 mb-2" />
-                      {CHAIN[chain].NAME}
-                    </button>
-                  );
-                })}
-              </div>
+                // onClick={() => injected.connector.activate()}
+              >
+                {active && !!account ? (
+                  <>
+                    <div className="dot mr-1 bg-white" />
+                    {supportedChainIds.find((c) => c === chainId) ? (
+                      CHAIN[chainId as ChainId].NAME
+                    ) : (
+                      <>Unsupported</>
+                    )}
+                    <div className="w-0.5 h-full mx-2 bg-white" />
+                    {shortenAddress(account)}
+                    {/* {ens ?? shortenAddress(account)} */}
+                  </>
+                ) : (
+                  <>Connect Wallet</>
+                )}
+              </button>
+            }
+          >
+            {active ? (
+              <>
+                <span className="mb-2 centered uppercase font-semibold">
+                  Supported chains
+                </span>
+                <div className="grid grid-cols-2 gap-4">
+                  {supportedChainIds.map((chain) => {
+                    const ChainLogo = CHAIN[chain].Logo;
+                    return (
+                      <button
+                        key={chain}
+                        className={cn(
+                          "p-4 flex flex-col items-center border cursor-pointer",
+                          { "bg-slate-100": chain === chainId }
+                        )}
+                        onClick={() => switchChain(chain)}
+                      >
+                        <ChainLogo className="w-8 h-8 mb-2" />
+                        {CHAIN[chain].NAME}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="p-4 mt-8 flex justify-between cursor-pointer">
-                {connector && <span>Connected with {connectorName}</span>}
-                <button className="text-red-500" onClick={deactivate}>
-                  Disconnect
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <span className="centered uppercase font-semibold">
-                Choose a wallet to connect with
-              </span>
-              <div className="grid grid-cols-2">
-                {WALLET_LIST.map((wallet) => (
-                  <button
-                    key={wallet}
-                    className="p-4 m-2 border cursor-pointer"
-                    onClick={async () => {
-                      const { connector } = SupportedWallets[wallet];
-                      if (connector) activate(connector);
-                    }}
-                  >
-                    {wallet}
+                <div className="p-4 mt-8 flex justify-between cursor-pointer">
+                  {connector && <span>Connected with {connectorName}</span>}
+                  <button className="text-red-500" onClick={deactivate}>
+                    Disconnect
                   </button>
-                ))}
-              </div>
-            </>
-          )}
-        </Modal>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="centered uppercase font-semibold">
+                  Choose a wallet to connect with
+                </span>
+                <div className="grid grid-cols-2">
+                  {WALLET_LIST.map((wallet) => (
+                    <button
+                      key={wallet}
+                      className="p-4 m-2 border cursor-pointer"
+                      onClick={async () => {
+                        const { connector } = SupportedWallets[wallet];
+                        if (connector) activate(connector);
+                      }}
+                    >
+                      {wallet}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </Modal>
 
-        <button
-          className="mr-2 w-6 h-6
+          <button
+            className="mr-2 w-6 h-6
                      centered bg-white
                      border-2 border-white rounded-full"
-        >
-          <ALink href="https://snapshot.org/#/poh.eth/">
-            <ProofOfHumanityLogo height={16} width={16} />
-          </ALink>
-        </button>
+          >
+            <ALink href="https://snapshot.org/#/poh.eth/">
+              <ProofOfHumanityLogo height={16} width={16} />
+            </ALink>
+          </button>
 
-        <Popover
-          trigger={
-            <button
-              className="w-6 h-6
+          <Popover
+            trigger={
+              <button
+                className="w-6 h-6
                          border-2 border-white rounded-full
                          font-bold text-sm"
-            >
-              ?
-            </button>
-          }
-        >
-          <div className="p-2 h-fit grid grid-cols-1 gap-2">
-            <ALink href="https://t.me/proofhumanity">Get Help (English)</ALink>
-            <ALink href="https://t.me/proofhumanity">Get Help (Spanish)</ALink>
-            <ALink href="https://gov.proofofhumanity.id/">Forums</ALink>
-            <ALink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
-              Report a bug
-            </ALink>
-            <ALink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
-              Tutorial
-            </ALink>
-            <ALink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/proof-of-humanity-tutorial">
-              Report a bug
-            </ALink>
-            <ALink href="https://ethereum.org/en/wallets">
-              Crypto Beginner's Guide
-            </ALink>
-            <ALink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/poh-faq">
-              FAQ
-            </ALink>
-          </div>
-        </Popover>
+              >
+                ?
+              </button>
+            }
+          >
+            <div className="p-2 h-fit grid grid-cols-1 gap-2">
+              <ALink href="https://t.me/proofhumanity">
+                Get Help (English)
+              </ALink>
+              <ALink href="https://t.me/proofhumanity">
+                Get Help (Spanish)
+              </ALink>
+              <ALink href="https://gov.proofofhumanity.id/">Forums</ALink>
+              <ALink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
+                Report a bug
+              </ALink>
+              <ALink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
+                Tutorial
+              </ALink>
+              <ALink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/proof-of-humanity-tutorial">
+                Report a bug
+              </ALink>
+              <ALink href="https://ethereum.org/en/wallets">
+                Crypto Beginner's Guide
+              </ALink>
+              <ALink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/poh-faq">
+                FAQ
+              </ALink>
+            </div>
+          </Popover>
+        </div>
       </div>
     </nav>
   );

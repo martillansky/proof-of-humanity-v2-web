@@ -30,7 +30,7 @@ const Review: React.FC = () => {
   const { account, chainId } = useWeb3();
   const nav = useFormNavigate();
   const {
-    state: { humanityId, name, bio, photo, video, videoType },
+    state: { humanityId, name, bio, photo, video },
   } = useFormContext();
   const loading = useLoading();
   const claimHumanity = useClaimHumanity();
@@ -50,7 +50,7 @@ const Review: React.FC = () => {
   useEffect(() => {
     if (!name || !humanityId) return nav.toInfo();
     if (!photo) return nav.toPhoto();
-    if (!videoType || !video) return nav.toVideo();
+    if (!video) return nav.toVideo();
   }, []);
 
   useEffect(() => {
@@ -84,7 +84,6 @@ const Review: React.FC = () => {
         JSON.stringify({
           name,
           bio,
-          videoType: videoType || undefined,
           photo: photoUri,
           video: videoUri,
         } as RegistrationFile),

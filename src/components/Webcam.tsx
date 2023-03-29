@@ -9,9 +9,6 @@ import PlayIcon from "assets/svg/PlayMajor.svg";
 import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
 import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
 import { IS_MOBILE } from "constants/media";
-import useWeb3 from "hooks/useWeb3";
-import { VideoType } from "modules/form/reducer";
-import { phraseFromAddress } from "utils/address";
 
 interface CameraButtonInterface {
   className?: string;
@@ -46,7 +43,7 @@ interface WebcamProps {
   toggleFullscreen: () => void;
   action: () => void;
   video?: boolean;
-  overlay?: VideoType;
+  overlay?: boolean;
   loadCamera: React.Dispatch<React.SetStateAction<ReactWebcam | null>>;
 }
 
@@ -59,7 +56,6 @@ const Webcam: React.FC<WebcamProps> = ({
   fullscreen,
   toggleFullscreen,
 }) => {
-  const { account } = useWeb3();
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentCamera, setCurrentCamera] = useState("");
   const [cameraPermission, setCameraPermission] = useState(true);
@@ -148,9 +144,6 @@ const Webcam: React.FC<WebcamProps> = ({
         >
           I certify that I am a real human and that I am not already registered
           in this registry
-          {overlay === VideoType.PHRASE && (
-            <>. My confirmation phrase is {phraseFromAddress(account)}</>
-          )}
         </div>
       )}
 

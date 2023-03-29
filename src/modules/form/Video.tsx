@@ -1,4 +1,3 @@
-import cn from "classnames";
 import getBlobDuration from "get-blob-duration";
 import React, { useRef, useState } from "react";
 import ReactWebcam from "react-webcam";
@@ -11,9 +10,7 @@ import Webcam from "components/Webcam";
 import { IS_IOS } from "constants/media";
 import useFullscreen from "hooks/useFullscreen";
 import useWeb3 from "hooks/useWeb3";
-import { phraseFromAddress } from "utils/address";
 import { useFormContext } from "./context";
-import { VideoType } from "./reducer";
 import useFormNavigate from "./useFormNavigate";
 
 const MIN_DIMS = { width: 352, height: 352 };
@@ -22,7 +19,7 @@ const VideoStep: React.FC = () => {
   const { account } = useWeb3();
   const nav = useFormNavigate();
   const {
-    state: { video, videoType },
+    state: { video },
     dispatch,
   } = useFormContext();
 
@@ -88,97 +85,24 @@ const VideoStep: React.FC = () => {
         <div className="divider mt-4 w-2/3" />
       </span>
 
-      {!showCamera && !video && (
-        <>
-          <span className="txt mb-4">
-            You must be in a quiet room, with a working microphone and be able
-            to read from your screen. You must speak the phrase{" "}
-            <span className="text-theme">"</span>
-            <strong>
-              I certify that I am a real human and that I am not already
-              registered in this registry
-            </strong>
-            <span className="text-theme">"</span> accompanied by one of the
-            following you choose:
-          </span>
-
-          <div className="m-auto flex flex-col md:flex-row">
-            <div
-              className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                gradient: videoType === VideoType.SIGN,
-              })}
-            >
-              <button
-                className={cn(
-                  "w-full h-16 p-2 bg-white rounded-sm font-semibold ",
-                  videoType === VideoType.SIGN
-                    ? "bg-orange-50"
-                    : "hover:bg-slate-100"
-                )}
-                onClick={() =>
-                  dispatch({ type: "VIDEO_MODE", payload: VideoType.SIGN })
-                }
-              >
-                Hold a sign with your address
-              </button>
-            </div>
-            <span className="my-2 txt self-center text-slate-400">OR</span>
-            <div
-              className={cn("bg-slate-200 rounded mx-4 w-64 p-1", {
-                gradient: videoType === VideoType.PHRASE,
-              })}
-            >
-              <button
-                className={cn(
-                  "w-full h-16 p-2 bg-white rounded-sm font-semibold",
-                  videoType === VideoType.PHRASE
-                    ? "bg-blend-overlay opacity-90"
-                    : "hover:bg-slate-100"
-                )}
-                onClick={() =>
-                  dispatch({ type: "VIDEO_MODE", payload: VideoType.PHRASE })
-                }
-              >
-                Speak a phrase generated from your address
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {videoType === VideoType.SIGN && (
-        <span className="txt text-center my-8 mx-12">
-          You must record yourself holding a sign with your address{" "}
-          <strong>{account}</strong> and say the phrase{" "}
-          <span className="text-theme">"</span>
-          <strong>
-            I certify that I am a real human and that I am not already
-            registered in this registry
-          </strong>
-          <span className="text-theme">"</span>
-        </span>
-      )}
-
-      {videoType === VideoType.PHRASE && (
-        <span className="txt text-center my-8 mx-12">
-          You must record yourself saying the phrase{" "}
-          <span className="text-theme">"</span>
-          <strong>
-            I certify that I am a real human and that I am not already
-            registered in this registry. My confirmation phrase is{" "}
-            <strong>{phraseFromAddress(account)}</strong>
-          </strong>
-          <span className="text-theme">"</span>
-        </span>
-      )}
+      <span className="txt text-center my-8 mx-12">
+        You must record yourself holding a sign with your address{" "}
+        <strong>{account}</strong> and say the phrase{" "}
+        <span className="text-theme">"</span>
+        <strong>
+          I certify that I am a real human and that I am not already registered
+          in this registry
+        </strong>
+        <span className="text-theme">"</span>
+      </span>
 
       {showCamera && (
         <span className="txt text-center mb-4">
-          The phrase will appear on screen when you start recording.
+          The phrase will also appear on screen when you start recording.
         </span>
       )}
 
-      {videoType && !showCamera && !video && (
+      {!showCamera && !video && (
         <div className="relative w-full mt-12 bordered grid grid-cols-2">
           <Uploader
             className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"
@@ -240,11 +164,11 @@ const VideoStep: React.FC = () => {
         </div>
       )}
 
-      {showCamera && videoType && (
+      {showCamera && (
         <div tabIndex={0} ref={fullscreenRef}>
           <Webcam
             video
-            overlay={videoType}
+            overlay
             recording={recording}
             action={recording ? stopRecording : startRecording}
             fullscreen={isFullscreen}

@@ -12,14 +12,14 @@ export type queryReturnType<Q extends queryType> = Record<
 >;
 
 export const sdk = supportedChainIds.reduce(
-  (acc, chainID) => ({
+  (acc, chainId) => ({
     ...acc,
-    [chainID]: getSdk(new GraphQLClient(SUBGRAPH_ENDPOINTS[chainID])),
+    [chainId]: getSdk(new GraphQLClient(SUBGRAPH_ENDPOINTS[chainId])),
   }),
   {} as Record<ChainId, sdkReturnType>
 );
 
-type MULTIPLE_ENTITIES_QUERY = "Requests" | "Humanities" | "Gateways";
+type MULTIPLE_ENTITIES_QUERY = "Requests" | "Gateways";
 type SINGLE_ENTITY_QUERY = "Request" | "Humanity" | "Me";
 
 export const queryFetchSingle = async <Q extends SINGLE_ENTITY_QUERY>(
@@ -41,11 +41,11 @@ export const queryFetchSingleAllChains = async <Q extends SINGLE_ENTITY_QUERY>(
   id: string
 ): Promise<queryReturnType<Q>> => {
   const res = await Promise.all(
-    supportedChainIds.map((chainID) => sdk[chainID][query]({ id }))
+    supportedChainIds.map((chainId) => sdk[chainId][query]({ id }))
   );
 
   return supportedChainIds.reduce(
-    (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
+    (acc, chainId, i) => ({ ...acc, [chainId]: res[i] }),
     {}
   );
 };
@@ -55,13 +55,13 @@ export const queryFetchAllChains = async <Q extends MULTIPLE_ENTITIES_QUERY>(
   ...params: Parameters<sdkReturnType[Q]>
 ): Promise<queryReturnType<Q>> => {
   const res = await Promise.all(
-    supportedChainIds.map((chainID) =>
-      sdk[chainID][query](...((params as any) || []))
+    supportedChainIds.map((chainId) =>
+      sdk[chainId][query](...((params as any) || []))
     )
   );
 
   return supportedChainIds.reduce(
-    (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
+    (acc, chainId, i) => ({ ...acc, [chainId]: res[i] }),
     {}
   );
 };

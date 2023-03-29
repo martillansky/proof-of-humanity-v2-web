@@ -2,7 +2,6 @@ import { ChainId } from "enums/ChainId";
 import { PoHContract } from "enums/PoHContract";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import {
   PastRequest as PastRequestType,
   PendingRequest as PendingRequestType,
@@ -11,22 +10,19 @@ import { useGateways } from "api/useGateways";
 import { useHumanity } from "api/useHumanity";
 import ProofOfHumanityLogo from "assets/svg/ProofOfHumanityLogo.svg";
 import ALink from "components/ALink";
-import Image from "components/Image";
 import Modal from "components/Modal";
 import PageLoader from "components/PageLoader";
 import TimeAgo from "components/TimeAgo";
-import Video from "components/Video";
-import { CHAIN, supportedChainIds } from "constants/chains";
+import { CHAIN, TOKEN_CHAIN, supportedChainIds } from "constants/chains";
 import { CONTRACT } from "constants/contracts";
 import { Status } from "generated/graphql";
-import useIPFS from "hooks/useIPFS";
-import PendingRequest from "modules/PendingRequest";
+import Card from "modules/card/Individual";
 import Transfer from "modules/crosschain/Transfer";
 import Update from "modules/crosschain/Update";
 import Revoke from "modules/humanity/Revoke";
+import TokenAccordion from "modules/token";
 import { explorerLink, shortenAddress } from "utils/address";
 import { machinifyId, shortenId } from "utils/identifier";
-import { ipfs } from "utils/ipfs";
 
 interface TransferState {
   foreignProxy: string;
@@ -53,17 +49,6 @@ const Humanity: React.FC = () => {
   const winnerClaimRequest =
     lastEvidenceChain &&
     humanityAllChains![lastEvidenceChain]!.humanity!.winnerClaimRequest[0];
-
-  const [winnerEvidence] = useIPFS<EvidenceFileInterface>(
-    winnerClaimRequest?.evidence[0].URI
-  );
-  const [registration] = useIPFS<RegistrationFileInterface>(
-    winnerEvidence?.fileURI
-  );
-
-  const fullName = registration?.firstName
-    ? `${registration.firstName} ${registration.lastName}`
-    : registration?.name;
 
   const updateTransferState = async () => {
     if (!humanityAllChains || !gateways) return;
@@ -164,14 +149,14 @@ const Humanity: React.FC = () => {
 
   return (
     <div className="content">
-      <div className="mt-24 paper pt-20 pb-8 relative flex flex-col items-center">
+      <div className="mt-24 paper pt-20 relative flex flex-col items-center">
         <div className="absolute bordered left-1/2 -top-16 -translate-x-1/2 rounded-full shadow">
           <div className="w-32 h-32 px-6 pt-5 rounded-full bg-white">
             <ProofOfHumanityLogo />
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-xs text-slate-400">Humanity ID</span>
+          <span className="text-xs text-slate-400">POH ID</span>
           <span className="mb-12 font-semibold text-xl">
             {shortenId(humanityId!)}
           </span>
@@ -179,72 +164,58 @@ const Humanity: React.FC = () => {
 
         {lastEvidenceChain && homeChain ? (
           <>
-            <div className="mb-8 flex flex-col">
-              <div className="flex justify-between mb-2">
-                <div className="flex flex-col">
-                  <span className="text-xs text-slate-400">
-                    Claimed by <strong>{fullName}</strong>
-                  </span>
-                  <ALink
-                    className="underline underline-offset-2"
-                    href={explorerLink(
-                      humanityAllChains[homeChain]!.humanity!.owner!.id,
-                      homeChain
-                    )}
-                  >
-                    {shortenAddress(
-                      humanityAllChains[homeChain]!.humanity!.owner!.id
-                    )}
-                  </ALink>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-slate-400">Home chain</span>
-                  <span className="flex font-semibold">
-                    <HomeChainLogo className="w-6 h-6 mr-1" />
-                    {CHAIN[homeChain].NAME}
-                  </span>
-                </div>
-              </div>
-
-              {registration && (
-                <div className="flex flex-col items-end">
-                  <div className="w-full flex flex-col sm:flex-row items-center justify-center mx-auto">
-                    <Image uri={ipfs(registration!.photo)} rounded previewed />
-                    <Video
-                      className="h-40 mt-4 sm:mt-0 sm:ml-8 cursor-pointer"
-                      uri={ipfs(registration!.video)}
-                      previewed
-                    />
-                  </div>
-
-                  {winnerClaimRequest && (
-                    <Link
-                      className="mt-1 text-theme underline underline-offset-2 font-semibold"
-                      to={`/request/${CHAIN[
-                        lastEvidenceChain
-                      ].NAME.toLowerCase()}/${humanityId}/${
-                        (winnerClaimRequest.legacy ? -1 : 1) *
-                        winnerClaimRequest.index
-                      }`}
-                    >
-                      See winner claim request ➜
-                    </Link>
-                  )}
-                </div>
-              )}
+            <div className="mb-2 flex text-emerald-500">
+              Claimed by
+              <ALink
+                className="ml-2 underline underline-offset-2"
+                href={explorerLink(
+                  humanityAllChains[homeChain]!.humanity!.owner!.id,
+                  homeChain
+                )}
+              >
+                {shortenAddress(
+                  humanityAllChains[homeChain]!.humanity!.owner!.id
+                )}
+              </ALink>
             </div>
 
             <Revoke humanity={humanityId} homeChain={homeChain} />
 
-            <Transfer homeChain={homeChain} />
-            <Update
-              humanityAllChains={humanityAllChains}
-              homeChain={homeChain}
-            />
+            {humanityAllChains[TOKEN_CHAIN].humanity && (
+              <TokenAccordion
+                humanity={humanityAllChains[TOKEN_CHAIN].humanity}
+              />
+            )}
+
+            <div className="w-full p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t">
+              <div className="flex">
+                <span className="text-slate-500">Home chain</span>
+                <span className="flex font-semibold">
+                  <HomeChainLogo className="w-6 h-6 mx-1" />
+                  {CHAIN[homeChain].NAME}
+                </span>
+              </div>
+
+              <Transfer homeChain={homeChain} />
+
+              <Update
+                humanityAllChains={humanityAllChains}
+                homeChain={homeChain}
+              />
+
+              <div className="font-bold">
+                <span className="mr-2 font-normal text-slate-500">
+                  Expiration:
+                </span>
+                <TimeAgo
+                  time={humanityAllChains[homeChain].humanity?.expirationTime}
+                />
+              </div>
+            </div>
           </>
         ) : (
           <>
-            <span className="mb-8">Not claimed</span>
+            <span className="mb-6 text-theme">Not claimed</span>
             <Link to={`/claim/${humanityId}`} className="btn-main w-48">
               Claim humanity
             </Link>
@@ -275,21 +246,66 @@ const Humanity: React.FC = () => {
         )}
       </div>
 
-      <div className="paper p-4 mt-4 mb-1 flex justify-between">
-        {pendingRequests.length} pending request
-        {pendingRequests.length !== 1 && "s"}
+      <div className="flex flex-col sm:flex-row sm:gap-4">
+        {homeChain && winnerClaimRequest && (
+          <div>
+            <div className="p-4 mt-4 mb-1">Owner</div>
+            <div className="grid">
+              <Card
+                request={{
+                  ...winnerClaimRequest,
+                  chainId: lastEvidenceChain,
+                  revocation: false,
+                  status: Status.Resolved,
+                  requester: humanityAllChains[homeChain]!.humanity!.owner!.id,
+                  humanity: humanityAllChains[homeChain]!.humanity!,
+                  claimer:
+                    humanityAllChains[lastEvidenceChain]!.humanity!.owner!,
+                }}
+              />
+            </div>
+          </div>
+        )}
+        {pendingRequests.length > 0 && (
+          <div>
+            <div className="p-4 mt-4 mb-1">
+              {pendingRequests.length} pending request
+              {pendingRequests.length !== 1 && "s"}
+            </div>
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+              {pendingRequests.map((req, index) => (
+                <Card
+                  key={index}
+                  request={{
+                    ...req,
+                    humanity: humanityAllChains[req.chainId]!.humanity!,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      {pendingRequests.map((req, index) => (
-        <PendingRequest key={index} humanity={humanityId} request={req} />
-      ))}
 
-      <div className="paper p-4 mt-8 mb-1 flex justify-between">
-        {pastRequests.length} past resolved request
-        {pastRequests.length !== 1 && "s"}
-      </div>
-      {pastRequests.map((req, index) => (
-        <PendingRequest key={index} humanity={humanityId} request={req} />
-      ))}
+      {pastRequests.length > 0 && (
+        <>
+          <div className="p-4 mt-8 mb-1">
+            {pastRequests.length} past request
+            {pastRequests.length !== 1 && "s"}
+          </div>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+            {pastRequests.map((req, index) => (
+              <Card
+                key={index}
+                request={{
+                  ...req,
+                  humanity: humanityAllChains![req.chainId]!.humanity!,
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

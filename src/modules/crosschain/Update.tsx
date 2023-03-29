@@ -1,6 +1,5 @@
 import { ChainId } from "enums/ChainId";
 import { PoHContract } from "enums/PoHContract";
-import React from "react";
 import { useParams } from "react-router-dom";
 import useContractData from "api/useContractData";
 import Modal from "components/Modal";
@@ -30,7 +29,7 @@ const Update: React.FC<UpdateInterface> = ({
     <Modal
       formal
       header="Update"
-      trigger={<button className="btn-main mb-2 w-48 my-4">Update</button>}
+      trigger={<button className="text-sky-500">Update</button>}
     >
       <div className="p-4">
         <span className="txt m-2">
@@ -80,8 +79,6 @@ const Update: React.FC<UpdateInterface> = ({
                               chainId
                             ].toLowerCase()
                         );
-
-                        console.log({ chainId, gatewayForChain });
 
                         if (!gatewayForChain) return;
 

@@ -3,7 +3,7 @@ import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { ProofOfHumanity } from "generated/contracts";
-import useProofOfHumanity from "./useProofOfHumanity";
+import { useProofOfHumanity } from "./useContract";
 
 export const useGasFees = <F extends keyof ProofOfHumanity["callStatic"]>(
   method: F,

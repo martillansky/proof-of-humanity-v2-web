@@ -2,6 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export { CrossChainProofOfHumanity__factory } from "./CrossChainProofOfHumanity__factory";
+export { GroupCurrencyToken__factory } from "./GroupCurrencyToken__factory";
+export { IHUB__factory } from "./IHUB__factory";
 export { KlerosLiquid__factory } from "./KlerosLiquid__factory";
+export { PoHTokenManager__factory } from "./PoHTokenManager__factory";
 export { ProofOfHumanity__factory } from "./ProofOfHumanity__factory";
 export { ProofOfHumanityOld__factory } from "./ProofOfHumanityOld__factory";
+export { Token__factory } from "./Token__factory";

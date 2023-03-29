@@ -1,12 +1,12 @@
 import { ChainId } from "enums/ChainId";
 import { BigNumber } from "ethers";
 import { concat, keccak256, toUtf8Bytes } from "ethers/lib/utils";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { EvidenceFileInterface, RegistrationFileInterface } from "api/files";
 import useContractData from "api/useContractData";
 import { useRequest } from "api/useRequest";
 import { useVouches } from "api/useVouches";
+import AttachmentIcon from "assets/svg/AttachmentMajor.svg";
 import ALink from "components/ALink";
 import Identicon from "components/Identicon";
 import Image from "components/Image";
@@ -29,8 +29,9 @@ import Challenge from "modules/challenge";
 import EvidenceSection from "modules/evidence/Section";
 import FundButton from "modules/funding/Button";
 import VouchButton from "modules/vouch/Button";
-import { explorerLink, shortenAddress } from "utils/address";
-import { machinifyId, shortenId } from "utils/identifier";
+import { EvidenceFile, RegistrationFile } from "types/docs";
+import { explorerLink } from "utils/address";
+import { machinifyId } from "utils/identifier";
 import { ipfs } from "utils/ipfs";
 import { formatEth } from "utils/misc";
 
@@ -45,6 +46,21 @@ const genRequestId = (humanityId: string, index: number) => {
     ? keccak256(concat([requestId, toUtf8Bytes("legacy")]))
     : requestId;
 };
+
+enum Action {
+  NONE,
+  OLD_ACTIVE,
+  VOUCH,
+  FUND,
+  ADVANCE,
+  CHALLENGE,
+  DISPUTED,
+  EXECUTE,
+}
+
+const StatusDetail: React.FC<{ children: ReactNode }> = ({ children }) => (
+  <span className="text-slate-400">{children}</span>
+);
 
 const Request: React.FC = () => {
   const { humanity, index, chain } = useParams();
@@ -61,24 +77,36 @@ const Request: React.FC = () => {
     []
   );
 
-  console.log({ requestId });
-
   const request = useRequest(chainId, requestId);
   const { totalCount, getRequestValidVouches } = useVouches(chainId, requestId);
 
-  const [evidence] = useIPFS<EvidenceFileInterface>(
+  const [registrationEvidence] = useIPFS<EvidenceFile>(
     request &&
       (request.revocation
         ? request?.humanity.winnerClaimRequest[0]
         : request
       ).evidence.at(-1)?.URI
   );
-  const [registration] = useIPFS<RegistrationFileInterface>(evidence?.fileURI);
+  const [registration] = useIPFS<RegistrationFile>(
+    registrationEvidence?.fileURI
+  );
+
+  const [revocationEvidence] = useIPFS<EvidenceFile>(
+    request && request.revocation && request.evidence.at(-1)?.URI
+  );
 
   const advanceState = useAdvanceState();
   const withdrawRequest = useWithdrawRequest();
   const executeRequest = useExecuteRequest();
   const totalCost = useRequestTotalCost();
+
+  const funded = useMemo(
+    () =>
+      request &&
+      !request.legacy &&
+      request.challenges[0].rounds[0].requesterFunds,
+    [request]
+  );
 
   const challengePeriodEnd =
     contractData?.contract &&
@@ -87,52 +115,202 @@ const Request: React.FC = () => {
       .add(request.lastStatusChange)
       .toNumber();
 
-  if (!request || !evidence || !registration || !humanity || !index || !chainId)
+  const action = useMemo(() => {
+    if (!request || !contractData || !totalCost) return Action.NONE;
+
+    if (
+      request.status === Status.Resolved ||
+      request.status === Status.Withdrawn
+    )
+      return Action.NONE;
+
+    if (request.legacy) return Action.OLD_ACTIVE;
+
+    if (request.status === Status.Vouching) {
+      if (!totalCost.eq(funded)) return Action.FUND;
+
+      if (
+        contractData.contract &&
+        request.claimer.vouchesReceived.length >=
+          +contractData.contract.requiredNumberOfVouches
+      )
+        return Action.ADVANCE;
+
+      return Action.VOUCH;
+    }
+
+    if (request.status == Status.Resolving)
+      return challengePeriodEnd && challengePeriodEnd * 1000 < Date.now()
+        ? Action.EXECUTE
+        : Action.CHALLENGE;
+
+    if (request.status === Status.Disputed) return Action.DISPUTED;
+
+    return Action.NONE;
+  }, [contractData, request, totalCost]);
+
+  if (
+    !request ||
+    !registrationEvidence ||
+    !registration ||
+    !humanity ||
+    !index ||
+    !chainId ||
+    !contractData ||
+    !totalCost
+  )
     return <PageLoader />;
 
   const ChainLogo = CHAIN[chainId].Logo;
 
-  const fullName = registration.firstName
-    ? `${registration.firstName} ${registration.lastName}`
-    : registration.name;
-  const funded =
-    !request.legacy && request.challenges[0].rounds[0].requesterFunds;
   const statusColor = getColorForStatus(request.status, request.revocation);
 
-  const currentReason = request.challenges.at(-1)?.reason;
+  const currentChallenge = request.challenges.at(-1);
 
   return (
-    <div
-      className="content
-                 mx-auto flex flex-col justify-center
-                 font-semibold"
-    >
-      <div className="p-4 border flex justify-between rounded shadow bg-white">
-        <span className="flex">
-          {request.revocation ? <>Revocation</> : <>Claim</>} request
-        </span>
-        <div className="flex items-center">
-          <span className={`text-status-${statusColor}`}>{request.status}</span>
-          <span
-            className={`m-1 h-2 w-2 rounded-full bg-status-${statusColor}`}
-          />
-        </div>
-      </div>
-
-      <div className="my-6 border flex flex-col md:flex-row rounded bg-white shadow">
-        <div className="pt-8 md:pb-48 px-8 md:w-2/5 flex flex-col background items-center">
-          <Image uri={ipfs(registration.photo)} rounded previewed />
-
-          <span className="font-bold">{fullName}</span>
-          <span className="mb-4">{registration.bio}</span>
-
-          <div className="mb-8 flex flex-col items-center font-semibold text-green-500">
-            <span>Humanity:</span>
-            <Link to={`/humanity/${humanity}`}>{shortenId(humanity)} ➜</Link>
+    <div className="content mx-auto flex flex-col justify-center font-semibold">
+      <div className="mb-6 border shadow bg-white rounded">
+        <div className="p-6 flex justify-between items-center border-b">
+          <div className="flex items-center">
+            <span className="mr-4">Status</span>
+            <span
+              className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}
+            >
+              {request.status}
+            </span>
           </div>
+          <div className="w-full ml-8 flex items-center justify-between font-normal">
+            {action >= Action.VOUCH && action < Action.ADVANCE && (
+              <>
+                <StatusDetail>
+                  Vouches:{" "}
+                  <strong>
+                    {totalCount} /{" "}
+                    {contractData?.contract?.requiredNumberOfVouches}
+                  </strong>
+                </StatusDetail>
 
-          {request.legacy ? (
-            <>
+                <VouchButton request={request} />
+              </>
+            )}
+
+            {action === Action.FUND && (
+              <>
+                {totalCost && (
+                  <StatusDetail>
+                    Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
+                  </StatusDetail>
+                )}
+
+                <FundButton
+                  totalCost={totalCost}
+                  funded={funded}
+                  request={request}
+                />
+              </>
+            )}
+
+            {action === Action.ADVANCE && (
+              <>
+                <StatusDetail>Ready to advance</StatusDetail>
+
+                <button
+                  className="btn-main mb-2"
+                  onClick={async () => {
+                    const validVouches = await getRequestValidVouches(
+                      contractData.contract!.requiredNumberOfVouches
+                    );
+                    await advanceState(
+                      request.requester,
+                      validVouches.onChain,
+                      validVouches.offChain
+                    );
+                  }}
+                >
+                  Advance state
+                </button>
+              </>
+            )}
+
+            {action === Action.EXECUTE && (
+              <>
+                <StatusDetail>Ready to finalize.</StatusDetail>
+
+                <button
+                  className="btn-main mb-2"
+                  onClick={async () =>
+                    await executeRequest(request.humanity.id, index)
+                  }
+                >
+                  Execute
+                </button>
+              </>
+            )}
+
+            {action === Action.CHALLENGE && (
+              <>
+                <StatusDetail>
+                  Challenge period end:{" "}
+                  {challengePeriodEnd && <TimeAgo time={challengePeriodEnd} />}
+                </StatusDetail>
+
+                <Challenge request={request} />
+              </>
+            )}
+
+            {action === Action.DISPUTED && (
+              <>
+                <StatusDetail>
+                  The request was challenged
+                  {!request.revocation && <> for {currentChallenge?.reason}</>}.
+                </StatusDetail>
+
+                <ALink
+                  href={`https://resolve.kleros.io/cases/${currentChallenge?.disputeId}`}
+                  className="btn-main px-4"
+                >
+                  View case #{currentChallenge?.disputeId}
+                </ALink>
+              </>
+            )}
+          </div>
+        </div>
+
+        {request.revocation && revocationEvidence && (
+          <div className="p-4 bg-shade-100">
+            <div className="relative">
+              <div className="flex justify-between">
+                Revocation requested - {revocationEvidence.name}
+                {revocationEvidence.fileURI && (
+                  <ALink href={ipfs(revocationEvidence.fileURI)}>
+                    <AttachmentIcon className="fill-black w-6" />
+                  </ALink>
+                )}
+              </div>
+              <p className="text-slate-600">
+                {revocationEvidence?.description}
+              </p>
+            </div>
+            <div className="flex font-normal text-sm">
+              <span className="mr-2">Requested by</span>
+              <Identicon diameter={16} address={request.requester} />
+              <ALink
+                className="ml-1 text-blue-500 underline underline-offset-2"
+                href={explorerLink(request.requester, chainId)}
+              >
+                {request.requester}
+              </ALink>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col md:flex-row">
+          <div className="relative pt-8 md:pb-48 px-8 md:w-2/5 flex flex-col background items-center border-r">
+            <Image uri={ipfs(registration.photo)} rounded previewed />
+
+            <span className="mt-4 mb-12 text-2xl">{request.claimer.name}</span>
+
+            {action === Action.OLD_ACTIVE && (
               <ALink
                 href={`https://app.proofofhumanity.id/profile/${request.humanity.id}`}
                 className="text-center font-semibold text-blue-500"
@@ -140,146 +318,52 @@ const Request: React.FC = () => {
                 This is a profile registered on the old contract. Navigate to
                 the old interface to withdraw or challenge.
               </ALink>
-            </>
-          ) : (
-            <>
-              {request.status == Status.Vouching && (
-                <>
-                  <Label>
-                    Vouches:{" "}
-                    <strong>
-                      {totalCount} /{" "}
-                      {contractData?.contract?.requiredNumberOfVouches}
-                    </strong>
-                  </Label>
+            )}
 
-                  <VouchButton request={request} />
+            {request.status == Status.Vouching && (
+              <button
+                className="btn-main mb-2"
+                onClick={async () => {
+                  await withdrawRequest();
+                }}
+              >
+                Withdraw request
+              </button>
+            )}
 
-                  {totalCost && (
-                    <span className="font-semibold">
-                      Funded: {formatEth(funded)} / {formatEth(totalCost)} ETH
-                    </span>
-                  )}
-
-                  <FundButton
-                    totalCost={totalCost}
-                    funded={funded}
-                    request={request}
-                  />
-
-                  {request.claimer &&
-                    contractData?.contract &&
-                    request.claimer.vouchesReceived.length >=
-                      Number(contractData.contract.requiredNumberOfVouches) && (
-                      <>
-                        <button
-                          className="btn-main mb-2"
-                          onClick={async () => {
-                            const validVouches = await getRequestValidVouches(
-                              contractData.contract!.requiredNumberOfVouches
-                            );
-                            await advanceState(
-                              request.requester,
-                              validVouches.onChain,
-                              validVouches.offChain
-                            );
-                          }}
-                        >
-                          Advance state
-                        </button>
-
-                        <button
-                          className="btn-main mb-2"
-                          onClick={async () => {
-                            await withdrawRequest();
-                          }}
-                        >
-                          Withdraw request
-                        </button>
-                      </>
-                    )}
-                </>
-              )}
-
-              {request.status == Status.Resolving && challengePeriodEnd && (
-                <>
-                  <button
-                    className="btn-main mb-2"
-                    onClick={async () =>
-                      await executeRequest(request.humanity.id, index)
-                    }
-                    disabled={challengePeriodEnd > Date.now() / 1000}
-                  >
-                    Execute request
-                  </button>
-
-                  <Label>
-                    Challenge period end:{" "}
-                    {challengePeriodEnd && (
-                      <TimeAgo time={challengePeriodEnd} />
-                    )}
-                  </Label>
-
-                  <Challenge request={request} />
-                </>
-              )}
-
-              {request.status == Status.Disputed &&
-                request.challenges.length && (
-                  <div>
-                    {request.challenges.map((challenge, i) => (
-                      <ALink
-                        href={`https://resolve.kleros.io/cases/${challenge.disputeId}`}
-                        className="text-blue-500 underline underline-offset-2"
-                      >
-                        #{challenge.disputeId}:{" "}
-                        {request.revocation ? "Challenge" : currentReason}
-                      </ALink>
-                    ))}
-                  </div>
-                )}
-            </>
-          )}
-
-          <Label>
-            Last status change: <TimeAgo time={request.lastStatusChange} />
-          </Label>
-        </div>
-
-        <div className="w-full px-4 flex flex-col">
-          <div className="mt-4 flex justify-between font-semibold">
-            <span className="ml-8 text-xl">{fullName}</span>
-            <span className="flex">
-              <ChainLogo className="w-6 h-6 mr-2" />
-              {CHAIN[chainId].NAME}
-            </span>
+            <Label className="absolute p-8 left-0 right-0 bottom-0">
+              Last update: <TimeAgo time={request.lastStatusChange} />
+            </Label>
           </div>
 
-          <div className="flex mb-4">
-            <Identicon
-              address={
-                request.revocation
-                  ? request.humanity.winnerClaimRequest[0].requester
-                  : request.requester
-              }
-            />
-            <ALink
-              className="ml-2 font-semibold underline underline-offset-2"
-              href={explorerLink(request.requester, chainId)}
-            >
-              {shortenAddress(request.requester)}
-            </ALink>
-          </div>
+          <div className="w-full p-8 flex flex-col">
+            <div className="mb-4 flex justify-between">
+              <div className="flex mb-4">
+                <Identicon address={request.claimer.id} />
+                <ALink
+                  className="ml-2 font-semibold underline underline-offset-2"
+                  href={explorerLink(request.claimer.id, chainId)}
+                >
+                  {request.claimer.id}
+                </ALink>
+              </div>
+              <span className="flex">
+                <ChainLogo className="w-6 h-6 mr-1" />
+                {CHAIN[chainId].NAME}
+              </span>
+            </div>
 
-          <Video className="w-full" uri={ipfs(registration.video)} />
+            <div className="mb-8 flex items-center text-emerald-500">
+              <span className="mr-4 font-normal">POH ID:</span>
+              <Link to={`/humanity/${humanity}`}>{humanity} ➜</Link>
+            </div>
+
+            <Video className="w-full" uri={ipfs(registration.video)} />
+          </div>
         </div>
       </div>
 
-      <Appeal
-        // humanityId={request.humanity.id}
-        // requestIndex={index}
-        request={request}
-      />
+      <Appeal request={request} />
 
       <EvidenceSection
         humanityId={request.humanity.id}

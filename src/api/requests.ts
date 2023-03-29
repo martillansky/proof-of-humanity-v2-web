@@ -7,19 +7,19 @@ import { queryFetch, queryReturnType, sdkReturnType } from ".";
 import { RequestsQueryItem } from "./types";
 
 export interface RequestInterface extends RequestsQueryItem {
-  old: boolean;
-  chainID: ChainId;
+  legacy: boolean;
+  chainId: ChainId;
 }
 
 const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
   Object.keys(requestData)
     .reduce<RequestInterface[]>(
-      (acc, chainID) => [
+      (acc, chainId) => [
         ...acc,
-        ...requestData[Number(chainID) as ChainId].map((request) => ({
+        ...requestData[Number(chainId) as ChainId].map((request) => ({
           ...request,
-          old: Number(chainID) === ChainId.MAINNET,
-          chainID: Number(chainID),
+          old: Number(chainId) === ChainId.MAINNET,
+          chainId: Number(chainId),
         })),
       ],
       []
@@ -28,7 +28,7 @@ const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
 
 const initialChainStacks = supportedChainIds.reduce<
   Record<number, RequestsQueryItem[]>
->((acc, chainID) => ({ ...acc, [chainID]: [] }), {});
+>((acc, chainId) => ({ ...acc, [chainId]: [] }), {});
 
 const cursorAtom = atom(0);
 const chainStacksAtom = atom(initialChainStacks);
@@ -66,27 +66,27 @@ export const requestsAtom = atom(
     const fetchPromises: Promise<ReturnType<sdkReturnType["Requests"]>>[] = [];
 
     chainStacks = supportedChainIds.reduce(
-      (acc, chainID) => ({
+      (acc, chainId) => ({
         ...acc,
-        [chainID]:
-          fromChain === "all" || chainID === fromChain
-            ? chainStacks[chainID]
+        [chainId]:
+          fromChain === "all" || chainId === fromChain
+            ? chainStacks[chainId]
             : [],
       }),
       chainStacks
     );
 
-    for (const chainID of supportedChainIds) {
-      if (fromChain !== "all" && fromChain !== chainID) continue;
+    for (const chainId of supportedChainIds) {
+      if (fromChain !== "all" && fromChain !== chainId) continue;
 
       const displayedForChain = get(requestsAtom).filter(
-        (request) => request.chainID === chainID
+        (request) => request.chainId === chainId
       ).length;
 
       if (
         !loadContinued ||
         displayedForChain + REQUESTS_DISPLAY_BATCH >=
-          chainStacks[chainID].length
+          chainStacks[chainId].length
       ) {
         const statusFilter = REQUEST_STATUS[status].filter;
         const where = {
@@ -94,13 +94,13 @@ export const requestsAtom = atom(
           ...(searchQuery ? { claimer_: { name_contains: searchQuery } } : {}),
         };
 
-        fetchChainIds.push(chainID);
+        fetchChainIds.push(chainId);
         fetchPromises.push(
-          queryFetch(chainID, "Requests", {
+          queryFetch(chainId, "Requests", {
             first: REQUESTS_DISPLAY_BATCH * 4,
             skip: loadContinued
               ? get(normalizedRequestsAtom).filter(
-                  (request) => request.chainID === chainID
+                  (request) => request.chainId === chainId
                 ).length
               : 0,
             where,
@@ -113,16 +113,16 @@ export const requestsAtom = atom(
       const res = await Promise.all(fetchPromises);
 
       const fetchedRequests = fetchChainIds.reduce<queryReturnType<"Requests">>(
-        (acc, chainID, i) => ({ ...acc, [chainID]: res[i] }),
+        (acc, chainId, i) => ({ ...acc, [chainId]: res[i] }),
         {}
       );
 
       chainStacks = fetchChainIds.reduce(
-        (acc, chainID) => ({
+        (acc, chainId) => ({
           ...acc,
-          [chainID]: [
-            ...(loadContinued ? chainStacks[chainID] : []),
-            ...fetchedRequests[chainID].requests,
+          [chainId]: [
+            ...(loadContinued ? chainStacks[chainId] : []),
+            ...fetchedRequests[chainId].requests,
           ],
         }),
         chainStacks

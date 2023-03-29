@@ -58,7 +58,7 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
     <Modal
       formal
       header="Revoke"
-      trigger={<button className="btn-main w-48 my-4">Revoke humanity</button>}
+      trigger={<button className="btn-main">Revoke humanity</button>}
     >
       <div className="p-4 flex flex-col items-center">
         {contractData && contractData.contract && (

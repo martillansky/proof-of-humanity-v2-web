@@ -1,10 +1,5 @@
-import { PoHContract } from "enums/PoHContract";
-import { CrossChainProofOfHumanity } from "generated/contracts";
-import useContract from "./useContract";
+import { useCrossChainPoH } from "./useContract";
 import useSend from "./useSend";
-
-const useCrossChainPoH = () =>
-  useContract<CrossChainProofOfHumanity>(PoHContract.CROSS_CHAIN_POH);
 
 export const useTransferHumanity = () =>
   useSend(useCrossChainPoH(), "transferHumanity");

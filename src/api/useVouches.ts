@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { VDB_CHAIN } from "constants/chains";
 import { ProofOfHumanity } from "generated/contracts";
 import { RequestQuery } from "generated/graphql";
-import useProofOfHumanity from "hooks/useProofOfHumanity";
+import { useProofOfHumanity } from "hooks/useContract";
 import { VDBVouch } from "types/vouchdb";
 import { shuffleArray } from "utils/misc";
 import { useRequest } from "./useRequest";

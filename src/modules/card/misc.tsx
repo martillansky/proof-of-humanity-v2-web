@@ -1,4 +1,4 @@
-import { RequestsQueryItem } from "api/types";
+import { RequestCardInterface } from "./Individual";
 
 export const LoadingFallback = () => (
   <div className="p-2 h-84 flex flex-col items-center bg-white">
@@ -7,7 +7,7 @@ export const LoadingFallback = () => (
   </div>
 );
 
-export const ErrorFallback: React.FC<{ request: RequestsQueryItem }> = ({
+export const ErrorFallback: React.FC<{ request: RequestCardInterface }> = ({
   request,
 }) => (
   <div className="animate-pulse p-2 h-84 flex flex-col items-center bg-white">

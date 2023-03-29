@@ -2,8 +2,8 @@ import { ChainId } from "enums/ChainId";
 import React, { useEffect } from "react";
 import useContractData from "api/useContractData";
 import Modal from "components/Modal";
+import { useProofOfHumanity } from "hooks/useContract";
 import { useTransferHumanity } from "hooks/useCrossChainPoH";
-import useProofOfHumanity from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
 
 const Transfer: React.FC<{ homeChain: ChainId }> = ({ homeChain }) => {
@@ -25,7 +25,7 @@ const Transfer: React.FC<{ homeChain: ChainId }> = ({ homeChain }) => {
     <Modal
       formal
       header="Transfer"
-      trigger={<button className="btn-main w-48 my-4">Transfer</button>}
+      trigger={<button className="text-sky-500">Transfer</button>}
     >
       <div className="p-4">
         <span className="txt m-2">
