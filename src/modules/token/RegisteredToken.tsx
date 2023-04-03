@@ -1,5 +1,5 @@
 import { PoHContract } from "enums/PoHContract";
-import { parseEther } from "ethers/lib/utils";
+import { formatEther, parseEther } from "ethers/lib/utils";
 import { useState } from "react";
 import Field from "components/Field";
 import Label from "components/Label";
@@ -32,25 +32,36 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
 }) => {
   const { account } = useWeb3();
 
-  const [myCirclesBalance] = useTokenBalanceOf(circlesToken, account);
-  const [treasuryCirclesBalance] = useTokenBalanceOf(
-    circlesToken,
-    CONTRACT[PoHContract.POH_TOKEN_MANAGER][TOKEN_CHAIN]
-  );
-
   const [circlesWallet] = useHubTokenToUser(circlesToken);
 
-  const [myPoHBalance] = useGCTBalanceOf(account);
+  const [myCirclesBalance, { mutate: mutateMyCirclesBalance }] =
+    useTokenBalanceOf(circlesToken, account);
+  const [treasuryCirclesBalance, { mutate: mutateTreasuryCirlclesBalance }] =
+    useTokenBalanceOf(
+      circlesToken,
+      CONTRACT[PoHContract.POH_TOKEN_MANAGER][TOKEN_CHAIN]
+    );
+  const [myPoHBalance, { mutate: mutateMyPoHBalance }] =
+    useGCTBalanceOf(account);
   const [otherPoHBalance] = useGCTBalanceOf(circlesWallet);
 
   const [tokensToMint, setTokensToMint] = useState(0);
   const [tokensToRedeem, setTokensToRedeem] = useState(0);
+  const [mintLoading, setMintLoading] = useState(false);
+  const [redeemLoading, setRedeemLoading] = useState(false);
 
   const gctContract = CONTRACT[PoHContract.GROUP_CURRENCY_TOKEN][TOKEN_CHAIN];
   const pohtmContract = CONTRACT[PoHContract.POH_TOKEN_MANAGER][TOKEN_CHAIN];
 
-  const [crcAllowance] = useTokenAllowance(circlesToken, account, gctContract);
-  const [gctAllowance] = useGCTAllowance(account, pohtmContract);
+  const [crcAllowance, { mutate: mutateCRCAllowance }] = useTokenAllowance(
+    circlesToken,
+    account,
+    gctContract
+  );
+  const [gctAllowance, { mutate: mutateGCTAllowance }] = useGCTAllowance(
+    account,
+    pohtmContract
+  );
 
   const mint = useGCTMint();
   const redeem = usePoHRedeem();
@@ -58,10 +69,6 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
   const gctApprove = useGCTApprove();
 
   const isSelf = !!account && account === circlesWallet;
-
-  console.log({
-    myPoHBalance: myPoHBalance?.toString(),
-  });
 
   return (
     <div className="p-4 flex flex-col bg-emerald-50">
@@ -88,41 +95,68 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                 <code className="font-bold">CRC</code> you can use to mint{" "}
                 <code className="font-bold">POH</code>.
               </Label>
-              <div className="mb-4 flex">
-                <Field
-                  type="number"
-                  placeholder="Number of tokens"
-                  value={tokensToMint}
-                  onChange={(e) => setTokensToMint(+e.target.value)}
-                />
-                {crcAllowance &&
-                  (crcAllowance.gte(parseEther(tokensToMint.toString())) ? (
-                    <button
-                      className="btn-main ml-2 px-2 font-bold"
-                      onClick={async () =>
-                        await mint(
-                          circlesToken,
-                          parseEther(tokensToMint.toString())
-                        )
-                      }
-                      disabled={!tokensToMint}
-                    >
-                      MINT
-                    </button>
-                  ) : (
-                    <button
-                      className="btn-main ml-2 px-2 font-bold"
-                      onClick={async () =>
-                        await crcApprove(
-                          gctContract,
-                          parseEther(tokensToMint.toString())
-                        )
-                      }
-                    >
-                      APPROVE
-                    </button>
-                  ))}
-              </div>
+              {!myCirclesBalance.isZero() && (
+                <div className="mb-4 flex">
+                  <Field
+                    type="number"
+                    className="no-spinner"
+                    placeholder="Number of tokens"
+                    min={0}
+                    max={formatEther(myCirclesBalance)}
+                    step={1}
+                    value={tokensToMint}
+                    onChange={(e) =>
+                      setTokensToMint(parseFloat(e.target.value || "0"))
+                    }
+                  />
+                  {crcAllowance &&
+                    (crcAllowance.gte(parseEther(tokensToMint.toString())) ? (
+                      <button
+                        className="btn-main ml-2 px-2 font-bold"
+                        disabled={!tokensToMint}
+                        onClick={async () => {
+                          setMintLoading(true);
+                          await mint(
+                            circlesToken,
+                            parseEther(tokensToMint.toString()),
+                            {},
+                            {
+                              onMined: () => {
+                                setMintLoading(false);
+                                setTokensToMint(0);
+                                mutateCRCAllowance();
+                              },
+                              onError: () => setMintLoading(false),
+                            }
+                          );
+                        }}
+                      >
+                        {mintLoading ? "..." : "MINT"}
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-main ml-2 px-2 font-bold"
+                        onClick={async () => {
+                          setMintLoading(true);
+                          await crcApprove(
+                            gctContract,
+                            parseEther(tokensToMint.toString()),
+                            {},
+                            {
+                              onMined: () => {
+                                setMintLoading(false);
+                                mutateMyCirclesBalance();
+                              },
+                              onError: () => setMintLoading(false),
+                            }
+                          );
+                        }}
+                      >
+                        {mintLoading ? "..." : "APPROVE"}
+                      </button>
+                    ))}
+                </div>
+              )}
             </>
           )}
 
@@ -134,49 +168,81 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                   {formatEth(treasuryCirclesBalance, 2)}
                 </code>{" "}
                 of {isSelf ? "your" : pohName + "'s"} personal{" "}
-                <code className="font-bold">CRC</code> in the treasury. You can
-                use some of your{" "}
-                <code className="font-bold">
-                  {formatEth(myPoHBalance, 2)} POH
-                </code>{" "}
-                to redeem some.
+                <code className="font-bold">CRC</code> in the treasury.{" "}
+                {!myPoHBalance.isZero() && (
+                  <>
+                    You can use some of your{" "}
+                    <code className="font-bold">
+                      {formatEth(myPoHBalance, 2)} POH
+                    </code>{" "}
+                    to redeem some.
+                  </>
+                )}
               </Label>
-              <div className="mb-4 flex">
-                <Field
-                  type="number"
-                  placeholder="Number of tokens"
-                  value={tokensToRedeem}
-                  onChange={(e) => setTokensToRedeem(+e.target.value)}
-                />
+              {!myPoHBalance.isZero() && (
+                <div className="mb-4 flex">
+                  <Field
+                    type="number"
+                    className="no-spinner"
+                    placeholder="Number of tokens"
+                    value={tokensToRedeem}
+                    min={0}
+                    max={formatEther(myPoHBalance)}
+                    step={1}
+                    onChange={(e) =>
+                      setTokensToRedeem(parseFloat(e.target.value))
+                    }
+                  />
 
-                {gctAllowance &&
-                  (gctAllowance.gte(parseEther(tokensToRedeem.toString())) ? (
-                    <button
-                      className="btn-main ml-2 px-2 font-bold"
-                      onClick={async () =>
-                        await redeem(
-                          circlesToken,
-                          parseEther(tokensToRedeem.toString())
-                        )
-                      }
-                      disabled={!tokensToRedeem}
-                    >
-                      REDEEM
-                    </button>
-                  ) : (
-                    <button
-                      className="btn-main ml-2 px-2 font-bold"
-                      onClick={async () =>
-                        await gctApprove(
-                          pohtmContract,
-                          parseEther(tokensToRedeem.toString())
-                        )
-                      }
-                    >
-                      APPROVE
-                    </button>
-                  ))}
-              </div>
+                  {gctAllowance &&
+                    (gctAllowance.gte(parseEther(tokensToRedeem.toString())) ? (
+                      <button
+                        className="btn-main ml-2 px-2 font-bold"
+                        disabled={!tokensToRedeem}
+                        onClick={async () => {
+                          setRedeemLoading(true);
+                          await redeem(
+                            circlesToken,
+                            parseEther(tokensToRedeem.toString()),
+                            {},
+                            {
+                              onMined: () => {
+                                setRedeemLoading(false);
+                                setTokensToRedeem(0);
+                                mutateTreasuryCirlclesBalance();
+                                mutateMyPoHBalance();
+                              },
+                              onError: () => setRedeemLoading(false),
+                            }
+                          );
+                        }}
+                      >
+                        {redeemLoading ? "..." : "REDEEM"}
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-main ml-2 px-2 font-bold"
+                        onClick={async () => {
+                          setRedeemLoading(false);
+                          await gctApprove(
+                            pohtmContract,
+                            parseEther(tokensToRedeem.toString()),
+                            {},
+                            {
+                              onMined: () => {
+                                setRedeemLoading(false);
+                                mutateGCTAllowance();
+                              },
+                              onError: () => setRedeemLoading(false),
+                            }
+                          );
+                        }}
+                      >
+                        {redeemLoading ? "..." : "APPROVE"}
+                      </button>
+                    ))}
+                </div>
+              )}
             </>
           )}
         </div>

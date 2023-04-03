@@ -11,6 +11,7 @@ import Image from "components/Image";
 import Label from "components/Label";
 import TimeAgo from "components/TimeAgo";
 import Video from "components/Video";
+import { CHAIN } from "constants/chains";
 import useBalance from "hooks/useBalance";
 import { useGasFees } from "hooks/useGasFees";
 import { useLoading } from "hooks/useLoading";
@@ -41,11 +42,13 @@ const Review: React.FC = () => {
     parseFloat(formatEther(totalCost || Zero))
   );
   const [estimatedGasFees, estimationError] = useGasFees(
-    "claimHumanity(string,string)",
+    "claimHumanityDefault",
     [name, "ipfs/randomhashtoestimategasfees/evidence.json"]
   );
   const [ipfsUri, setIpfsUri] = useState<string>();
   const balance = useBalance();
+
+  const nativeCurrency = chainId && CHAIN[chainId].CURRENCY.name;
 
   useEffect(() => {
     if (!name || !humanityId) return nav.toInfo();
@@ -108,8 +111,6 @@ const Review: React.FC = () => {
 
     loading.stop();
   };
-
-  console.log({ totalCost });
 
   return (
     <>
@@ -176,13 +177,18 @@ const Review: React.FC = () => {
             Initial deposit
             {balance && (
               <span className="ml-8 text-black">
-                Your balance: <strong>{formatEth(balance)} ETH</strong>
+                Your balance:{" "}
+                <strong>
+                  {formatEth(balance)} {nativeCurrency}
+                </strong>
               </span>
             )}
             {estimatedGasFees && (
               <span className="ml-8 text-black">
                 Estimated gas fees:{" "}
-                <strong>{formatEth(estimatedGasFees)} ETH</strong>
+                <strong>
+                  {formatEth(estimatedGasFees)} {nativeCurrency}
+                </strong>
               </span>
             )}
           </div>
@@ -212,7 +218,7 @@ const Review: React.FC = () => {
               >
                 {formatEther(totalCost)}
               </span>{" "}
-              ETH
+              {nativeCurrency}
             </div>
           )}
 

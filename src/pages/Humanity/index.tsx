@@ -1,3 +1,4 @@
+import cn from "classnames";
 import { ChainId } from "enums/ChainId";
 import { PoHContract } from "enums/PoHContract";
 import React, { useEffect, useState } from "react";
@@ -157,9 +158,7 @@ const Humanity: React.FC = () => {
         </div>
         <div className="flex flex-col items-center">
           <span className="text-xs text-slate-400">POH ID</span>
-          <span className="mb-12 font-semibold text-xl">
-            {shortenId(humanityId!)}
-          </span>
+          <span className="mb-12 font-semibold text-xl">{humanityId}</span>
         </div>
 
         {lastEvidenceChain && homeChain ? (
@@ -181,8 +180,12 @@ const Humanity: React.FC = () => {
 
             <Revoke humanity={humanityId} homeChain={homeChain} />
 
-            {humanityAllChains[TOKEN_CHAIN].humanity && (
+            {humanityAllChains[TOKEN_CHAIN].humanity?.id && (
               <TokenAccordion
+                pohName={
+                  humanityAllChains[lastEvidenceChain].humanity?.owner?.name ??
+                  "Profile"
+                }
                 humanity={humanityAllChains[TOKEN_CHAIN].humanity}
               />
             )}
@@ -216,7 +219,7 @@ const Humanity: React.FC = () => {
         ) : (
           <>
             <span className="mb-6 text-theme">Not claimed</span>
-            <Link to={`/claim/${humanityId}`} className="btn-main w-48">
+            <Link to={`/claim/${humanityId}`} className="btn-main w-48 mb-6">
               Claim humanity
             </Link>
           </>
@@ -246,11 +249,16 @@ const Humanity: React.FC = () => {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:gap-4">
+      <div className={"flex flex-col sm:flex-row sm:gap-4"}>
         {homeChain && winnerClaimRequest && (
           <div>
             <div className="p-4 mt-4 mb-1">Owner</div>
-            <div className="grid">
+            <div
+              className={cn("grid", {
+                "gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4":
+                  !pendingRequests.length,
+              })}
+            >
               <Card
                 request={{
                   ...winnerClaimRequest,
@@ -272,7 +280,14 @@ const Humanity: React.FC = () => {
               {pendingRequests.length} pending request
               {pendingRequests.length !== 1 && "s"}
             </div>
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+            <div
+              className={cn(
+                "grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
+                homeChain && winnerClaimRequest
+                  ? "md:grid-cols-2 xl:grid-cols-3"
+                  : "sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+              )}
+            >
               {pendingRequests.map((req, index) => (
                 <Card
                   key={index}

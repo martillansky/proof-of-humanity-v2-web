@@ -1,6 +1,6 @@
 import { ChainId } from "enums/ChainId";
 import { atom } from "jotai";
-import { supportedChainIds } from "constants/chains";
+import { LEGACY_CHAIN, supportedChainIds } from "constants/chains";
 import { REQUESTS_DISPLAY_BATCH } from "constants/misc";
 import { REQUEST_STATUS, RequestStatus } from "constants/requests";
 import { queryFetch, queryReturnType, sdkReturnType } from ".";
@@ -18,7 +18,7 @@ const normalizeRequests = (requestData: Record<ChainId, RequestsQueryItem[]>) =>
         ...acc,
         ...requestData[Number(chainId) as ChainId].map((request) => ({
           ...request,
-          old: Number(chainId) === ChainId.MAINNET,
+          old: Number(chainId) === LEGACY_CHAIN,
           chainId: Number(chainId),
         })),
       ],

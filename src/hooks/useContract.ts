@@ -42,26 +42,27 @@ export const useCrossChainPoH = () =>
 export const useKlerosLiquid = () =>
   useContract<KlerosLiquid>(PoHContract.ARBITRATOR, true);
 
-export const useHub = () => useContract<IHUB>(PoHContract.HUB);
+export const useHub = () => useContract<IHUB>(PoHContract.HUB, true);
 
-export const useGroupCurrencyToken = () =>
-  useContract<GroupCurrencyToken>(PoHContract.GROUP_CURRENCY_TOKEN);
-
-export const usePoHTokenManager = () =>
-  useContract<PoHTokenManager>(PoHContract.POH_TOKEN_MANAGER);
-
-export const useToken = (address: string) => {
-  const { account, library } = useWeb3();
-
-  return useMemo(
-    () =>
-      library
-        ? (new Contract(
-            address,
-            TokenABI,
-            account ? library.getSigner(account).connectUnchecked() : library
-          ) as Token)
-        : null,
-    [library, account]
+export const useGroupCurrencyToken = (onlyNetwork = false) =>
+  useContract<GroupCurrencyToken>(
+    PoHContract.GROUP_CURRENCY_TOKEN,
+    onlyNetwork
   );
+
+export const usePoHTokenManager = (onlyNetwork = false) =>
+  useContract<PoHTokenManager>(PoHContract.POH_TOKEN_MANAGER, onlyNetwork);
+
+export const useToken = (address: string, onlyNetwork = false) => {
+  const { account, library } = useWeb3(onlyNetwork);
+
+  return useMemo(() => {
+    if (!library) return null;
+
+    return new Contract(
+      address,
+      TokenABI,
+      account ? library.getSigner(account).connectUnchecked() : library
+    ) as Token;
+  }, [library, account]);
 };

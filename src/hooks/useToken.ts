@@ -13,7 +13,7 @@ export const useTokenAllowance = (
     owner && spender ? [owner, spender] : null
   );
 export const useTokenBalanceOf = (token: string, account?: string | null) =>
-  useCall(useToken(token), "balanceOf", account ? [account] : null);
+  useCall(useToken(token, true), "balanceOf", account ? [account] : null);
 
 export const useTokenApprove = (token: string) =>
   useSend(useToken(token), "approve");

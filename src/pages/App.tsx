@@ -13,7 +13,6 @@ const App: React.FC = () => (
       <Route index element={<Home />} />
       <Route path="request/:chain/:humanity/:index">
         <Route index element={<Request />} />
-        <Route path=":old" element={<Request />} />
       </Route>
       <Route path="claim">
         <Route index element={<Claim />} />

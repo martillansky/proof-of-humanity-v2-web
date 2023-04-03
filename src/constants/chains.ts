@@ -10,7 +10,7 @@ export const RPC: { [key in ChainId]: string } = {
   [ChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
   [ChainId.GOERLI]: `https://goerli.infura.io/v3/${INFURA_KEY}`,
   [ChainId.OPGOERLI]: "https://goerli.optimism.io",
-  [ChainId.GNOSIS]: "https://rpc.gnosischain.com/",
+  [ChainId.GNOSIS]: "https://rpc.gnosischain.com",
 };
 
 interface AddEthereumChainCurrency {
@@ -34,8 +34,8 @@ const ETH: AddEthereumChainCurrency = {
 };
 
 const xDAI: AddEthereumChainCurrency = {
-  name: "Ether",
-  symbol: "ETH",
+  name: "xDAI",
+  symbol: "xDAI",
   decimals: 18,
 };
 
@@ -90,7 +90,9 @@ export const CHAIN_SETTING = {
 
 export const supportedChainIds = [ChainId.GNOSIS];
 
-export const FALLBACK_CHAIN = ChainId.GNOSIS;
+export const FALLBACK_CHAIN = supportedChainIds[0];
+
+export const LEGACY_CHAIN = ChainId.GOERLI;
 
 export const VDB_CHAIN = ChainId.GOERLI;
 

@@ -11,6 +11,7 @@ import { MeQuery } from "generated/graphql";
 import useSwitchChain from "hooks/useSwitchChain";
 import useWeb3 from "hooks/useWeb3";
 import { shortenAddress } from "utils/address";
+import { camelToTitle } from "utils/case";
 import {
   SupportedWallets,
   WALLET_LIST,
@@ -49,7 +50,7 @@ const Header: React.FC = () => {
         chain: requestChain,
         data: me[requestChain]!.currentRequest!,
       });
-  }, [!!me]);
+  }, [me]);
 
   const connectorName = useMemo(
     () =>
@@ -101,10 +102,7 @@ const Header: React.FC = () => {
           )}
         </div>
 
-        <div
-          className="justify-self-center sm:w-fit sm:justify-self-end col-span-2 sm:col-span-1
-                   flex items-center"
-        >
+        <div className="justify-self-center sm:w-fit sm:justify-self-end col-span-2 sm:col-span-1 flex items-center">
           <Modal
             className="flex-col bg-white p-4 w-4/5 md:w-1/2"
             trigger={
@@ -112,7 +110,6 @@ const Header: React.FC = () => {
                 className="mr-2 px-2 h-8 centered
                          border-2 border-white rounded bg-white/10
                          text-white text-sm font-semibold"
-                // onClick={() => injected.connector.activate()}
               >
                 {active && !!account ? (
                   <>
@@ -134,18 +131,21 @@ const Header: React.FC = () => {
           >
             {active ? (
               <>
-                <span className="mb-2 centered uppercase font-semibold">
-                  Supported chains
-                </span>
-                <div className="grid grid-cols-2 gap-4">
+                {chainId && account && (
+                  <div className="mb-2 centered uppercase font-semibold">
+                    <span className="mr-4">{CHAIN[chainId].NAME}</span>
+                    <span>{shortenAddress(account)}</span>
+                  </div>
+                )}
+                <div className="grid grid-cols-3 gap-4">
                   {supportedChainIds.map((chain) => {
                     const ChainLogo = CHAIN[chain].Logo;
                     return (
                       <button
                         key={chain}
                         className={cn(
-                          "p-4 flex flex-col items-center border cursor-pointer",
-                          { "bg-slate-100": chain === chainId }
+                          "p-4 flex flex-col items-center border cursor-pointer bg-shade-50 rounded",
+                          { "border border-orange-500": chain === chainId }
                         )}
                         onClick={() => switchChain(chain)}
                       >
@@ -168,17 +168,17 @@ const Header: React.FC = () => {
                 <span className="centered uppercase font-semibold">
                   Choose a wallet to connect with
                 </span>
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-3">
                   {WALLET_LIST.map((wallet) => (
                     <button
-                      key={wallet}
-                      className="p-4 m-2 border cursor-pointer"
-                      onClick={async () => {
-                        const { connector } = SupportedWallets[wallet];
-                        if (connector) activate(connector);
-                      }}
+                      key={wallet.name}
+                      className="p-4 m-2 flex flex-col justify-center items-center bg-shade-50 rounded cursor-pointer"
+                      onClick={async () =>
+                        wallet.connector && activate(wallet.connector)
+                      }
                     >
-                      {wallet}
+                      <wallet.icon className="mb-4 w-16 h-16 fill-sky-500" />
+                      {camelToTitle(wallet.name)}
                     </button>
                   ))}
                 </div>

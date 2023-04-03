@@ -12,7 +12,6 @@ import {
   usePoHIdToToken,
 } from "hooks/usePoHTokenManager";
 import useWeb3 from "hooks/useWeb3";
-import { prettifyId } from "utils/identifier";
 
 interface NotRegisteredTokenProps {
   humanityId: string;
@@ -34,19 +33,12 @@ const NotRegisteredToken: React.FC<NotRegisteredTokenProps> = ({
   const confirmHumanToken = usePoHConfirmHumanToken();
 
   const isSelfPoH =
-    !!account &&
-    !!me &&
-    prettifyId(account) === prettifyId(me[TOKEN_CHAIN]?.humanity?.id);
-  const isSelfCirclesWallet =
-    !!account && userToken && userToken !== AddressZero;
+    me &&
+    me[TOKEN_CHAIN]?.humanity?.id &&
+    account?.toLowerCase() === me[TOKEN_CHAIN].humanity.id;
+  const isSelfCirclesWallet = account && userToken && userToken !== AddressZero;
 
-  console.log({
-    isSelfPoH,
-    confirmedToken,
-    userToken,
-    me,
-    meID: me && me[TOKEN_CHAIN]?.humanity?.id,
-  });
+  console.log({ isSelfPoH, isSelfCirclesWallet, account, userToken });
 
   return (
     <div className="p-4 flex flex-col bg-emerald-50">

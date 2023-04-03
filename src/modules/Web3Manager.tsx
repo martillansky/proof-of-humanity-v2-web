@@ -16,7 +16,7 @@ const Web3Connection = ({ children }: { children: JSX.Element }) => {
 
   const { active } = useWeb3React();
   const {
-    active: networkActive,
+    // active: networkActive,
     error: networkError,
     activate: activateNetwork,
   } = useWeb3React(NetworkContextName);
@@ -26,8 +26,9 @@ const Web3Connection = ({ children }: { children: JSX.Element }) => {
   const triedEager = useEagerConnect();
 
   useEffect(() => {
-    if (triedEager && !networkActive && !networkError) activateNetwork(network);
-  }, [triedEager, networkActive, networkError, activateNetwork]);
+    // if (triedEager && !networkActive && !networkError)
+    activateNetwork(network);
+  }, [activateNetwork]);
 
   useInactiveListener(!triedEager);
 
@@ -35,10 +36,6 @@ const Web3Connection = ({ children }: { children: JSX.Element }) => {
     if (!chainId) return;
     switchChainForNetwork(chainId);
   }, [chainId, switchChainForNetwork]);
-
-  console.log({ triedEager, active, networkError });
-
-  // if (!triedEager) return null;
 
   if (!active && networkError)
     return (

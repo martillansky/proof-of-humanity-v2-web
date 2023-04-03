@@ -149,6 +149,17 @@ const Request: React.FC = () => {
     return Action.NONE;
   }, [contractData, request, totalCost]);
 
+  console.log({
+    request,
+    registrationEvidence,
+    registration,
+    humanity,
+    index,
+    chainId,
+    contractData,
+    totalCost,
+  });
+
   if (
     !request ||
     !registrationEvidence ||

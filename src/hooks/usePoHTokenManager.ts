@@ -5,9 +5,9 @@ import useSend from "./useSend";
 
 export const usePoHTokenToId = (
   params: Parameters<PoHTokenManager["tokenToPohId"]> | null
-) => useCall(usePoHTokenManager(), "tokenToPohId", params);
+) => useCall(usePoHTokenManager(true), "tokenToPohId", params);
 export const usePoHIdToToken = (pohId?: string | null) =>
-  useCall(usePoHTokenManager(), "pohIdToToken", pohId ? [pohId] : null);
+  useCall(usePoHTokenManager(true), "pohIdToToken", pohId ? [pohId] : null);
 
 export const usePoHConfirmHuman = () =>
   useSend(usePoHTokenManager(), "confirmHuman");

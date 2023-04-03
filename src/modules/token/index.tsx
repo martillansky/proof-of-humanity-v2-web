@@ -8,14 +8,20 @@ import NotRegisteredToken from "./NotRegisteredToken";
 import RegisteredToken from "./RegisteredToken";
 
 interface TokenAccordionProps {
+  pohName: string;
   humanity: NonNullable<HumanityQuery["humanity"]>;
 }
 
-const TokenAccordion: React.FC<TokenAccordionProps> = ({ humanity }) => {
+const TokenAccordion: React.FC<TokenAccordionProps> = ({
+  pohName,
+  humanity,
+}) => {
   const [showCircles, setShowCircles] = useState(false);
 
   const [confirmedToken] = usePoHIdToToken(humanity.id);
   const [isGroupMember] = useGCTMember(confirmedToken);
+
+  console.log({ humanity: humanity.id, isGroupMember, confirmedToken });
 
   return (
     <div className="w-full p-8">
@@ -32,9 +38,7 @@ const TokenAccordion: React.FC<TokenAccordionProps> = ({ humanity }) => {
 
       {showCircles &&
         (isGroupMember ? (
-          confirmedToken && (
-            <RegisteredToken pohName={"Bob"} circlesToken={confirmedToken} />
-          )
+          <RegisteredToken pohName={pohName} circlesToken={confirmedToken!} />
         ) : (
           <NotRegisteredToken humanityId={humanity.id} />
         ))}
