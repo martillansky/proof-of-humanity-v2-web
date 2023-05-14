@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { ProofOfHumanity } from "generated/contracts";
 import useCall from "./useCall";
 import { useProofOfHumanity } from "./useContract";
@@ -74,7 +75,11 @@ export const useArbitrationCost = () => {
 export const useRequestTotalCost = () => {
   const [requestBaseDeposit] = useRequestBaseDeposit();
   const arbitrationCost = useArbitrationCost();
-  return arbitrationCost && requestBaseDeposit
-    ? arbitrationCost.add(requestBaseDeposit)
-    : null;
+  return useMemo(
+    () =>
+      arbitrationCost && requestBaseDeposit
+        ? arbitrationCost.add(requestBaseDeposit)
+        : null,
+    [arbitrationCost, requestBaseDeposit]
+  );
 };

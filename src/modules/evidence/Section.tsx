@@ -12,7 +12,6 @@ import Uploader from "components/Uploader";
 import { useSubmitEvidence } from "hooks/useProofOfHumanity";
 import useSuggestedChain from "hooks/useSuggestedChain";
 import useSwitchChain from "hooks/useSwitchChain";
-import { EvidenceFile } from "types/docs";
 import { ipfs, uploadToIPFS } from "utils/ipfs";
 import EvidenceItem from "./Item";
 
@@ -37,19 +36,13 @@ const EvidenceSection: React.FC<EvidenceProps> = ({
   const submit = async () => {
     if (!chainId || (await switchChain(chainId))) return;
 
-    const evidence: EvidenceFile = { name: title, description };
+    const data = new FormData();
+    data.append("###", "evidence.json");
+    data.append("name", title);
+    data.append("description", description);
+    if (file) data.append("evidence", file, file.name);
 
-    if (file) {
-      evidence.fileURI = await uploadToIPFS(
-        await file.arrayBuffer(),
-        file.name
-      );
-    }
-
-    const evidenceUri = await uploadToIPFS(
-      JSON.stringify(evidence),
-      "evidence.json"
-    );
+    const evidenceUri = await uploadToIPFS(data);
 
     await submitEvidence(humanityId, requestIndex, evidenceUri);
   };

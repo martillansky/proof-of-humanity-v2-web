@@ -10,7 +10,7 @@ interface TransactionEvents {
   withToast?: boolean;
   onPending?: () => void;
   onConfirm?: (tx?: ContractTransaction) => void;
-  onMined?: (receipt?: TransactionReceipt) => void;
+  onSuccess?: (receipt?: TransactionReceipt) => void;
   onError?: () => void;
   chain?: ChainId;
 }
@@ -31,20 +31,22 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
       console.log({ contract, method, params });
       // TODO fix for when there is no txEvents
       const txEvents = params.at(-1) as TransactionEvents | undefined;
-      let { chain, withToast, onConfirm, onError, onMined, onPending } =
-        txEvents || {};
+      let {
+        chain,
+        withToast = true,
+        onConfirm,
+        onError,
+        onSuccess,
+        onPending,
+      } = txEvents || {};
 
       if (!chain) {
         chain = suggestedChain!;
-        if (typeof withToast === "undefined") {
-          withToast = true;
-          if (onConfirm || onError || onMined || onPending)
+        if (withToast) {
+          if (onConfirm || onError || onSuccess || onPending)
             params = params.slice(0, -1) as any;
         } else params = params.slice(0, -1) as any;
-      } else {
-        if (typeof withToast === "undefined") withToast = true;
-        params = params.slice(0, -1) as any;
-      }
+      } else params = params.slice(0, -1) as any;
 
       try {
         if (!contract) return;
@@ -57,12 +59,12 @@ const useSend = <C extends Contract, F extends keyof C["callStatic"]>(
         const tx: ContractTransaction = await contract[method](...params);
 
         onConfirm && onConfirm(tx);
-        withToast && toast.info("Mining transaction");
+        withToast && toast.info("Transaction pending");
 
         const receipt = await tx.wait();
 
-        onMined && onMined(receipt);
-        withToast && toast.success("Transaction mined");
+        onSuccess && onSuccess(receipt);
+        withToast && toast.success("Transaction succeeded");
       } catch (err) {
         console.error(err);
 

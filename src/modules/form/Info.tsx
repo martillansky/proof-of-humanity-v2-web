@@ -27,9 +27,8 @@ const Info: React.FC = () => {
       </div>
 
       <span className="mb-6 txt">
-        Submitting your profile to Proof of Humanity takes an average of 5-10
-        minutes, an existing Ethereum account and requires you to record a video
-        of yourself talking.
+        Submitting your profile to Proof of Humanity takes 5-10 and requires an
+        Ethereum wallet as well as a short video.
       </span>
 
       <Field label="Connected wallet" value={account} disabled />

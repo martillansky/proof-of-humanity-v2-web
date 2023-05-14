@@ -29,8 +29,8 @@ const Transfer: React.FC<{ homeChain: ChainId }> = ({ homeChain }) => {
     >
       <div className="p-4">
         <span className="txt m-2">
-          Transfer your humanity to another chain. If you use wallet contract
-          make sure it has same address on both chains.
+          Transfer your humanity to another chain. If you use a contract wallet
+          make sure it has the same address on both chains.
         </span>
         <button
           className="btn-main mt-4"

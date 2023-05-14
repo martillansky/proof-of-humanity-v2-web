@@ -35,15 +35,12 @@ const Challenge: React.FC<ChallengeInterface> = ({ request }) => {
 
     loading.start("Uploading evidence");
 
-    const evidenceUri = await uploadToIPFS(
-      Buffer.from(
-        JSON.stringify({
-          name: "Challenge Justification",
-          description: justification || undefined,
-        })
-      ),
-      "evidence.json"
-    );
+    const data = new FormData();
+    data.append("###", "evidence.json");
+    data.append("name", "Challenge Justification");
+    if (justification) data.append("description", justification);
+
+    const evidenceUri = await uploadToIPFS(data);
 
     loading.start("Executing transaction");
 

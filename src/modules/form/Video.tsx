@@ -49,7 +49,7 @@ const VideoStep: React.FC = () => {
       dispatch({
         type: "VIDEO",
         payload: {
-          content: await blob.arrayBuffer(),
+          content: blob,
           uri: URL.createObjectURL(blob),
         },
       });
@@ -85,15 +85,18 @@ const VideoStep: React.FC = () => {
         <div className="divider mt-4 w-2/3" />
       </span>
 
-      <span className="txt text-center my-8 mx-12">
-        You must record yourself holding a sign with your address{" "}
-        <strong>{account}</strong> and say the phrase{" "}
-        <span className="text-theme">"</span>
-        <strong>
-          I certify that I am a real human and that I am not already registered
-          in this registry
-        </strong>
-        <span className="text-theme">"</span>
+      <span className="flex flex-col txt text-center my-8 mx-12">
+        <span>You must record yourself holding a sign with your address</span>
+        <strong className="my-2">{account}</strong>
+        <span>and say the phrase</span>
+        <span className="my-2">
+          <code className="text-theme">"</code>
+          <strong>
+            I certify that I am a real human and that I am not already
+            registered in this registry
+          </strong>
+          <code className="text-theme">"</code>
+        </span>
       </span>
 
       {showCamera && (
@@ -111,8 +114,6 @@ const VideoStep: React.FC = () => {
               const file = received[0];
               const blob = new Blob([file], { type: file.type });
               const uri = URL.createObjectURL(blob);
-
-              console.log({ uri });
 
               const duration = await getBlobDuration(blob);
               if (duration > 60 * 2) return console.error("Video is too long");
@@ -132,7 +133,7 @@ const VideoStep: React.FC = () => {
                 setRecording(false);
                 dispatch({
                   type: "VIDEO",
-                  payload: { uri, content: await blob.arrayBuffer() },
+                  payload: { uri, content: blob },
                 });
               });
             }}

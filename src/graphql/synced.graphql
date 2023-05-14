@@ -1,0 +1,5 @@
+query IsSynced($block: Int!) {
+  _meta(block: { number: $block }) {
+    hasIndexingErrors
+  }
+}

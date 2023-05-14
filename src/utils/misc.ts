@@ -30,7 +30,7 @@ export const concatenateBuffers = (...buffers: ArrayBufferLike[]) => {
     offset += bf.byteLength;
   });
 
-  return temporary.buffer;
+  return temporary;
 };
 
 export const base64ToUint8Array = (base64: string) => {

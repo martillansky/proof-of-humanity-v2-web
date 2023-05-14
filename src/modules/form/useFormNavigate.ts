@@ -8,6 +8,7 @@ const useFormNavigate = () => {
     toPhoto: () => navigate("?step=photo"),
     toVideo: () => navigate("?step=video"),
     toReview: () => navigate("?step=review"),
+    toFinalize: () => navigate("?step=finalize"),
   };
 };
 

@@ -121,7 +121,7 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                             parseEther(tokensToMint.toString()),
                             {},
                             {
-                              onMined: () => {
+                              onSuccess: () => {
                                 setMintLoading(false);
                                 setTokensToMint(0);
                                 mutateCRCAllowance();
@@ -143,7 +143,7 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                             parseEther(tokensToMint.toString()),
                             {},
                             {
-                              onMined: () => {
+                              onSuccess: () => {
                                 setMintLoading(false);
                                 mutateMyCirclesBalance();
                               },
@@ -206,7 +206,7 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                             parseEther(tokensToRedeem.toString()),
                             {},
                             {
-                              onMined: () => {
+                              onSuccess: () => {
                                 setRedeemLoading(false);
                                 setTokensToRedeem(0);
                                 mutateTreasuryCirlclesBalance();
@@ -229,7 +229,7 @@ const RegisteredToken: React.FC<RegisteredTokenProps> = ({
                             parseEther(tokensToRedeem.toString()),
                             {},
                             {
-                              onMined: () => {
+                              onSuccess: () => {
                                 setRedeemLoading(false);
                                 mutateGCTAllowance();
                               },

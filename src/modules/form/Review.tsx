@@ -1,6 +1,6 @@
 import { Zero } from "@ethersproject/constants";
 import { formatEther, parseEther } from "ethers/lib/utils";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import useContractData from "api/useContractData";
 import DocumentIcon from "assets/svg/NoteMajor.svg";
@@ -20,7 +20,6 @@ import {
   useRequestTotalCost,
 } from "hooks/useProofOfHumanity";
 import useWeb3 from "hooks/useWeb3";
-import { EvidenceFile, RegistrationFile } from "types/docs";
 import { machinifyId } from "utils/identifier";
 import { ipfs, uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
@@ -31,7 +30,8 @@ const Review: React.FC = () => {
   const { account, chainId } = useWeb3();
   const nav = useFormNavigate();
   const {
-    state: { humanityId, name, bio, photo, video },
+    state: { humanityId, name, photo, video },
+    setReceipt,
   } = useFormContext();
   const loading = useLoading();
   const claimHumanity = useClaimHumanity();
@@ -74,29 +74,24 @@ const Review: React.FC = () => {
 
     let uri = ipfsUri;
     if (!uri) {
-      loading.start("Uploading media to IPFS");
+      loading.start("Uploading media");
 
-      const [photoUri, videoUri] = await Promise.all([
-        uploadToIPFS(photo.content),
-        uploadToIPFS(video.content),
-      ]);
+      let data = new FormData();
+      data.append("###", "file.json");
+      data.append("name", name);
+      data.append("photo", photo.content);
+      data.append("video", video.content);
 
-      loading.start("Uploading evidence files to IPFS");
+      const fileURI = await uploadToIPFS(data);
 
-      const fileURI = await uploadToIPFS(
-        JSON.stringify({
-          name,
-          bio,
-          photo: photoUri,
-          video: videoUri,
-        } as RegistrationFile),
-        "file.json"
-      );
+      loading.start("Uploading evidence files");
 
-      const evidenceUri = await uploadToIPFS(
-        JSON.stringify({ fileURI, name: "Registration" } as EvidenceFile),
-        "registration.json"
-      );
+      data = new FormData();
+      data.append("###", "registration.json");
+      data.append("name", "Registration");
+      data.append("fileURI", fileURI);
+
+      const evidenceUri = await uploadToIPFS(data);
 
       uri = evidenceUri;
       setIpfsUri(evidenceUri);
@@ -105,9 +100,16 @@ const Review: React.FC = () => {
     loading.start("Executing");
 
     if (humanityId)
-      await claimHumanity(machinifyId(humanityId), uri, name, {
-        value: parseEther(selfFunded.toString()),
-      });
+      await claimHumanity(
+        machinifyId(humanityId),
+        uri,
+        name,
+        { value: parseEther(selfFunded.toString()) },
+        {
+          onConfirm: () => nav.toFinalize(),
+          onSuccess: (rec) => rec && setReceipt(rec),
+        }
+      );
 
     loading.stop();
   };
@@ -202,7 +204,7 @@ const Review: React.FC = () => {
                   className="no-spinner text-right"
                   min={0}
                   max={formatEther(totalCost)}
-                  step={0.01}
+                  step="any"
                   value={selfFunded}
                   onChange={(event) =>
                     setSelfFunded(parseFloat(event.target.value))

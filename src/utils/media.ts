@@ -7,34 +7,33 @@ import { concatenateBuffers, randomString } from "./misc";
 const exifRemoved = async (buffer: Uint8Array) => {
   const dv = new DataView(buffer.buffer);
   const formatTag = dv.getUint16(0);
-  if (formatTag === 0xffd8) {
-    const pieces = [];
-    let i = 0;
-    let recess = 0;
-    let offset = 2;
-    let app1 = dv.getUint16(offset);
-    offset += 2;
-    while (offset < dv.byteLength) {
-      if (app1 === 0xffda) break;
-      if (app1 === 0xffe1) {
-        pieces[i++] = { recess, offset: offset - 2 };
-        recess = offset + dv.getUint16(offset);
-      }
-      offset += dv.getUint16(offset);
-      app1 = dv.getUint16(offset);
-      offset += 2;
-    }
 
-    return concatenateBuffers(
-      ...pieces.reduce(
-        (acc, v) => [...acc, buffer.slice(v.recess, v.offset)],
-        []
-      ),
-      buffer.slice(recess)
-    );
+  if (formatTag !== 0xffd8) return buffer;
+
+  const pieces = [];
+  let i = 0;
+  let recess = 0;
+  let offset = 2;
+  let app1 = dv.getUint16(offset);
+  offset += 2;
+  while (offset < dv.byteLength) {
+    if (app1 === 0xffda) break;
+    if (app1 === 0xffe1) {
+      pieces[i++] = { recess, offset: offset - 2 };
+      recess = offset + dv.getUint16(offset);
+    }
+    offset += dv.getUint16(offset);
+    app1 = dv.getUint16(offset);
+    offset += 2;
   }
 
-  return buffer;
+  return concatenateBuffers(
+    ...pieces.reduce(
+      (acc, v) => [...acc, buffer.slice(v.recess, v.offset)],
+      []
+    ),
+    buffer.slice(recess)
+  );
 };
 
 const isGrayscale = async (image: Jimp) => {
@@ -63,11 +62,16 @@ export const sanitizeImage = async (buffer: Buffer) => {
 
   if (await isGrayscale(image)) throw new Error("Image is grayscale!");
 
-  return exifRemoved(
-    await image
-      .quality(95)
-      .resize(Math.min(bitmap.width, 1080), Math.min(bitmap.height, 1080))
-      .getBufferAsync(Jimp.MIME_JPEG)
+  return new Blob(
+    [
+      await exifRemoved(
+        await image
+          .quality(95)
+          .resize(Math.min(bitmap.width, 1080), Math.min(bitmap.height, 1080))
+          .getBufferAsync(Jimp.MIME_JPEG)
+      ),
+    ],
+    { type: "image/jpeg" }
   );
 };
 

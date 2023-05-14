@@ -1703,6 +1703,7 @@ export type QuerySubmissionSearchArgs = {
   skip?: InputMaybe<Scalars['Int']>;
   subgraphError?: _SubgraphErrorPolicy_;
   text: Scalars['String'];
+  where?: InputMaybe<Claimer_Filter>;
 };
 
 
@@ -2683,6 +2684,13 @@ export type RequestsQueryVariables = Exact<{
 
 export type RequestsQuery = { __typename?: 'Query', requests: Array<{ __typename?: 'Request', id: any, legacy: boolean, index: any, status: Status, revocation: boolean, creationTime: any, requester: any, claimer: { __typename?: 'Claimer', id: any, name?: string | null }, humanity: { __typename?: 'Humanity', id: any, nbRequests: any, claimed: boolean, winnerClaimRequest: Array<{ __typename?: 'Request', evidence: Array<{ __typename?: 'Evidence', URI: string }> }> }, evidence: Array<{ __typename?: 'Evidence', URI: string }> }> };
 
+export type IsSyncedQueryVariables = Exact<{
+  block: Scalars['Int'];
+}>;
+
+
+export type IsSyncedQuery = { __typename?: 'Query', _meta?: { __typename?: '_Meta_', hasIndexingErrors: boolean } | null };
+
 export type TransferQueryVariables = Exact<{
   hash: Scalars['ID'];
 }>;
@@ -2920,6 +2928,13 @@ export const RequestsDocument = gql`
   }
 }
     `;
+export const IsSyncedDocument = gql`
+    query IsSynced($block: Int!) {
+  _meta(block: {number: $block}) {
+    hasIndexingErrors
+  }
+}
+    `;
 export const TransferDocument = gql`
     query Transfer($hash: ID!) {
   inTransfer(id: $hash) {
@@ -2953,6 +2968,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     Requests(variables?: RequestsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RequestsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<RequestsQuery>(RequestsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Requests', 'query');
+    },
+    IsSynced(variables: IsSyncedQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<IsSyncedQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<IsSyncedQuery>(IsSyncedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'IsSynced', 'query');
     },
     Transfer(variables: TransferQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TransferQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<TransferQuery>(TransferDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Transfer', 'query');

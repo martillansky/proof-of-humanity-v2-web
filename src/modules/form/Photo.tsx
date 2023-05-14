@@ -86,9 +86,7 @@ const Photo: React.FC = () => {
         type: "PHOTO",
         payload: {
           content: sanitized,
-          uri: URL.createObjectURL(
-            new Blob([sanitized], { type: "image/jpeg" })
-          ),
+          uri: URL.createObjectURL(sanitized),
         },
       });
     } catch (err) {

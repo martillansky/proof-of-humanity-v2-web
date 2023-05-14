@@ -1,3 +1,4 @@
+import { TransactionReceipt } from "@ethersproject/providers";
 import { SetStateAction } from "jotai";
 import { Dispatch, createContext, useContext } from "react";
 import { SubmissionAction, SubmissionInfo, emptySubmission } from "./reducer";
@@ -7,6 +8,8 @@ interface FormContextValues {
   dispatch: Dispatch<SubmissionAction>;
   tookNotice: boolean;
   setTookNotice: Dispatch<SetStateAction<boolean>>;
+  receipt?: TransactionReceipt;
+  setReceipt: Dispatch<SetStateAction<TransactionReceipt>>;
 }
 
 const FormContext = createContext<FormContextValues>({
@@ -14,6 +17,7 @@ const FormContext = createContext<FormContextValues>({
   dispatch: () => {},
   tookNotice: false,
   setTookNotice: () => {},
+  setReceipt: () => {},
 });
 
 export const useFormContext = () => useContext(FormContext);

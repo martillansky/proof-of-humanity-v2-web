@@ -37,19 +37,13 @@ const Revoke: React.FC<RevokeProps> = ({ humanity, homeChain }) => {
   const submit = async () => {
     if (await switchChain(homeChain)) return;
 
-    const evidence: EvidenceFile = { name: title, description };
+    const data = new FormData();
+    data.append("###", "evidence.json");
+    data.append("name", title);
+    data.append("description", description);
+    if (file) data.append("fileURI", file, file.name);
 
-    if (file) {
-      evidence.fileURI = await uploadToIPFS(
-        await file.arrayBuffer(),
-        file.name
-      );
-    }
-
-    const evidenceUri = await uploadToIPFS(
-      JSON.stringify(evidence),
-      "evidence.json"
-    );
+    const evidenceUri = await uploadToIPFS(data);
 
     revokeHumanity(machinifyId(humanity), evidenceUri, { value: totalCost });
   };
