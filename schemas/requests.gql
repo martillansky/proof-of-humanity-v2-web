@@ -1,0 +1,37 @@
+query Requests($skip: Int, $first: Int, $where: Request_filter) {
+  requests(
+    first: $first
+    skip: $skip
+    where: $where
+    orderBy: creationTime
+    orderDirection: desc
+  ) {
+    id
+    index
+    status {
+      id
+    }
+    revocation
+    creationTime
+    requester
+    claimer {
+      id
+      name
+    }
+    humanity {
+      id
+      nbRequests
+      registration {
+        claimer {
+          id
+        }
+      }
+      ...winnerClaim
+    }
+    evidenceGroup {
+      evidence(orderBy: creationTime, first: 1) {
+        uri
+      }
+    }
+  }
+}

@@ -1,0 +1,198 @@
+import { useState, useMemo } from "react";
+import ALink from "components/ExternalLink";
+import Field from "components/Field";
+import Label from "components/Label";
+import Modal from "components/Modal";
+import TimeAgo from "components/TimeAgo";
+import { useLoading } from "hooks/useLoading";
+import { ipfs, uploadToIPFS } from "utils/ipfs";
+import { formatEth } from "utils/misc";
+import cn from "classnames";
+import Image from "next/image";
+import { useObservable } from "@legendapp/state/react";
+import usePoHWrite from "contracts/hooks/usePoHWrite";
+import { Hash } from "viem";
+import { ContractQuery } from "generated/graphql";
+import DocumentIcon from "icons/NoteMajor.svg";
+import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+
+type Reason =
+  | "none"
+  | "incorrectSubmission"
+  | "deceased"
+  | "duplicate"
+  | "doesNotExist";
+
+const reasonToImage: Record<Reason, string> = {
+  none: "",
+  incorrectSubmission: "reason-incorrect.png",
+  deceased: "reason-duplicate.png",
+  duplicate: "reason-duplicate.png",
+  doesNotExist: "reason-dne.png",
+};
+
+function reasonToIdx(reason: Reason) {
+  switch (reason) {
+    case "none":
+      return 0;
+    case "incorrectSubmission":
+      return 1;
+    case "deceased":
+      return 2;
+    case "duplicate":
+      return 3;
+    case "doesNotExist":
+      return 4;
+    default:
+      return 0;
+  }
+}
+
+interface ReasonCardInterface {
+  text: string;
+  reason: Reason;
+  current: ObservablePrimitiveBaseFns<Reason>;
+}
+
+const ReasonCard: React.FC<ReasonCardInterface> = ({
+  text,
+  reason,
+  current,
+}) => (
+  <div
+    className={cn(
+      "bg-slate-200 p-0.5 rounded-sm cursor-pointer uppercase text-black text-lg",
+      reason === current.get() ? "gradient font-bold" : "grayscale"
+    )}
+    onClick={() => current.set(reason)}
+  >
+    <div className="flex flex-col h-full p-4 bg-white rounded-sm text-center">
+      <Image alt={reason} src={reasonToImage[reason]} />
+      {text}
+    </div>
+  </div>
+);
+
+interface ChallengeInterface {
+  pohId: Hash;
+  requestIndex: number;
+  revocation: boolean;
+  arbitrationCost: bigint;
+  arbitrationInfo: NonNullable<
+    NonNullable<ContractQuery["contract"]>["latestArbitratorHistory"]
+  >;
+}
+
+export default function Challenge({
+  pohId,
+  requestIndex,
+  revocation,
+  arbitrationCost,
+  arbitrationInfo,
+}: ChallengeInterface) {
+  const [prepare] = usePoHWrite(
+    "challengeRequest",
+    useMemo(
+      () => ({
+        onReady(fire) {
+          fire();
+        },
+      }),
+      []
+    )
+  );
+
+  const reason$ = useObservable<Reason>("none");
+  const reason = reason$.use();
+
+  const [justification, setJustification] = useState("");
+
+  const loading = useLoading();
+
+  const submit = async () => {
+    if (revocation === !reason && !justification) return;
+
+    loading.start("Uploading evidence");
+
+    const data = new FormData();
+    data.append("###", "evidence.json");
+    data.append("name", "Challenge Justification");
+    if (justification) data.append("description", justification);
+
+    prepare({
+      value: arbitrationCost,
+      args: [
+        pohId,
+        BigInt(requestIndex),
+        reasonToIdx(revocation ? "none" : reason),
+        await uploadToIPFS(data),
+      ],
+    });
+
+    loading.start("Executing transaction");
+  };
+
+  return (
+    <Modal
+      formal
+      header="Challenge"
+      trigger={<button className="btn-main">Challenge</button>}
+    >
+      <div className="p-4 flex flex-col items-center">
+        <ALink className="flex" href={ipfs(arbitrationInfo.registrationMeta)}>
+          <DocumentIcon className="fill-theme w-6 h-6" />
+          <strong className="mr-1 text-theme font-semibold">
+            Registration Policy
+          </strong>
+          (at the time of submission)
+        </ALink>
+        <span className="text-sm text-slate-400">
+          Updated: <TimeAgo time={arbitrationInfo.updateTime} />
+        </span>
+
+        {!revocation && (
+          <>
+            <Label>Select challenging reason</Label>
+            <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-2">
+              <ReasonCard
+                reason="incorrectSubmission"
+                text="Incorrect Submission"
+                current={reason$}
+              />
+              <ReasonCard reason="deceased" text="Deceased" current={reason$} />
+              <ReasonCard
+                reason="duplicate"
+                text="Duplicate"
+                current={reason$}
+              />
+              <ReasonCard
+                reason="doesNotExist"
+                text="Does Not Exist"
+                current={reason$}
+              />
+            </div>
+          </>
+        )}
+
+        <Field
+          textarea
+          label="Justification"
+          value={justification}
+          onChange={(e) => setJustification(e.target.value)}
+        />
+
+        <div className="mt-4 txt text-lg">
+          Deposit: {formatEth(arbitrationCost)} ETH
+        </div>
+
+        <button
+          disabled={revocation !== !reason || !justification}
+          className="btn-main mt-12"
+          onClick={submit}
+        >
+          Challenge request
+        </button>
+      </div>
+    </Modal>
+  );
+}

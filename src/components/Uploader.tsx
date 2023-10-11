@@ -20,17 +20,11 @@ const Uploader: React.FC<UploaderProps> = ({
   disabled,
   ...props
 }) => {
-  // const [dragEntered, setDragEntered] = useState(false);
   const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
     disabled,
     multiple: false,
     accept: type !== "all" ? MEDIA_TYPES[type] : undefined,
-    // onDragEnter: () => setDragEntered(true),
-    // onDragLeave: () => setDragEntered(false),
-    onDrop: (acceptedFiles) => {
-      onDrop(acceptedFiles);
-      // setDragEntered(false);
-    },
   });
 
   return (

@@ -1,14 +1,14 @@
+import { useState } from "react";
 import cn from "classnames";
-import React, { useState } from "react";
 import ReactWebcam from "react-webcam";
-import FlipCameraIcon from "assets/svg/FlipCameraMajor.svg";
-import MaximizeIcon from "assets/svg/MaximizeMinor.svg";
-import MinimizeIcon from "assets/svg/MinimizeMinor.svg";
-import PauseIcon from "assets/svg/PauseMajor.svg";
-import PlayIcon from "assets/svg/PlayMajor.svg";
-import MirrorIcon from "assets/svg/ProductReturnsMinor.svg";
-import SmileyIcon from "assets/svg/SmileyHappyMajor.svg";
-import { IS_MOBILE } from "constants/media";
+import { IS_MOBILE } from "utils/media";
+import FlipCameraIcon from "icons/FlipCameraMajor.svg";
+import MaximizeIcon from "icons/MaximizeMinor.svg";
+import MinimizeIcon from "icons/MinimizeMinor.svg";
+import PauseIcon from "icons/PauseMajor.svg";
+import PlayIcon from "icons/PlayMajor.svg";
+import MirrorIcon from "icons/ProductReturnsMinor.svg";
+import SmileyIcon from "icons/SmileyHappyMajor.svg";
 
 interface CameraButtonInterface {
   className?: string;
@@ -42,13 +42,13 @@ interface WebcamProps {
   recording?: boolean;
   toggleFullscreen: () => void;
   action: () => void;
-  video?: boolean;
+  isVideo?: boolean;
   overlay?: boolean;
   loadCamera: React.Dispatch<React.SetStateAction<ReactWebcam | null>>;
 }
 
 const Webcam: React.FC<WebcamProps> = ({
-  video = false,
+  isVideo = false,
   overlay,
   loadCamera,
   action,
@@ -66,7 +66,7 @@ const Webcam: React.FC<WebcamProps> = ({
   const switchFacingMode = () =>
     setFacingMode(facingMode === "user" ? "environment" : "user");
 
-  const onUserMedia = (mediaStream: MediaStream) => {
+  const onUserMedia = (_mediaStream: MediaStream) => {
     if (devices.length !== 0) return;
 
     // if (video) loadFFMPEG();
@@ -77,8 +77,8 @@ const Webcam: React.FC<WebcamProps> = ({
     });
   };
 
-  const onUserMediaError = (error: DOMException) => {
-    switch (error.name) {
+  const onUserMediaError = (error: string | DOMException) => {
+    switch (typeof error === "string" ? error : error.name) {
       case "NotFoundError":
       case "DevicesNotFound:Error":
         if (devices.length > 0) switchFacingMode();
@@ -103,7 +103,7 @@ const Webcam: React.FC<WebcamProps> = ({
     return <div className="text-red-500 text-3xl">Camera not enabled</div>;
 
   const FullscreenIcon = fullscreen ? MinimizeIcon : MaximizeIcon;
-  const ActionIcon = video ? (recording ? PauseIcon : PlayIcon) : SmileyIcon;
+  const ActionIcon = isVideo ? (recording ? PauseIcon : PlayIcon) : SmileyIcon;
 
   return (
     <div className="relative">
@@ -112,7 +112,7 @@ const Webcam: React.FC<WebcamProps> = ({
         ref={loadCamera}
         mirrored={mirrored}
         screenshotFormat={"image/jpeg"}
-        audio={video}
+        audio={isVideo}
         screenshotQuality={1}
         forceScreenshotSourceSize
         videoConstraints={{

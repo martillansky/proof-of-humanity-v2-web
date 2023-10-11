@@ -1,0 +1,8 @@
+query Registration($id: ID!) {
+  registration(id: $id) {
+    expirationTime
+    claimer {
+      id
+    }
+  }
+}

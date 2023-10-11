@@ -8,10 +8,7 @@ interface LabelProps {
 
 const Label: React.FC<LabelProps> = ({ children, className }) => (
   <legend
-    className={cn(
-      "mt-8 mb-2 text-theme text-sm font-semibold uppercase",
-      className
-    )}
+    className={cn("mt-8 mb-2 text-theme font-medium uppercase", className)}
   >
     {children}
   </legend>

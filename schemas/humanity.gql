@@ -1,0 +1,43 @@
+query Humanity($id: ID!) {
+  humanity(id: $id) {
+    registration {
+      expirationTime
+      claimer {
+        id
+        name
+      }
+    }
+    requests {
+      id
+      status {
+        id
+      }
+      claimer {
+        id
+        name
+      }
+      creationTime
+      index
+      revocation
+      requester
+      evidenceGroup {
+        evidence(orderBy: creationTime, first: 1) {
+          uri
+        }
+      }
+    }
+    ...winnerClaim
+  }
+  crossChainRegistration(id: $id) {
+    claimer {
+      id
+    }
+    expirationTime
+    lastReceivedTransferTimestamp
+  }
+  outTransfer(id: $id) {
+    foreignProxy
+    transferHash
+    transferTimestamp
+  }
+}

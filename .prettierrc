@@ -4,18 +4,11 @@
     "semi": true,
     "importOrder": [
         "<THIRD_PARTY_MODULES>",
-        "^api/(.*)$",
-        "^assets/(.*)$",
         "^components/(.*)$",
-        "^constants/(.*)$",
         "^generated/(.*)$",
         "^hooks/(.*)$",
-        "^modules/(.*)$",
-        "^pages/(.*)$",
-        "^styles/(.*)$",
         "^types/(.*)$",
         "^utils/(.*)$",
-        "^svgs/(.*)$",
         "^[./]"
     ],
     "importOrderSortSpecifiers": true

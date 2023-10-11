@@ -1,5 +1,5 @@
 import cn from "classnames";
-import React, { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { InputHTMLAttributes, TextareaHTMLAttributes, useState } from "react";
 import Label from "./Label";
 
 type FieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> &
@@ -8,13 +8,9 @@ type FieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> &
     label?: string;
   };
 
-const Field: React.FC<FieldProps> = ({
-  label,
-  textarea = false,
-  className,
-  ...props
-}) => {
-  const [focused, setFocused] = React.useState(false);
+function Field({ label, textarea = false, className, ...props }: FieldProps) {
+  const [focused, setFocused] = useState(false);
+
   return (
     <div className="w-full flex flex-col">
       {label && <Label>{label}</Label>}
@@ -26,7 +22,7 @@ const Field: React.FC<FieldProps> = ({
         {textarea ? (
           <textarea
             className={cn(
-              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-lighten rounded-sm transition ease-in-out font-semibold",
+              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-lighten rounded-sm transition ease-in-out font-medium",
               "focus:ring-0",
               className
             )}
@@ -35,7 +31,7 @@ const Field: React.FC<FieldProps> = ({
         ) : (
           <input
             className={cn(
-              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-overlay rounded-sm font-semibold",
+              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-overlay rounded-sm font-medium",
               "focus-visible:outline-none",
               className
             )}
@@ -47,6 +43,6 @@ const Field: React.FC<FieldProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default Field;

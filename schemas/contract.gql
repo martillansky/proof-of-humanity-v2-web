@@ -1,0 +1,19 @@
+query Contract {
+  contract(id: "0x00") {
+    baseDeposit
+    humanityLifespan
+    renewalPeriodDuration
+    challengePeriodDuration
+    requiredNumberOfVouches
+    latestArbitratorHistory {
+      extraData
+      updateTime
+      registrationMeta
+      clearingMeta
+    }
+  }
+  crossChainGateways {
+    id
+    foreignProxy
+  }
+}

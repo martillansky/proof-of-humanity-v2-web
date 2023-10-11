@@ -1,0 +1,30 @@
+query RequestsToAdvance {
+  status(id: "vouching") {
+    requests(orderBy: lastStatusChange) {
+      claimer {
+        id
+        vouchesReceived {
+          humanity {
+            id
+            usedVouch {
+              id
+            }
+          }
+          from {
+            id
+          }
+        }
+      }
+      humanity {
+        id
+      }
+      challenges {
+        rounds {
+          requesterFund {
+            amount
+          }
+        }
+      }
+    }
+  }
+}

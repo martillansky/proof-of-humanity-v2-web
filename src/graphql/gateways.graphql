@@ -1,6 +1,0 @@
-query Gateways {
-  crossChainGateways {
-    id
-    foreignProxy
-  }
-}

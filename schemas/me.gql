@@ -1,0 +1,13 @@
+query Me($id: ID!) {
+  claimer(id: $id) {
+    registration {
+      id
+    }
+    currentRequest {
+      index
+      humanity {
+        id
+      }
+    }
+  }
+}

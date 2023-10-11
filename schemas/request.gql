@@ -1,0 +1,70 @@
+query Request($id: ID!) {
+  request(id: $id) {
+    status {
+      id
+    }
+    index
+    revocation
+    requester
+    creationTime
+    lastStatusChange
+    humanity {
+      id
+      registration {
+        claimer {
+          id
+        }
+      }
+      ...winnerClaim
+    }
+    claimer {
+      id
+      name
+      vouchesReceived {
+        from {
+          id
+          registration {
+            expirationTime
+            humanity {
+              vouching
+            }
+          }
+        }
+        humanity {
+          id
+        }
+      }
+    }
+    evidenceGroup {
+      evidence(orderBy: creationTime, orderDirection: desc) {
+        id
+        uri
+        creationTime
+        submitter
+      }
+    }
+    challenges(orderBy: creationTime) {
+      id
+      reason {
+        id
+      }
+      disputeId
+      challenger {
+        id
+      }
+      nbRounds
+      rounds(orderBy: creationTime) {
+        requesterFund {
+          amount
+        }
+        challengerFund {
+          amount
+        }
+      }
+    }
+    arbitratorHistory {
+      updateTime
+      registrationMeta
+    }
+  }
+}

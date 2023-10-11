@@ -2,7 +2,18 @@ import { FFmpeg, createFFmpeg } from "@ffmpeg/ffmpeg";
 import Jimp from "jimp";
 import { Area } from "react-easy-crop";
 import { on } from "./events";
-import { concatenateBuffers, randomString } from "./misc";
+import { concatBuffers, randomString } from "./misc";
+import UAParser from "ua-parser-js";
+
+const parser = new UAParser(navigator.userAgent);
+export const USER_AGENT = parser.getResult();
+
+const device = parser.getDevice();
+export const IS_MOBILE = device.type === "mobile" || device.type === "tablet";
+
+export const OS = parser.getOS();
+export const IS_IOS = OS.name === "iOS";
+export const IS_ANDROID = OS.name === "Android";
 
 const exifRemoved = async (buffer: Uint8Array) => {
   const dv = new DataView(buffer.buffer);
@@ -27,11 +38,8 @@ const exifRemoved = async (buffer: Uint8Array) => {
     offset += 2;
   }
 
-  return concatenateBuffers(
-    ...pieces.reduce(
-      (acc, v) => [...acc, buffer.slice(v.recess, v.offset)],
-      []
-    ),
+  return concatBuffers(
+    ...pieces.map((v) => buffer.slice(v.recess, v.offset)),
     buffer.slice(recess)
   );
 };

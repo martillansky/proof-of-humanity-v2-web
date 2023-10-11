@@ -1,18 +1,15 @@
-import axios from "axios";
 import useSWR from "swr";
+import { ipfsFetch } from "utils/ipfs";
 
 interface useIPFSConfig {
   suspense?: boolean;
 }
 
-const ipfsFetcher = async (ipfsURI: string) =>
-  (await axios.get(`https://ipfs.kleros.io${ipfsURI}`)).data;
-
 const useIPFS = <T>(
   uri?: string | null | false,
   { suspense }: useIPFSConfig = {}
 ): [T | undefined, Error] => {
-  const { data, error } = useSWR(uri || null, ipfsFetcher, {
+  const { data, error } = useSWR(uri || null, ipfsFetch<T>, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,

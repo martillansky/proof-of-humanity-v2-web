@@ -1,22 +1,7 @@
 module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
-  extends: ["plugin:react/recommended", "standard"],
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: "latest",
-    sourceType: "module",
-  },
-  plugins: ["react", "@typescript-eslint"],
+  extends: ["next/core-web-vitals"],
   rules: {
-    quotes: "off",
-    "comma-dangle": "off",
-    semi: "off",
-    "no-use-before-define": "off",
+    "react/no-unescaped-entities": 0,
+    "react/display-name": "off",
   },
 };

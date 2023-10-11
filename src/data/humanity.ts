@@ -1,0 +1,16 @@
+import { cache } from "react";
+import { SupportedChainId, supportedChains } from "config/chains";
+import { sdk } from "config/subgraph";
+import { HumanityQuery } from "generated/graphql";
+import { Hash } from "viem";
+
+export const getHumanityData = cache(async (pohId: Hash) => {
+  const res = await Promise.all(
+    supportedChains.map((chain) => sdk[chain.id].Humanity({ id: pohId }))
+  );
+
+  return supportedChains.reduce(
+    (acc, chain, i) => ({ ...acc, [chain.id]: res[i] }),
+    {} as Record<SupportedChainId, HumanityQuery>
+  );
+});

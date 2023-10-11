@@ -1,21 +1,17 @@
-import { useCallback, useState } from "react";
+import { useObservable } from "@legendapp/state/react";
+import { useMemo } from "react";
 
 export const useLoading = (
   initState: boolean = false,
   initMessage?: string
 ) => {
-  const [active, setActive] = useState<boolean>(initState);
-  const [message, setMessage] = useState<string | undefined>(initMessage);
-
-  const start = useCallback((message?: string) => {
-    setActive(true);
-    setMessage(message);
-  }, []);
-
-  const stop = useCallback(() => {
-    setActive(false);
-    setMessage(undefined);
-  }, []);
-
-  return { message, active, start, stop };
+  const $state = useObservable([initState, initMessage] as const);
+  return useMemo(
+    () => ({
+      use: $state.use,
+      start: (message?: string) => $state.set([true, message]),
+      stop: () => $state.set([false, undefined]),
+    }),
+    [$state]
+  );
 };

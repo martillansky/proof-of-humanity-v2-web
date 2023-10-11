@@ -1,0 +1,16 @@
+fragment winnerClaim on Humanity {
+  winnerClaim: requests(
+    where: { revocation: false, status: "resolved", winnerParty: "requester" }
+    orderBy: resolutionTime
+    orderDirection: desc
+    first: 1
+  ) {
+    index
+    resolutionTime
+    evidenceGroup {
+      evidence(orderBy: creationTime, first: 1) {
+        uri
+      }
+    }
+  }
+}

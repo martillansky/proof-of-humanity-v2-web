@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { timeAgo } from "utils/time";
 
 interface TimeAgoProps {
