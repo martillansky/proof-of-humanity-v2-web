@@ -8,7 +8,7 @@ import Vouch from "./Vouch";
 import TimeAgo from "components/TimeAgo";
 import { useAccount } from "wagmi";
 import FundButton from "./Funding";
-import { Action } from "./page";
+import { ActionType } from "./page";
 import Challenge from "./Challenge";
 import { ContractQuery, RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
@@ -34,7 +34,7 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   requester: Address;
   revocation: boolean;
   status: string;
-  action: Action;
+  action: ActionType;
   funded: bigint;
   index: number;
   lastStatusChange: number;
@@ -99,7 +99,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   );
 
   useEffectOnce(() => {
-    if (action === Action.ADVANCE && !revocation)
+    if (action === ActionType.ADVANCE && !revocation)
       prepareAdvanceState({
         value: 0n,
         args: [
@@ -118,7 +118,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         ],
       });
 
-    if (action === Action.EXECUTE)
+    if (action === ActionType.EXECUTE)
       prepareExecute({ args: [requester, BigInt(index)] });
   });
 
@@ -126,9 +126,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     if (
       !revocation &&
       requester === address &&
-      (action === Action.VOUCH ||
-        action === Action.FUND ||
-        action === Action.ADVANCE)
+      (action === ActionType.VOUCH ||
+        action === ActionType.FUND ||
+        action === ActionType.ADVANCE)
     )
       prepareWithdrawRequest();
   }, [address, prepareWithdrawRequest, action, requester, revocation]);
@@ -146,9 +146,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         </span>
       </div>
       <div className="w-full ml-8 flex items-center justify-between font-normal">
-        {(action === Action.VOUCH ||
-          action === Action.FUND ||
-          action === Action.ADVANCE) && (
+        {(action === ActionType.VOUCH ||
+          action === ActionType.FUND ||
+          action === ActionType.ADVANCE) && (
           <>
             <span className="text-slate-400">
               Vouches:{" "}
@@ -170,7 +170,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               <Vouch pohId={pohId} claimer={requester} />
             )}
 
-            {action === Action.FUND && (
+            {action === ActionType.FUND && (
               <>
                 <span className="text-slate-400">
                   Funded: {formatEther(funded)} /{" "}
@@ -189,7 +189,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               </>
             )}
 
-            {action === Action.ADVANCE && (
+            {action === ActionType.ADVANCE && (
               <>
                 <span className="text-slate-400">Ready to advance</span>
 
@@ -205,7 +205,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {action === Action.EXECUTE && (
+        {action === ActionType.EXECUTE && (
           <>
             <span className="text-slate-400">Ready to finalize.</span>
 
@@ -219,7 +219,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {action === Action.CHALLENGE && (
+        {action === ActionType.CHALLENGE && (
           <>
             <span className="text-slate-400">
               Challenge period end:{" "}
@@ -238,7 +238,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {action === Action.DISPUTED && currentChallenge && (
+        {action === ActionType.DISPUTED && currentChallenge && (
           <>
             <span className="text-slate-400">
               The request was challenged

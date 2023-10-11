@@ -2,16 +2,15 @@ import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfsFetch } from "utils/ipfs";
 import { paramToChain } from "config/chains";
 import ActionBar from "./ActionBar";
-import { Address, Hash, encodeFunctionData } from "viem";
+import { Address, Hash } from "viem";
 import Evidence from "./Evidence";
 import Preview from "./Preview";
 import { getRequestData, getRequestsToAdvance } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId } from "utils/identifier";
-import abis from "contracts/abis";
 
-export enum Action {
+export enum ActionType {
   NONE,
   OLD_ACTIVE,
   VOUCH,
@@ -43,30 +42,30 @@ export default async function Request({ params }: PageProps) {
     contractData.contract!.latestArbitratorHistory!.extraData
   );
 
-  let action = Action.NONE;
+  let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
-    action = Action.NONE;
-  else if (request.index < 0) action = Action.OLD_ACTIVE;
-  else if (request.status.id === "disputed") action = Action.DISPUTED;
+    action = ActionType.NONE;
+  else if (request.index < 0) action = ActionType.OLD_ACTIVE;
+  else if (request.status.id === "disputed") action = ActionType.DISPUTED;
   else if (request.status.id === "vouching") {
     if (
       BigInt(request.challenges[0].rounds[0].requesterFund.amount) <
       arbitrationCost + BigInt(contractData.contract!.baseDeposit)
     )
-      action = Action.FUND;
+      action = ActionType.FUND;
     else if (
       request.claimer.vouchesReceived.length >=
       contractData.contract!.requiredNumberOfVouches
     )
-      action = Action.ADVANCE;
-    else action = Action.VOUCH;
+      action = ActionType.ADVANCE;
+    else action = ActionType.VOUCH;
   } else if (request.status.id == "resolving")
     action =
       +request.lastStatusChange +
         +contractData.contract!.challengePeriodDuration <
       Date.now() / 1000
-        ? Action.EXECUTE
-        : Action.CHALLENGE;
+        ? ActionType.EXECUTE
+        : ActionType.CHALLENGE;
 
   let registrationFile: RegistrationFile | null;
   let revocationFile: EvidenceFile | null = null;
@@ -97,7 +96,7 @@ export default async function Request({ params }: PageProps) {
     claimer: Address;
     vouchers: Address[];
   }[] = [];
-  if (action === Action.ADVANCE)
+  if (action === ActionType.ADVANCE)
     advanceRequestsOnChainVouches = (await getRequestsToAdvance(chain.id))
       .map((req) => {
         if (
