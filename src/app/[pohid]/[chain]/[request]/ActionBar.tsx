@@ -8,7 +8,6 @@ import Vouch from "./Vouch";
 import TimeAgo from "components/TimeAgo";
 import { useAccount } from "wagmi";
 import FundButton from "./Funding";
-import { ActionType } from "./page";
 import Challenge from "./Challenge";
 import { ContractQuery, RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
@@ -20,6 +19,7 @@ import useChainParam from "hooks/useChainParam";
 import { Contract } from "contracts";
 import useWagmiWrite from "contracts/hooks/useWagmiWrite";
 import { useLoading } from "hooks/useLoading";
+import { ActionType } from "utils/enums";
 
 const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
   encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({

@@ -9,17 +9,7 @@ import { getRequestData, getRequestsToAdvance } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId } from "utils/identifier";
-
-export enum ActionType {
-  NONE,
-  OLD_ACTIVE,
-  VOUCH,
-  FUND,
-  ADVANCE,
-  CHALLENGE,
-  DISPUTED,
-  EXECUTE,
-}
+import { ActionType } from "utils/enums";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
