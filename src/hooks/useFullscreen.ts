@@ -42,7 +42,7 @@ const useFullscreen = (
       try {
         screenfull.request(ref.current);
         setIsFullscreen(true);
-      } catch (error) {
+      } catch (error: any) {
         onClose(error);
         setIsFullscreen(false);
       }
