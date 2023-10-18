@@ -153,45 +153,49 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           action === ActionType.FUND ||
           action === ActionType.ADVANCE) && (
           <>
-            <span className="text-slate-400">
-              Vouches:{" "}
-              <strong>
-                {advanceRequestsOnChainVouches!.length} /{" "}
-                {contractData.requiredNumberOfVouches}
-              </strong>
-            </span>
+            <div className="flex gap-6">
+              <span className="text-slate-400">
+                Vouches:{" "}
+                <strong>
+                  {advanceRequestsOnChainVouches!.length} /{" "}
+                  {contractData.requiredNumberOfVouches}
+                </strong>
+              </span>
 
-            <span className="text-slate-400">
-              Funded:{" "}
-              <strong>
-                {formatEther(funded)} /{" "}
-                {formatEther(
-                  BigInt(contractData.baseDeposit) + arbitrationCost
-                )}{" "}
-                {chain.nativeCurrency.symbol}
-              </strong>
-            </span>
+              <span className="text-slate-400">
+                Funded:{" "}
+                <strong>
+                  {formatEther(funded)} /{" "}
+                  {formatEther(
+                    BigInt(contractData.baseDeposit) + arbitrationCost
+                  )}{" "}
+                  {chain.nativeCurrency.symbol}
+                </strong>
+              </span>
+            </div>
 
-            {requester === address ? (
-              <button
-                disabled={pending}
-                className="btn-main mb-2"
-                onClick={withdrawRequest}
-              >
-                Withdraw
-              </button>
-            ) : (
-              <Vouch pohId={pohId} claimer={requester} />
-            )}
+            <div className="flex gap-4">
+              {requester === address ? (
+                <button
+                  disabled={pending}
+                  className="btn-main mb-2"
+                  onClick={withdrawRequest}
+                >
+                  Withdraw
+                </button>
+              ) : (
+                <Vouch pohId={pohId} claimer={requester} />
+              )}
 
-            {action === ActionType.FUND && (
-              <FundButton
-                pohId={pohId}
-                totalCost={BigInt(contractData.baseDeposit) + arbitrationCost}
-                index={index}
-                funded={funded}
-              />
-            )}
+              {action === ActionType.FUND && (
+                <FundButton
+                  pohId={pohId}
+                  totalCost={BigInt(contractData.baseDeposit) + arbitrationCost}
+                  index={index}
+                  funded={funded}
+                />
+              )}
+            </div>
 
             {action === ActionType.ADVANCE && (
               <>

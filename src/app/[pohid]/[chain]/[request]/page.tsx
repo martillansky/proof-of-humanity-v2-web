@@ -219,15 +219,11 @@ export default async function Request({ params }: PageProps) {
                 width={24}
               />
               <Link href={`/${prettifyId(pohId)}`}>{prettifyId(pohId)}</Link>
-              <span className="ml-2">
-                {+request.humanity.nbRequests + +request.humanity.nbRequests}{" "}
-                total requests
-              </span>
               <Modal
                 formal
-                className="p-8 centered flex-col"
+                className="p-8 flex flex-col"
                 trigger={
-                  <button className="ml-2 w-6 h-6 border border-theme rounded-full font-medium text-sm">
+                  <button className="w-6 h-6 ml-2 border-2 border-theme rounded-full font-bold text-sm">
                     i
                   </button>
                 }
@@ -235,13 +231,22 @@ export default async function Request({ params }: PageProps) {
                 <Image
                   alt="poh id"
                   src="/logo/pohid.svg"
-                  className="mr-2 mb-8"
+                  className="mx-auto mb-8"
                   height={128}
                   width={128}
                 />
                 <p>
                   The Proof of Humanity ID is a soulbound ID. It corresponds to
                   each unique human registered on Proof of Humanity.
+                </p>
+                <p>
+                  This POH ID had{" "}
+                  <strong>
+                    {+request.humanity.nbRequests +
+                      +request.humanity.nbRequests}{" "}
+                    requests
+                  </strong>{" "}
+                  in total
                 </p>
               </Modal>
             </div>
