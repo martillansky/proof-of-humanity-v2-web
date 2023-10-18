@@ -179,7 +179,7 @@ function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
     <>
       <div className="my-4 py-2 flex">
         <input
-          className="w-full p-2 mr-2 border rounded"
+          className="w-full p-2 mr-2 border border-slate-200 rounded"
           placeholder="Search (case sensitive)"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
