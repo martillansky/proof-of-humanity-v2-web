@@ -60,7 +60,7 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
     const { address, isConnected } = useAccount();
     const chainId = useChainId() as SupportedChainId;
 
-    const step$ = useObservable(renewal ? Step.photo : Step.info);
+    const step$ = useObservable(Step.info);
     const media$ = useObservable<MediaState>({ photo: null, video: null });
     const media = media$.use();
     const state$ = useObservable<SubmissionState>({
@@ -94,8 +94,6 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
       }),
       [step$, loading]
     );
-
-    console.log({ renewal });
 
     const [prepareClaimHumanity] = usePoHWrite("claimHumanity", events);
     const [prepareRenewHumanity] = usePoHWrite("renewHumanity", events);
@@ -139,10 +137,19 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
         });
     });
 
+    // const steps = useMemo(
+    //   () =>
+    //     renewal
+    //       ? ["Photo", "Video", "Review"]
+    //       : ["Info", "Photo", "Video", "Review"],
+    //   [renewal]
+    // );
+
     if (
       !isConnected ||
       (renewal &&
-        (renewal.claimer.id !== address || renewal.chain.id !== chainId))
+        (renewal.claimer.id !== address!.toLowerCase() ||
+          renewal.chain.id !== chainId))
     )
       return (
         <Connect

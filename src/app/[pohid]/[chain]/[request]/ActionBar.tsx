@@ -20,6 +20,9 @@ import { Contract } from "contracts";
 import useWagmiWrite from "contracts/hooks/useWagmiWrite";
 import { useLoading } from "hooks/useLoading";
 import { ActionType } from "utils/enums";
+import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+
+enableReactUse();
 
 const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
   encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
@@ -158,6 +161,17 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               </strong>
             </span>
 
+            <span className="text-slate-400">
+              Funded:{" "}
+              <strong>
+                {formatEther(funded)} /{" "}
+                {formatEther(
+                  BigInt(contractData.baseDeposit) + arbitrationCost
+                )}{" "}
+                {chain.nativeCurrency.symbol}
+              </strong>
+            </span>
+
             {requester === address ? (
               <button
                 disabled={pending}
@@ -171,22 +185,12 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             )}
 
             {action === ActionType.FUND && (
-              <>
-                <span className="text-slate-400">
-                  Funded: {formatEther(funded)} /{" "}
-                  {formatEther(
-                    BigInt(contractData.baseDeposit) + arbitrationCost
-                  )}{" "}
-                  ETH
-                </span>
-
-                <FundButton
-                  pohId={pohId}
-                  totalCost={BigInt(contractData.baseDeposit) + arbitrationCost}
-                  index={index}
-                  funded={funded}
-                />
-              </>
+              <FundButton
+                pohId={pohId}
+                totalCost={BigInt(contractData.baseDeposit) + arbitrationCost}
+                index={index}
+                funded={funded}
+              />
             )}
 
             {action === ActionType.ADVANCE && (
@@ -221,12 +225,12 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
         {action === ActionType.CHALLENGE && (
           <>
-            <span className="text-slate-400">
+            <div className="text-slate-400">
               Challenge period end:{" "}
               <TimeAgo
                 time={lastStatusChange + +contractData.challengePeriodDuration}
               />
-            </span>
+            </div>
 
             <Challenge
               pohId={pohId}

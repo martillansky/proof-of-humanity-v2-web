@@ -8,7 +8,7 @@ import Modal from "components/Modal";
 import Uploader from "components/Uploader";
 import { ipfs, uploadToIPFS } from "utils/ipfs";
 import { formatEth } from "utils/misc";
-import { SupportedChain } from "config/chains";
+import { SupportedChain, SupportedChainId } from "config/chains";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Hash } from "viem";
 import { ContractQuery } from "generated/graphql";
@@ -17,6 +17,8 @@ import { useLoading } from "hooks/useLoading";
 import { toast } from "react-toastify";
 import DocumentIcon from "icons/NoteMajor.svg";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+import { useChainId } from "wagmi";
+import useWeb3Loaded from "hooks/useWeb3Loaded";
 
 enableReactUse();
 
@@ -41,6 +43,8 @@ export default withClientConnected<RevokeProps>(function Revoke({
   const [modalOpen, setModalOpen] = useState(false);
   const loading = useLoading(false, "Revoke");
   const [pending] = loading.use();
+  const connectedChainId = useChainId() as SupportedChainId;
+  const web3Loaded = useWeb3Loaded();
 
   const [prepare] = usePoHWrite(
     "revokeHumanity",
@@ -76,6 +80,13 @@ export default withClientConnected<RevokeProps>(function Revoke({
 
     prepare({ args: [pohId, evidenceUri], value: cost });
   };
+
+  if (web3Loaded && homeChain.id !== connectedChainId)
+    return (
+      <span className="mb-4 text-slate-500">
+        Connect to <strong>{homeChain.name}</strong> to revoke.
+      </span>
+    );
 
   return (
     <Modal

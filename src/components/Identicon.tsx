@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 interface IdenticonProps {

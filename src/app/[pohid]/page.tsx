@@ -12,6 +12,8 @@ import Image from "next/image";
 import Revoke from "./Revoke";
 import { getArbitrationCost } from "data/costs";
 import TimeAgo from "components/TimeAgo";
+import Renew from "./Renew";
+import CrossChain from "./CrossChain";
 
 type PoHRequest = ArrayElement<
   NonNullable<HumanityQuery["humanity"]>["requests"]
@@ -37,9 +39,17 @@ async function Profile({ params: { pohid } }: PageProps) {
     (chain) => !!humanity[chain.id]?.humanity?.registration
   );
 
+  console.log(
+    "~~~~~",
+    homeChain!.name,
+    contractData[homeChain!.id].contract!.latestArbitratorHistory!.arbitrator
+  );
+
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
         homeChain,
+        contractData[homeChain.id].contract!.latestArbitratorHistory!
+          .arbitrator,
         contractData[homeChain.id].contract!.latestArbitratorHistory!.extraData
       )
     : 0n;
@@ -89,18 +99,21 @@ async function Profile({ params: { pohid } }: PageProps) {
     lastEvidenceChain &&
     humanity[lastEvidenceChain.id].humanity!.winnerClaim[0];
 
-  // const lastTransferChain = supportedChains.sort((chain1, chain2) => {
-  //   const out1 = humanity[chain1.id]?.outTransfer;
-  //   const out2 = humanity[chain2.id]?.outTransfer;
-  //   return out2
-  //     ? out1
-  //       ? out2.transferTimestamp - out1.transferTimestamp
-  //       : 1
-  //     : -1;
-  // })[0];
+  const lastTransferChain = supportedChains.sort((chain1, chain2) => {
+    const out1 = humanity[chain1.id]?.outTransfer;
+    const out2 = humanity[chain2.id]?.outTransfer;
+    return out2
+      ? out1
+        ? out2.transferTimestamp - out1.transferTimestamp
+        : 1
+      : -1;
+  })[0];
 
-  // const { transferHash, foreignProxy, transferTimestamp } =
-  //   humanity[lastTransferChain.id].outTransfer!;
+  const canRenew =
+    homeChain &&
+    +humanity[homeChain.id]!.humanity!.registration!.expirationTime -
+      Date.now() / 1000 <
+      +contractData[homeChain.id].contract!.renewalPeriodDuration;
 
   return (
     <div className="content">
@@ -158,6 +171,15 @@ async function Profile({ params: { pohid } }: PageProps) {
               />
             </span>
 
+            {canRenew && (
+              <Renew
+                claimer={
+                  humanity[homeChain.id]!.humanity!.registration!.claimer.id
+                }
+                pohId={pohId}
+              />
+            )}
+
             <Revoke
               pohId={pohId}
               arbitrationInfo={
@@ -170,7 +192,7 @@ async function Profile({ params: { pohid } }: PageProps) {
               }
             />
 
-            {/* <CrossChain
+            <CrossChain
               claimer={
                 humanity[homeChain.id]!.humanity!.registration!.claimer.id
               }
@@ -178,13 +200,9 @@ async function Profile({ params: { pohid } }: PageProps) {
               homeChain={homeChain}
               pohId={pohId}
               humanity={humanity}
-              lastTransfer={{
-                transferHash,
-                foreignProxy,
-                transferTimestamp,
-                chain: lastTransferChain,
-              }}
-            /> */}
+              lastTransfer={humanity[lastTransferChain.id].outTransfer}
+              lastTransferChain={lastTransferChain}
+            />
           </>
         ) : (
           <>
@@ -199,7 +217,7 @@ async function Profile({ params: { pohid } }: PageProps) {
       <div className={"flex flex-col sm:flex-row sm:gap-4"}>
         {homeChain && winnerClaimRequest && (
           <div>
-            <div className="p-4 mt-4 mb-1">Owner</div>
+            <div className="p-4 mt-4 mb-1">Winning claim</div>
             <div
               className={cn("grid", {
                 "gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4":

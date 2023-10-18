@@ -45,10 +45,12 @@ export default async function Claim({ params: { pohid } }: PageProps) {
   );
   const isRenewal =
     registrationChain &&
-    registrationData[registrationChain.id]!.expirationTime >
-      contractData[registrationChain.id].contract!.renewalPeriodDuration;
+    +registrationData[registrationChain.id]!.expirationTime -
+      Date.now() / 1000 <
+      +contractData[registrationChain.id].contract!.renewalPeriodDuration;
 
-  if (registrationChain && !isRenewal) redirect(pohid, RedirectType.replace);
+  if (registrationChain && !isRenewal)
+    redirect(`/${pohid}`, RedirectType.replace);
 
   const totalCosts = await getTotalCosts(contractData);
 

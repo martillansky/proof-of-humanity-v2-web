@@ -1,21 +1,24 @@
-import { useEffect } from "react";
+"use client";
+
+import { useMemo } from "react";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
 import withClientConnected from "components/high-order/withClientConnected";
 import {
   SupportedChain,
   SupportedChainId,
-  chainLogo,
   supportedChains,
 } from "config/chains";
 import { Contract } from "contracts";
 import useCCPoHWrite from "contracts/hooks/useCCPoHWrite";
 import { ContractQuery, HumanityQuery } from "generated/graphql";
-import Image from "next/image";
 import { timeAgo } from "utils/time";
-import { Address, Hash, zeroAddress } from "viem";
-import { useAccount } from "wagmi";
+import { Address, Hash } from "viem";
+import { useAccount, useChainId } from "wagmi";
 import { useObservable } from "@legendapp/state/react";
+import ChainLogo from "components/ChainLogo";
+import { useLoading } from "hooks/useLoading";
+import useWeb3Loaded from "hooks/useWeb3Loaded";
 
 interface CrossChainProps extends JSX.IntrinsicAttributes {
   contractData: Record<SupportedChainId, ContractQuery>;
@@ -23,7 +26,8 @@ interface CrossChainProps extends JSX.IntrinsicAttributes {
   claimer: Address;
   homeChain: SupportedChain;
   pohId: Hash;
-  lastTransfer: HumanityQuery["outTransfer"] & { chain: SupportedChain };
+  lastTransfer: HumanityQuery["outTransfer"];
+  lastTransferChain?: SupportedChain;
 }
 
 export default withClientConnected<CrossChainProps>(function CrossChain({
@@ -33,75 +37,100 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   claimer,
   homeChain,
   lastTransfer,
+  lastTransferChain,
 }) {
   const { address } = useAccount();
+  const loading = useLoading();
+  const web3Loaded = useWeb3Loaded();
+  const chainId = useChainId();
 
-  const [transferHumanity] = useCCPoHWrite(
+  const [prepareTransfer] = useCCPoHWrite(
     "transferHumanity",
-    ({ args }) => args[0] !== zeroAddress && claimer === address
+    useMemo(
+      () => ({
+        onLoading() {
+          loading.start();
+        },
+        onReady(fire) {
+          fire();
+        },
+      }),
+      [loading]
+    )
   );
-  const [updateHumanity] = useCCPoHWrite(
+  const [prepareUpdate] = useCCPoHWrite(
     "updateHumanity",
-    ({ args }) => args[0] !== zeroAddress
+    useMemo(
+      () => ({
+        onLoading() {
+          loading.start();
+        },
+        onReady(fire) {
+          fire();
+        },
+      }),
+      [loading]
+    )
   );
 
   const transfer$ = useObservable({
-    transferHash: lastTransfer.transferHash,
-    foreignProxy: lastTransfer.foreignProxy,
-    transferTimestamp: lastTransfer.transferTimestamp,
-    senderChain: lastTransfer.chain,
+    transferHash: lastTransfer?.transferHash,
+    foreignProxy: lastTransfer?.foreignProxy,
+    transferTimestamp: lastTransfer?.transferTimestamp,
+    senderChain: lastTransferChain,
     receivingChain: supportedChains.find(
       (chain) =>
         Contract.CrossChainProofOfHumanity[chain.id].toLowerCase() ===
-        lastTransfer.foreignProxy
+        lastTransfer?.foreignProxy
     )!,
     received: !!supportedChains.find(
       (c) =>
-        Contract.CrossChainProofOfHumanity[c.id] === lastTransfer.foreignProxy
+        Contract.CrossChainProofOfHumanity[c.id] === lastTransfer?.foreignProxy
     ),
   });
   const transferState = transfer$.use();
 
-  useEffect(() => {
-    if (updateHumanity.fire) updateHumanity.fire();
-  }, [updateHumanity]);
-
   return (
     <div className="w-full p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t">
-      <div className="flex">
+      <div className="flex flex-col">
         <span className="text-slate-500">Home chain</span>
-        <span className="flex font-semibold">
-          <Image
-            alt="chain"
-            src={chainLogo(homeChain.id)}
-            className="mx-1"
-            height={16}
-            width={16}
-          />
+        <span className="flex items-center font-semibold">
+          <ChainLogo chainId={homeChain.id} className="w-4 h-4 ml-1" />
           {homeChain.name}
         </span>
       </div>
 
-      <Modal
-        formal
-        header="Transfer"
-        trigger={<button className="text-sky-500">Transfer</button>}
-      >
-        <div className="p-4">
-          <span className="txt m-2">
-            Transfer your humanity to another chain. If you use a contract
-            wallet make sure it has the same address on both chains.
-          </span>
-          <button className="btn-main mt-4" onClick={transferHumanity.fire}>
-            Transfer
-          </button>
-        </div>
-      </Modal>
+      {web3Loaded &&
+        address?.toLowerCase() === claimer &&
+        homeChain.id === chainId && (
+          <Modal
+            formal
+            header="Transfer"
+            trigger={<button className="text-sky-500">Transfer</button>}
+          >
+            <div className="p-4">
+              <span className="txt m-2">
+                Transfer your humanity to another chain. If you use a contract
+                wallet make sure it has the same address on both chains.
+              </span>
+              <button
+                className="btn-main mt-4"
+                onClick={() =>
+                  prepareTransfer({
+                    args: [contractData[homeChain.id].crossChainGateways[0].id],
+                  })
+                }
+              >
+                Transfer
+              </button>
+            </div>
+          </Modal>
+        )}
 
       <Modal
         formal
         header="Update"
-        trigger={<button className="text-sky-500">Update</button>}
+        trigger={<button className="text-sky-500">Update state</button>}
       >
         <div className="p-4">
           <span className="txt m-2">
@@ -116,21 +145,16 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                 className="m-2 p-2 flex items-center justify-between border"
               >
                 <div className="flex items-center">
-                  <Image
-                    alt="chain"
-                    src={chainLogo(chain.id)}
-                    className="mr-2"
-                    width={16}
-                    height={16}
-                  />{" "}
+                  <ChainLogo chainId={chain.id} className="w-4 h-4 mr-1" />
                   {chain.name}{" "}
                   {chain === homeChain ||
-                  humanity[chain.id].crossChainRegistration
+                  humanity[chain.id].crossChainRegistration ||
+                  chain.id === homeChain.id
                     ? "✔"
                     : "❌"}
                 </div>
 
-                {chain === homeChain ? (
+                {chain.id === homeChain.id ? (
                   <div>Home chain</div>
                 ) : (
                   <>
@@ -138,8 +162,8 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                       <div>
                         Expiration time:{" "}
                         {timeAgo(
-                          humanity[chain.id].crossChainRegistration!
-                            .expirationTime
+                          humanity[chain.id].crossChainRegistration
+                            ?.expirationTime
                         )}
                       </div>
                     )}
@@ -151,15 +175,14 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                         ].crossChainGateways.find(
                           (gateway) =>
                             gateway.foreignProxy ===
-                            Contract.ProofOfHumanity[chain.id].toLowerCase()
+                            Contract.CrossChainProofOfHumanity[
+                              chain.id
+                            ].toLowerCase()
                         );
 
                         if (!gatewayForChain) return;
 
-                        updateHumanity.config$.args.set([
-                          gatewayForChain.id,
-                          pohId,
-                        ]);
+                        prepareUpdate({ args: [gatewayForChain.id, pohId] });
                       }}
                     >
                       Relay State Update
@@ -172,35 +195,28 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
         </div>
       </Modal>
 
-      {humanity[homeChain.id].humanity?.registration && (
-        <div className="font-bold">
-          <span className="mr-2 font-normal text-slate-500">Expiration:</span>
-          <TimeAgo
-            time={humanity[homeChain.id].humanity!.registration!.expirationTime}
-          />
-        </div>
+      {transferState.receivingChain && (
+        <Modal
+          trigger={
+            <button className="m-4 p-2 border-2 border-blue-500 text-blue-500 font-bold">
+              ⏳ Pending transfer
+            </button>
+          }
+          header="Last transfer"
+        >
+          <div className="paper p-4 flex flex-col">
+            <span>
+              {transferState.senderChain?.name} ▶{" "}
+              {transferState.receivingChain?.name}
+            </span>
+            <TimeAgo time={parseInt(transferState.transferTimestamp)} />
+            <span>Received: {String(transferState.received)}</span>
+            <span>
+              Transfer hash: {transferState.transferHash?.substring(0, 12)}...
+            </span>
+          </div>
+        </Modal>
       )}
-
-      <Modal
-        trigger={
-          <button className="m-4 p-2 border-2 border-blue-500 text-blue-500 font-bold">
-            ⏳ Pending transfer
-          </button>
-        }
-        header="Last transfer"
-      >
-        <div className="paper p-4 flex flex-col">
-          <span>
-            {transferState.senderChain.name} ▶{" "}
-            {transferState.receivingChain.name}
-          </span>
-          <TimeAgo time={parseInt(transferState.transferTimestamp)} />
-          <span>Received: {String(transferState.received)}</span>
-          <span>
-            Transfer hash: {transferState.transferHash.substring(0, 12)}...
-          </span>
-        </div>
-      </Modal>
     </div>
   );
 });

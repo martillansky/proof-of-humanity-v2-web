@@ -6,6 +6,7 @@ query Contract {
     challengePeriodDuration
     requiredNumberOfVouches
     latestArbitratorHistory {
+      arbitrator
       extraData
       updateTime
       registrationMeta

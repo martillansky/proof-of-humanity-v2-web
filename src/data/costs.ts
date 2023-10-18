@@ -5,18 +5,17 @@ import {
   getChainRpc,
   supportedChains,
 } from "config/chains";
-import { Hash, createPublicClient, http } from "viem";
-import { Contract } from "contracts";
+import { Address, Hash, createPublicClient, http } from "viem";
 import abis from "contracts/abis";
 import { ContractQuery } from "generated/graphql";
 
 export const getArbitrationCost = cache(
-  async (chain: SupportedChain, extraData: Hash) =>
+  async (chain: SupportedChain, arbitrator: Address, extraData: Hash) =>
     await createPublicClient({
       chain,
       transport: http(getChainRpc(chain.id)),
     }).readContract({
-      address: Contract.KlerosLiquid[chain.id],
+      address: arbitrator,
       abi: abis.KlerosLiquid,
       functionName: "arbitrationCost",
       args: [extraData],
@@ -30,6 +29,8 @@ export const getTotalCosts = cache(
         async (chain) =>
           (await getArbitrationCost(
             chain,
+            contractData[chain.id].contract!.latestArbitratorHistory!
+              .arbitrator,
             contractData[chain.id].contract!.latestArbitratorHistory!.extraData
           )) + BigInt(contractData[chain.id].contract!.baseDeposit)
       )

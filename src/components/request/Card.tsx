@@ -15,7 +15,7 @@ import { Suspense } from "react";
 import useIPFS from "hooks/useIPFS";
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { RequestsQueryItem } from "./Grid";
-import { getChainLogo } from "config/icons";
+import ChainLogo from "components/ChainLogo";
 
 interface ContentProps {
   chainId: SupportedChainId;
@@ -66,8 +66,6 @@ const Content = ({
     suspense: true,
   });
 
-  const ChainLogo = getChainLogo(chainId);
-
   return (
     <div className="p-3 h-full flex flex-col items-center bg-white">
       <div
@@ -76,7 +74,7 @@ const Content = ({
       />
       <span className="my-2 font-semibold truncate">{claimer.name}</span>
       <div className="grid grid-cols-3 items-center">
-        <ChainLogo className="w-4 h-4 fill-slate-400" />
+        <ChainLogo chainId={chainId} className="w-4 h-4 fill-slate-400" />
         <span className="text-slate-400">{shortenAddress(requester)}</span>
       </div>
     </div>

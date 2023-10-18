@@ -1,19 +1,20 @@
 "use client";
 
 import { useWeb3Modal } from "@web3modal/react";
+import ChainLogo from "components/ChainLogo";
 import ExternalLink from "components/ExternalLink";
 import Popover from "components/Popover";
 import withClientConnected from "components/high-order/withClientConnected";
-import { SupportedChainId, supportedChains } from "config/chains";
-import { getChainLogo } from "config/icons";
+import { supportedChains } from "config/chains";
 import { sdk } from "config/subgraph";
+import useWeb3Loaded from "hooks/useWeb3Loaded";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { shortenAddress } from "utils/address";
 import { prettifyId } from "utils/identifier";
+import { sepolia } from "viem/chains";
 import { useAccount, usePublicClient } from "wagmi";
 
 export const getMyData = async (account: string) => {
@@ -47,17 +48,11 @@ interface HeaderProps extends JSX.IntrinsicAttributes {
 export default withClientConnected<HeaderProps>(function Header({ policy }) {
   const pathname = usePathname();
   const modal = useWeb3Modal();
-  const { isConnected, address, isReconnecting } = useAccount();
+  const { isConnected, address } = useAccount();
   const { chain } = usePublicClient();
-  const [web3Loaded, setWeb3Loaded] = useState(false);
+  const web3Loaded = useWeb3Loaded();
 
   const { data: me } = useSWR(address, getMyData);
-
-  useEffect(() => {
-    if (!isReconnecting) setWeb3Loaded(true);
-  }, [isReconnecting]);
-
-  const ChainLogo = getChainLogo(chain.id as SupportedChainId);
 
   return (
     <header className="px-8 pb-2 sm:pt-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm">
@@ -72,23 +67,29 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
 
       <div className="flex flex-col sm:flex-row">
         <div className="my-2 sm:mr-12 flex gap-12 whitespace-nowrap">
+          {web3Loaded && chain.id === sepolia.id && (
+            <ExternalLink href={"https://docs.scroll.io/en/user-guide/faucet/"}>
+              SEP Faucet
+            </ExternalLink>
+          )}
           {pathname !== "/" && <Link href="/">Requests</Link>}
           {me &&
-            !pathname.endsWith("/claim") &&
             (me.pohId ? (
-              <Link href={`/${me.pohId}`}>PoH ID</Link>
+              <Link href={`/${prettifyId(me.pohId)}`}>PoH ID</Link>
             ) : (
-              <Link
-                href={
-                  me.currentRequest
-                    ? `/${prettifyId(me.currentRequest.humanity.id)}/${
-                        me.currentRequest.chain.name
-                      }/${me.currentRequest.index}`
-                    : `/${prettifyId(address!)}/claim`
-                }
-              >
-                Claim
-              </Link>
+              !pathname.endsWith("/claim") && (
+                <Link
+                  href={
+                    me.currentRequest
+                      ? `/${prettifyId(me.currentRequest.humanity.id)}/${
+                          me.currentRequest.chain.name
+                        }/${me.currentRequest.index}`
+                      : `/${prettifyId(address!)}/claim`
+                  }
+                >
+                  Claim
+                </Link>
+              )
             ))}
           <ExternalLink href={policy}>Policy</ExternalLink>
         </div>
@@ -100,7 +101,10 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
                 className="px-2 h-8 centered border-2 border-r-0 border-white/20 rounded-l bg-white/10 hover:bg-white/40 text-white"
                 onClick={() => modal.open({ route: "SelectNetwork" })}
               >
-                <ChainLogo className="w-4 h-4 mr-1 fill-white" />
+                <ChainLogo
+                  chainId={chain.id}
+                  className="w-4 h-4 mr-1 fill-white"
+                />
                 {chain.name}
               </button>
               <button

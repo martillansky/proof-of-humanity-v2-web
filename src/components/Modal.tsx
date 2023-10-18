@@ -1,5 +1,6 @@
+"use client";
+
 import cn from "classnames";
-import React from "react";
 import Popup from "reactjs-popup";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {

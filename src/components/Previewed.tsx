@@ -1,3 +1,5 @@
+"use client";
+
 import Popup from "reactjs-popup";
 
 interface ImageProps {

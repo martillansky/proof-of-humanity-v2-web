@@ -1,6 +1,6 @@
 import { gnosis, mainnet, sepolia } from "viem/chains";
 
-export const supportedChains = [sepolia];
+export const supportedChains = [gnosis, sepolia];
 export const defaultChain = supportedChains[0];
 
 export const legacyChain = sepolia;
@@ -16,8 +16,8 @@ export function nameToChain(name: string): SupportedChain {
     //   return mainnet;
     case sepolia.name.toLowerCase():
       return sepolia;
-    // case gnosis.name:
-    //   return gnosis;
+    case gnosis.name:
+      return gnosis;
     default:
       throw new Error("chain not supported");
   }
@@ -29,8 +29,8 @@ export function idToChain(id: number): SupportedChain {
     //   return mainnet;
     case sepolia.id:
       return sepolia;
-    // case gnosis.id:
-    //   return gnosis;
+    case gnosis.id:
+      return gnosis;
     default:
       throw new Error("chain not supported");
   }

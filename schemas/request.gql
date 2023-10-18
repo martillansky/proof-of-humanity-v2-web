@@ -10,6 +10,8 @@ query Request($id: ID!) {
     lastStatusChange
     humanity {
       id
+      nbRequests
+      nbLegacyRequests
       registration {
         claimer {
           id

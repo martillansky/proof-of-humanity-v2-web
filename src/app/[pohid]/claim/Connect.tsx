@@ -26,14 +26,15 @@ export default function Connect({
 
       {isConnected ? (
         renewalChain ? (
-          renewalAddress !== address ? (
+          renewalAddress !== address?.toLowerCase() ? (
             <span>
               Connect with corresponding wallet {renewalAddress} to renew
             </span>
           ) : (
             <>
-              <span className="txt">
-                Switch your chain to {renewalChain.name} to continue the renewal
+              <span className="txt mb-2 ">
+                Switch your chain to <strong>{renewalChain.name}</strong> to
+                continue the renewal
               </span>
               <Web3NetworkSwitch />
             </>

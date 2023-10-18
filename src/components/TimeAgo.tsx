@@ -7,7 +7,7 @@ interface TimeAgoProps {
 
 const TimeAgo: React.FC<TimeAgoProps> = ({ time }) => (
   <span
-    className="w-fit cursor-pointer"
+    className="w-fit cursor-help"
     title={useMemo(() => new Date(time * 1000).toLocaleString(), [time])}
   >
     {timeAgo(time)}

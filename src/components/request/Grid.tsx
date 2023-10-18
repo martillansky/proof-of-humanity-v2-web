@@ -28,7 +28,7 @@ import { observable } from "@legendapp/state";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
-import { getChainLogo } from "config/icons";
+import ChainLogo from "components/ChainLogo";
 
 enableReactUse();
 
@@ -226,20 +226,20 @@ function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
             onSelect={() => filter$.assign({ chainId: 0, cursor: 1 })}
             name="All"
           />
-          {supportedChains.map((chain) => {
-            const ChainLogo = getChainLogo(chain.id);
-            return (
-              <DropdownItem
-                icon={<ChainLogo className="w-4 h-4 mr-1 fill-black" />}
-                key={chain.id}
-                selected={filter.chainId === chain.id}
-                onSelect={() =>
-                  filter$.assign({ chainId: chain.id, cursor: 1 })
-                }
-                name={chain.name}
-              />
-            );
-          })}
+          {supportedChains.map((chain) => (
+            <DropdownItem
+              icon={
+                <ChainLogo
+                  chainId={chain.id}
+                  className="w-4 h-4 mr-1 fill-black"
+                />
+              }
+              key={chain.id}
+              selected={filter.chainId === chain.id}
+              onSelect={() => filter$.assign({ chainId: chain.id, cursor: 1 })}
+              name={chain.name}
+            />
+          ))}
         </Dropdown>
       </div>
 
