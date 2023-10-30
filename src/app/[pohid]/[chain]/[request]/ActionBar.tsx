@@ -3,7 +3,7 @@
 import ExternalLink from "components/ExternalLink";
 import { colorForStatus } from "config/misc";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
-import { Address, Hash, encodeFunctionData, formatEther } from "viem";
+import { Address, Hash, formatEther } from "viem";
 import Vouch from "./Vouch";
 import TimeAgo from "components/TimeAgo";
 import { useAccount } from "wagmi";
@@ -14,10 +14,7 @@ import { useEffectOnce } from "@legendapp/state/react";
 import { useEffect, useMemo } from "react";
 import withClientConnected from "components/high-order/withClientConnected";
 import { camelToTitle } from "utils/case";
-import abis from "contracts/abis";
 import useChainParam from "hooks/useChainParam";
-import { Contract } from "contracts";
-import useWagmiWrite from "contracts/hooks/useWagmiWrite";
 import { useLoading } from "hooks/useLoading";
 import { ActionType } from "utils/enums";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
@@ -26,12 +23,12 @@ import useWeb3Loaded from "hooks/useWeb3Loaded";
 
 enableReactUse();
 
-const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
-  encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
-    abi: abis.ProofOfHumanity,
-    functionName: "advanceState",
-    args: [claimer, vouchers, []],
-  });
+// const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
+//   encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
+//     abi: abis.ProofOfHumanity,
+//     functionName: "advanceState",
+//     args: [claimer, vouchers, []],
+//   });
 
 interface ActionBarProps extends JSX.IntrinsicAttributes {
   pohId: Hash;
@@ -69,9 +66,20 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const loading = useLoading();
   const [pending] = loading.use();
   const web3Loaded = useWeb3Loaded();
-  const [prepareAdvanceState, advanceState] = useWagmiWrite(
-    "Multicall3",
-    "aggregate",
+  // const [prepareAdvanceState, advanceState] = useWagmiWrite(
+  //   "Multicall3",
+  //   "aggregate",
+  //   useMemo(
+  //     () => ({
+  //       onLoading() {
+  //         loading.start();
+  //       },
+  //     }),
+  //     [loading]
+  //   )
+  // );
+  const [prepareExecute, executeRequest] = usePoHWrite(
+    "executeRequest",
     useMemo(
       () => ({
         onLoading() {
@@ -81,8 +89,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
-  const [prepareExecute, executeRequest] = usePoHWrite(
-    "executeRequest",
+  const [prepareAdvanceState, advanceState] = usePoHWrite(
+    "advanceState",
     useMemo(
       () => ({
         onLoading() {
@@ -107,21 +115,21 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   useEffectOnce(() => {
     if (action === ActionType.ADVANCE && !revocation)
       prepareAdvanceState({
-        value: 0n,
-        args: [
-          [
-            {
-              target: Contract.ProofOfHumanity[chain.id],
-              callData: encodeClaimToAdvance(requester, []),
-            },
-            ...advanceRequestsOnChainVouches!
-              .map((vouch) => ({
-                target: Contract.ProofOfHumanity[chain.id],
-                callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
-              }))
-              .slice(0, 1),
-          ],
-        ],
+        args: [requester, [], []],
+        // [
+        //   [
+        //     {
+        //       target: Contract.ProofOfHumanity[chain.id],
+        //       callData: encodeClaimToAdvance(requester, []),
+        //     },
+        //     ...advanceRequestsOnChainVouches!
+        //       .map((vouch) => ({
+        //         target: Contract.ProofOfHumanity[chain.id],
+        //         callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
+        //       }))
+        //       .slice(0, 1),
+        //   ],
+        // ],
       });
 
     if (action === ActionType.EXECUTE)
@@ -131,7 +139,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   useEffect(() => {
     if (
       !revocation &&
-      requester === address &&
+      requester === address?.toLowerCase() &&
       (action === ActionType.VOUCH ||
         action === ActionType.FUND ||
         action === ActionType.ADVANCE)
@@ -282,14 +290,20 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {index < 0 && (
+        {status === "resolved" && (
           <span>
             Request was accepted
             <TimeAgo
               className={`ml-1 text-status-${statusColor}`}
               time={lastStatusChange}
             />
-            . Check submission on
+            .
+          </span>
+        )}
+
+        {index < 0 && (
+          <span>
+            Check submission on
             <ExternalLink
               className={`ml-1 text-status-${statusColor}`}
               href={`https://app.proofofhumanity.id/profile/${pohId}`}
