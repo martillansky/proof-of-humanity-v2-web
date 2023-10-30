@@ -9,7 +9,7 @@ import TimeAgo from "components/TimeAgo";
 import { useAccount } from "wagmi";
 import FundButton from "./Funding";
 import Challenge from "./Challenge";
-import { ContractQuery, RequestQuery } from "generated/graphql";
+import { RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
 import { useEffect, useMemo } from "react";
 import withClientConnected from "components/high-order/withClientConnected";
@@ -21,6 +21,8 @@ import useWagmiWrite from "contracts/hooks/useWagmiWrite";
 import { useLoading } from "hooks/useLoading";
 import { ActionType } from "utils/enums";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+import { ContractData } from "data/contract";
+import useWeb3Loaded from "hooks/useWeb3Loaded";
 
 enableReactUse();
 
@@ -41,7 +43,7 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   funded: bigint;
   index: number;
   lastStatusChange: number;
-  contractData: NonNullable<ContractQuery["contract"]>;
+  contractData: ContractData;
   currentChallenge?: ArrayElement<
     NonNullable<NonNullable<RequestQuery>["request"]>["challenges"]
   >;
@@ -66,6 +68,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const { address } = useAccount();
   const loading = useLoading();
   const [pending] = loading.use();
+  const web3Loaded = useWeb3Loaded();
   const [prepareAdvanceState, advanceState] = useWagmiWrite(
     "Multicall3",
     "aggregate",
@@ -136,10 +139,11 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       prepareWithdrawRequest();
   }, [address, prepareWithdrawRequest, action, requester, revocation]);
 
+  const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation);
 
   return (
-    <div className="paper p-6 flex justify-between items-center border-b">
+    <div className="paper p-6 flex flex-col md:flex-row justify-between items-center gap-2 border-b">
       <div className="flex items-center">
         <span className="mr-4">Status</span>
         <span
@@ -148,37 +152,69 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           {camelToTitle(status)}
         </span>
       </div>
-      <div className="w-full ml-8 flex items-center justify-between font-normal">
-        {(action === ActionType.VOUCH ||
-          action === ActionType.FUND ||
-          action === ActionType.ADVANCE) && (
-          <>
-            <div className="flex gap-6">
-              <span className="text-slate-400">
-                Vouches:{" "}
-                <strong>
-                  {advanceRequestsOnChainVouches!.length} /{" "}
-                  {contractData.requiredNumberOfVouches}
-                </strong>
-              </span>
+      <div className="w-full ml-8 flex flex-col md:flex-row md:items-center justify-between gap-2 font-normal">
+        {web3Loaded &&
+          (action === ActionType.VOUCH || action === ActionType.FUND) && (
+            <>
+              <div className="flex gap-6">
+                <span className="text-slate-400">
+                  It needs{" "}
+                  <strong className={`text-status-${statusColor}`}>
+                    {contractData.requiredNumberOfVouches}
+                  </strong>{" "}
+                  {+contractData.requiredNumberOfVouches === 1
+                    ? "vouch"
+                    : "vouches"}{" "}
+                  to proceed
+                  {!!(totalCost - funded) && (
+                    <>
+                      {" + "}
+                      <strong className={`text-status-${statusColor}`}>
+                        {formatEther(totalCost - funded)}{" "}
+                        {chain.nativeCurrency.symbol}
+                      </strong>{" "}
+                      to complete the initial deposit
+                    </>
+                  )}
+                </span>
+              </div>
 
-              <span className="text-slate-400">
-                Funded:{" "}
-                <strong>
-                  {formatEther(funded)} /{" "}
-                  {formatEther(
-                    BigInt(contractData.baseDeposit) + arbitrationCost
-                  )}{" "}
-                  {chain.nativeCurrency.symbol}
-                </strong>
-              </span>
-            </div>
+              <div className="flex gap-4">
+                {action === ActionType.FUND && (
+                  <FundButton
+                    pohId={pohId}
+                    totalCost={
+                      BigInt(contractData.baseDeposit) + arbitrationCost
+                    }
+                    index={index}
+                    funded={funded}
+                  />
+                )}
+
+                {requester === address?.toLowerCase() ? (
+                  <button
+                    disabled={pending}
+                    className="btn-main mb-2"
+                    onClick={withdrawRequest}
+                  >
+                    Withdraw
+                  </button>
+                ) : (
+                  <Vouch pohId={pohId} claimer={requester} />
+                )}
+              </div>
+            </>
+          )}
+
+        {web3Loaded && action === ActionType.ADVANCE && (
+          <>
+            <span className="text-slate-400">Ready to advance</span>
 
             <div className="flex gap-4">
-              {requester === address ? (
+              {requester === address?.toLowerCase() ? (
                 <button
                   disabled={pending}
-                  className="btn-main mb-2"
+                  className="btn-sec mb-2"
                   onClick={withdrawRequest}
                 >
                   Withdraw
@@ -186,30 +222,14 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               ) : (
                 <Vouch pohId={pohId} claimer={requester} />
               )}
-
-              {action === ActionType.FUND && (
-                <FundButton
-                  pohId={pohId}
-                  totalCost={BigInt(contractData.baseDeposit) + arbitrationCost}
-                  index={index}
-                  funded={funded}
-                />
-              )}
+              <button
+                disabled={pending}
+                className="btn-main mb-2"
+                onClick={advanceState}
+              >
+                Advance
+              </button>
             </div>
-
-            {action === ActionType.ADVANCE && (
-              <>
-                <span className="text-slate-400">Ready to advance</span>
-
-                <button
-                  disabled={pending}
-                  className="btn-main mb-2"
-                  onClick={advanceState}
-                >
-                  Advance
-                </button>
-              </>
-            )}
           </>
         )}
 
@@ -241,7 +261,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               requestIndex={index}
               revocation={revocation}
               arbitrationCost={arbitrationCost}
-              arbitrationInfo={contractData.latestArbitratorHistory!}
+              arbitrationInfo={contractData.arbitrationInfo!}
             />
           </>
         )}
@@ -263,11 +283,21 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         )}
 
         {index < 0 && (
-          <ExternalLink
-            href={`https://app.proofofhumanity.id/profile/${pohId}`}
-          >
-            Check submission on old interface
-          </ExternalLink>
+          <span>
+            Request was accepted
+            <TimeAgo
+              className={`ml-1 text-status-${statusColor}`}
+              time={lastStatusChange}
+            />
+            . Check submission on
+            <ExternalLink
+              className={`ml-1 text-status-${statusColor}`}
+              href={`https://app.proofofhumanity.id/profile/${pohId}`}
+            >
+              old interface
+            </ExternalLink>
+            .
+          </span>
         )}
       </div>
     </div>

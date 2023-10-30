@@ -11,7 +11,6 @@ import { formatEth } from "utils/misc";
 import { SupportedChain, SupportedChainId } from "config/chains";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Hash } from "viem";
-import { ContractQuery } from "generated/graphql";
 import withClientConnected from "components/high-order/withClientConnected";
 import { useLoading } from "hooks/useLoading";
 import { toast } from "react-toastify";
@@ -19,6 +18,7 @@ import DocumentIcon from "icons/NoteMajor.svg";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { useChainId } from "wagmi";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
+import { ContractData } from "data/contract";
 
 enableReactUse();
 
@@ -26,9 +26,7 @@ interface RevokeProps extends JSX.IntrinsicAttributes {
   cost: bigint;
   pohId: Hash;
   homeChain: SupportedChain;
-  arbitrationInfo: NonNullable<
-    NonNullable<ContractQuery["contract"]>["latestArbitratorHistory"]
-  >;
+  arbitrationInfo: ContractData["arbitrationInfo"];
 }
 
 export default withClientConnected<RevokeProps>(function Revoke({
@@ -100,7 +98,7 @@ export default withClientConnected<RevokeProps>(function Revoke({
       }
     >
       <div className="p-4 flex flex-col items-center">
-        <ALink className="flex" href={ipfs(arbitrationInfo.registrationMeta)}>
+        <ALink className="flex" href={ipfs(arbitrationInfo.policy)}>
           <DocumentIcon className="fill-theme w-6 h-6" />
           <strong className="mr-1 text-theme font-semibold">Policy</strong>
         </ALink>

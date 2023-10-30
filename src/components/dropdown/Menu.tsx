@@ -8,7 +8,7 @@ interface DropdownProps {
 const Dropdown: React.FC<DropdownProps> = ({ title, children }) => (
   <Popover
     trigger={
-      <button className="w-64 mx-2 p-2 border rounded bg-white">{title}</button>
+      <button className="w-64 p-2 border rounded bg-white">{title}</button>
     }
   >
     <div className="flex flex-col">{children}</div>

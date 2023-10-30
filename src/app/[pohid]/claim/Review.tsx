@@ -9,15 +9,13 @@ import { MediaState, SubmissionState } from "./Form";
 import { formatEther, parseEther } from "viem";
 import { SupportedChainId, idToChain } from "config/chains";
 import ExternalLink from "components/ExternalLink";
-import { ContractQuery } from "generated/graphql";
 import Image from "next/image";
 import Previewed from "components/Previewed";
 import DocumentIcon from "icons/NoteMajor.svg";
+import { ContractData } from "data/contract";
 
 interface ReviewProps {
-  arbitrationInfo: NonNullable<
-    NonNullable<ContractQuery["contract"]>["latestArbitratorHistory"]
-  >;
+  arbitrationInfo: ContractData["arbitrationInfo"];
   totalCost: bigint;
   selfFunded$: ObservablePrimitiveBaseFns<bigint>;
   state$: ObservableObject<SubmissionState>;
@@ -55,7 +53,7 @@ function Review({
       <div className="centered flex-col mb-4">
         <ExternalLink
           className="flex mr-1 text-theme font-semibold"
-          href={ipfs(arbitrationInfo.registrationMeta)}
+          href={ipfs(arbitrationInfo.policy)}
         >
           <DocumentIcon className="fill-theme w-6 h-6" />
           Registration Policy

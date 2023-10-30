@@ -11,7 +11,7 @@ import {
 } from "config/chains";
 import { Contract } from "contracts";
 import useCCPoHWrite from "contracts/hooks/useCCPoHWrite";
-import { ContractQuery, HumanityQuery } from "generated/graphql";
+import { HumanityQuery } from "generated/graphql";
 import { timeAgo } from "utils/time";
 import { Address, Hash } from "viem";
 import { useAccount, useChainId } from "wagmi";
@@ -19,9 +19,10 @@ import { useObservable } from "@legendapp/state/react";
 import ChainLogo from "components/ChainLogo";
 import { useLoading } from "hooks/useLoading";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
+import { ContractData } from "data/contract";
 
 interface CrossChainProps extends JSX.IntrinsicAttributes {
-  contractData: Record<SupportedChainId, ContractQuery>;
+  contractData: Record<SupportedChainId, ContractData>;
   humanity: Record<SupportedChainId, HumanityQuery>;
   claimer: Address;
   homeChain: SupportedChain;
@@ -117,7 +118,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                 className="btn-main mt-4"
                 onClick={() =>
                   prepareTransfer({
-                    args: [contractData[homeChain.id].crossChainGateways[0].id],
+                    args: [contractData[homeChain.id].gateways[0].id],
                   })
                 }
               >
@@ -172,7 +173,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                       onClick={async () => {
                         const gatewayForChain = contractData[
                           homeChain.id
-                        ].crossChainGateways.find(
+                        ].gateways.find(
                           (gateway) =>
                             gateway.foreignProxy ===
                             Contract.CrossChainProofOfHumanity[

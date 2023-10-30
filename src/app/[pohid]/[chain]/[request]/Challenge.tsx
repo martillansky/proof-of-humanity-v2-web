@@ -12,9 +12,9 @@ import Image from "next/image";
 import { useObservable } from "@legendapp/state/react";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Hash } from "viem";
-import { ContractQuery } from "generated/graphql";
 import DocumentIcon from "icons/NoteMajor.svg";
 import { ObservablePrimitiveBaseFns } from "@legendapp/state";
+import { ContractData } from "data/contract";
 
 type Reason =
   | "none"
@@ -78,9 +78,7 @@ interface ChallengeInterface {
   requestIndex: number;
   revocation: boolean;
   arbitrationCost: bigint;
-  arbitrationInfo: NonNullable<
-    NonNullable<ContractQuery["contract"]>["latestArbitratorHistory"]
-  >;
+  arbitrationInfo: ContractData["arbitrationInfo"];
 }
 
 export default function Challenge({
@@ -139,7 +137,7 @@ export default function Challenge({
       trigger={<button className="btn-main">Challenge</button>}
     >
       <div className="p-4 flex flex-col items-center">
-        <ALink className="flex" href={ipfs(arbitrationInfo.registrationMeta)}>
+        <ALink className="flex" href={ipfs(arbitrationInfo.policy)}>
           <DocumentIcon className="fill-theme w-6 h-6" />
           <strong className="mr-1 text-theme font-semibold">
             Registration Policy

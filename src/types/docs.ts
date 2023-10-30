@@ -8,3 +8,8 @@ export interface RegistrationFile {
   photo: string;
   video: string;
 }
+
+export interface MetaEvidenceFile {
+  title: string;
+  fileURI: string;
+}

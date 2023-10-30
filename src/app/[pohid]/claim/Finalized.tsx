@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-const Finalized: React.FC = () => (
+interface FinalizedProps {
+  requiredVouches: number;
+}
+
+const Finalized: React.FC<FinalizedProps> = ({ requiredVouches }) => (
   <>
     <div className="w-full my-4 flex flex-col text-2xl font-extralight">
       <span>
@@ -23,17 +27,26 @@ const Finalized: React.FC = () => (
       <div className="my-8 text-slate-400">
         What do you need to advance:
         <ul className="ml-6 list-disc">
+          {requiredVouches && (
+            <li>
+              Receive{" "}
+              <strong className="text-status-vouching">
+                {requiredVouches} vouch{requiredVouches !== 1 && "es"}
+              </strong>{" "}
+              from{" "}
+              <strong className="text-status-registered">registered</strong>{" "}
+              humans
+            </li>
+          )}
           <li>
-            Receive <strong className="text-status-vouching">1 vouch</strong>{" "}
-            from a{" "}
-            <strong className="text-status-registered">registered</strong> human
+            Fully fund your{" "}
+            <strong className="text-status-vouching">initial deposit</strong>
           </li>
-          <li>Fully fund your initial deposit</li>
         </ul>
       </div>
 
       <Link href="/" className="btn-main">
-        Return to requests page
+        Return to homepage
       </Link>
     </div>
   </>

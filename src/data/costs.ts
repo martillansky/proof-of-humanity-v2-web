@@ -7,7 +7,7 @@ import {
 } from "config/chains";
 import { Address, Hash, createPublicClient, http } from "viem";
 import abis from "contracts/abis";
-import { ContractQuery } from "generated/graphql";
+import { ContractData } from "./contract";
 
 export const getArbitrationCost = cache(
   async (chain: SupportedChain, arbitrator: Address, extraData: Hash) =>
@@ -23,16 +23,15 @@ export const getArbitrationCost = cache(
 );
 
 export const getTotalCosts = cache(
-  async (contractData: Record<SupportedChainId, ContractQuery>) => {
+  async (contractData: Record<SupportedChainId, ContractData>) => {
     const res = await Promise.all(
       supportedChains.map(
         async (chain) =>
           (await getArbitrationCost(
             chain,
-            contractData[chain.id].contract!.latestArbitratorHistory!
-              .arbitrator,
-            contractData[chain.id].contract!.latestArbitratorHistory!.extraData
-          )) + BigInt(contractData[chain.id].contract!.baseDeposit)
+            contractData[chain.id].arbitrationInfo.arbitrator,
+            contractData[chain.id].arbitrationInfo.extraData
+          )) + BigInt(contractData[chain.id].baseDeposit)
       )
     );
 

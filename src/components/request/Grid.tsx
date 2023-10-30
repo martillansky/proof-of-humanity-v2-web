@@ -177,21 +177,12 @@ function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
 
   return (
     <>
-      <div className="my-4 py-2 flex">
+      <div className="my-4 py-2 flex gap-1 md:gap-2">
         <input
-          className="w-full p-2 mr-2 border border-slate-200 rounded"
+          className="w-full p-2 md:mr-2 border border-slate-200 rounded"
           placeholder="Search (case sensitive)"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {/* <Select
-          isSearchable={false}
-          defaultInputValue="all"
-          options={statusFilters.map((status) => ({
-            value: status,
-            label: camelToTitle(status),
-          }))}
-          onChange={({ value }) => filter$.assign({ status: value, cursor: 1 })}
-        /> */}
         <Dropdown title={camelToTitle(filter.status)}>
           {statusFilters.map((status) => (
             <DropdownItem

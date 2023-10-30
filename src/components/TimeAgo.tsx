@@ -1,13 +1,15 @@
+import cn from "classnames";
 import { useMemo } from "react";
 import { timeAgo } from "utils/time";
 
 interface TimeAgoProps {
+  className?: string;
   time: number;
 }
 
-const TimeAgo: React.FC<TimeAgoProps> = ({ time }) => (
+const TimeAgo: React.FC<TimeAgoProps> = ({ className, time }) => (
   <span
-    className="w-fit cursor-help"
+    className={cn("w-fit cursor-help", className)}
     title={useMemo(() => new Date(time * 1000).toLocaleString(), [time])}
   >
     {timeAgo(time)}

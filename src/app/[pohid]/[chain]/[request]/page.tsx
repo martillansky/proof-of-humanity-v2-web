@@ -19,7 +19,7 @@ import TimeAgo from "components/TimeAgo";
 import Link from "next/link";
 import Attachment from "components/Attachment";
 import ChainLogo from "components/ChainLogo";
-import Modal from "components/Modal";
+import Info from "./Info";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -39,8 +39,8 @@ export default async function Request({ params }: PageProps) {
 
   const arbitrationCost = await getArbitrationCost(
     chain,
-    contractData.contract!.latestArbitratorHistory!.arbitrator,
-    contractData.contract!.latestArbitratorHistory!.extraData
+    contractData.arbitrationInfo.arbitrator,
+    contractData.arbitrationInfo.extraData
   );
 
   let action = ActionType.NONE;
@@ -51,19 +51,18 @@ export default async function Request({ params }: PageProps) {
   else if (request.status.id === "vouching") {
     if (
       BigInt(request.challenges[0].rounds[0].requesterFund.amount) <
-      arbitrationCost + BigInt(contractData.contract!.baseDeposit)
+      arbitrationCost + BigInt(contractData.baseDeposit)
     )
       action = ActionType.FUND;
     else if (
       request.claimer.vouchesReceived.length >=
-      contractData.contract!.requiredNumberOfVouches
+      contractData.requiredNumberOfVouches
     )
       action = ActionType.ADVANCE;
     else action = ActionType.VOUCH;
   } else if (request.status.id == "resolving")
     action =
-      +request.lastStatusChange +
-        +contractData.contract!.challengePeriodDuration <
+      +request.lastStatusChange + +contractData.challengePeriodDuration <
       Date.now() / 1000
         ? ActionType.EXECUTE
         : ActionType.CHALLENGE;
@@ -102,7 +101,7 @@ export default async function Request({ params }: PageProps) {
       .map((req) => {
         if (
           BigInt(req.challenges[0].rounds[0].requesterFund.amount) !==
-          BigInt(contractData.contract!.baseDeposit) + arbitrationCost
+          BigInt(contractData.baseDeposit) + arbitrationCost
         )
           return null;
 
@@ -127,7 +126,7 @@ export default async function Request({ params }: PageProps) {
         index={request.index}
         status={request.status.id}
         requester={request.requester}
-        contractData={contractData.contract!}
+        contractData={contractData}
         pohId={pohId}
         lastStatusChange={+request.lastStatusChange}
         revocation={request.revocation}
@@ -138,8 +137,6 @@ export default async function Request({ params }: PageProps) {
         }
         advanceRequestsOnChainVouches={advanceRequestsOnChainVouches}
       />
-
-      {/* <Appeal /> */}
 
       <div className="mb-6 border shadow bg-white rounded">
         {request.revocation && revocationFile && (
@@ -167,41 +164,47 @@ export default async function Request({ params }: PageProps) {
         )}
 
         <div className="flex flex-col md:flex-row">
-          <div className="relative pt-8 md:pb-48 px-8 md:w-2/5 flex flex-col background items-center border-r">
-            {registrationFile && (
-              <Previewed
-                uri={ipfs(registrationFile.photo)}
-                trigger={
-                  <Image
-                    className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
-                    alt="image"
-                    src={ipfs(registrationFile.photo)}
-                    width={144}
-                    height={144}
-                  />
-                }
-              />
-            )}
+          <div className="pt-8 px-8 w-2/5 hidden md:flex flex-col items-stretch justify-between background border-r">
+            <div className="flex flex-col items-center">
+              {registrationFile && (
+                <Previewed
+                  uri={ipfs(registrationFile.photo)}
+                  trigger={
+                    <Image
+                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
+                      alt="image"
+                      src={ipfs(registrationFile.photo)}
+                      width={144}
+                      height={144}
+                    />
+                  }
+                />
+              )}
 
-            <span className="mt-4 mb-12 text-2xl">{request.claimer.name}</span>
+              <span className="mt-4 mb-12 text-2xl">
+                {request.claimer.name}
+              </span>
+            </div>
 
-            <Label className="absolute p-8 left-0 right-0 bottom-0">
+            <Label className="mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />
             </Label>
           </div>
 
           <div className="w-full p-8 flex flex-col">
-            <div className="mb-4 flex justify-between">
-              <div className="flex mb-4">
-                <Identicon address={request.claimer.id} />
+            <div className="mb-8 flex flex-col-reverse md:flex-row justify-between">
+              <div className="flex items-center">
+                <Identicon diameter={28} address={request.claimer.id} />
                 <ExternalLink
                   className="ml-2 font-semibold underline underline-offset-2"
                   href={explorerLink(request.claimer.id, chain)}
                 >
-                  {request.claimer.id}
+                  {request.claimer.id.slice(0, 20)}
+                  <wbr />
+                  {request.claimer.id.slice(20)}
                 </ExternalLink>
               </div>
-              <span className="flex">
+              <span className="flex items-center">
                 <ChainLogo
                   chainId={chain.id}
                   className="w-4 h-4 m-1 fill-black"
@@ -210,7 +213,7 @@ export default async function Request({ params }: PageProps) {
               </span>
             </div>
 
-            <div className="mb-8 flex items-center font-medium text-theme">
+            <div className="mb-8 flex font-medium text-theme">
               <Image
                 alt="poh id"
                 src="/logo/pohid.svg"
@@ -218,37 +221,39 @@ export default async function Request({ params }: PageProps) {
                 height={24}
                 width={24}
               />
-              <Link href={`/${prettifyId(pohId)}`}>{prettifyId(pohId)}</Link>
-              <Modal
-                formal
-                className="p-8 flex flex-col"
-                trigger={
-                  <button className="w-6 h-6 ml-2 border-2 border-theme rounded-full font-bold text-sm">
-                    i
-                  </button>
+              <Link href={`/${prettifyId(pohId)}`}>
+                {prettifyId(pohId).slice(0, 20)}
+                <wbr />
+                {prettifyId(pohId).slice(20)}
+              </Link>
+
+              <Info
+                nbRequests={
+                  +request.humanity.nbRequests +
+                  +request.humanity.nbLegacyRequests
                 }
-              >
-                <Image
-                  alt="poh id"
-                  src="/logo/pohid.svg"
-                  className="mx-auto mb-8"
-                  height={128}
-                  width={128}
+              />
+            </div>
+
+            <div className="flex md:hidden flex-col items-center">
+              {registrationFile && (
+                <Previewed
+                  uri={ipfs(registrationFile.photo)}
+                  trigger={
+                    <Image
+                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
+                      alt="image"
+                      src={ipfs(registrationFile.photo)}
+                      width={144}
+                      height={144}
+                    />
+                  }
                 />
-                <p>
-                  The Proof of Humanity ID is a soulbound ID. It corresponds to
-                  each unique human registered on Proof of Humanity.
-                </p>
-                <p>
-                  This POH ID had{" "}
-                  <strong>
-                    {+request.humanity.nbRequests +
-                      +request.humanity.nbRequests}{" "}
-                    requests
-                  </strong>{" "}
-                  in total
-                </p>
-              </Modal>
+              )}
+
+              <span className="mt-4 mb-12 text-2xl">
+                {request.claimer.name}
+              </span>
             </div>
 
             {registrationFile && (
@@ -258,6 +263,10 @@ export default async function Request({ params }: PageProps) {
                 controls
               />
             )}
+
+            <Label className="md:hidden mb-8">
+              Last update: <TimeAgo time={request.lastStatusChange} />
+            </Label>
           </div>
         </div>
       </div>

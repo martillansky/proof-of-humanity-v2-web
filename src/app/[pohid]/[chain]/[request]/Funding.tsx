@@ -38,7 +38,7 @@ const FundButton: React.FC<FundButtonProps> = ({
     <Modal
       formal
       header="Fund"
-      trigger={<button className="btn-main mb-2">Fund</button>}
+      trigger={<button className="btn-sec mb-2">Fund</button>}
     >
       <div className="p-4 flex flex-col">
         <div className="w-full p-4 flex justify-center rounded font-bold">

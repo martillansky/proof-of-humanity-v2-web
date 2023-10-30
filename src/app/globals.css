@@ -49,6 +49,10 @@
     @apply centered gradient p-2 rounded-sm text-white font-medium uppercase disabled:opacity-40;
   }
 
+  .btn-sec {
+    @apply centered p-2 border-2 border-theme rounded-sm text-theme font-semibold uppercase disabled:opacity-40;
+  }
+
   .backdrop {
     @apply fixed top-0 left-0 h-screen z-10 w-full flex justify-center items-center bg-slate-800/30 backdrop-blur;
   }
@@ -64,8 +68,9 @@
   }
 
   .content-wide {
-    @apply mt-8 mb-16 mx-auto w-11/12
-           sm:mt-12 sm:w-5/6
+    @apply mb-16 mx-auto w-11/12
+           sm:w-5/6
+           md:mt-12
            lg:w-4/5;
   }
 

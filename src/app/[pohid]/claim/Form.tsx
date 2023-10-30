@@ -15,13 +15,14 @@ import cn from "classnames";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import Connect from "./Connect";
 import { SupportedChain, SupportedChainId } from "config/chains";
-import { ContractQuery, RegistrationQuery } from "generated/graphql";
+import { RegistrationQuery } from "generated/graphql";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { toast } from "react-toastify";
 import { machinifyId } from "utils/identifier";
 import { Effects } from "contracts/hooks/types";
 import { uploadToIPFS } from "utils/ipfs";
 import { useLoading } from "hooks/useLoading";
+import { ContractData } from "data/contract";
 
 enableReactUse();
 
@@ -47,7 +48,7 @@ export interface SubmissionState {
 }
 
 interface FormProps {
-  contractData: Record<SupportedChainId, ContractQuery>;
+  contractData: Record<SupportedChainId, ContractData>;
   totalCosts: Record<SupportedChainId, bigint>;
   renewal?: RegistrationQuery["registration"] & {
     chain: SupportedChain;
@@ -218,16 +219,18 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
               <ReviewStep
                 totalCost={totalCosts[chainId]}
                 state$={state$}
-                arbitrationInfo={
-                  contractData[chainId].contract!.latestArbitratorHistory!
-                }
+                arbitrationInfo={contractData[chainId].arbitrationInfo}
                 media$={media$}
                 selfFunded$={selfFunded$}
                 loadingMessage={loadingMessage}
                 submit={submit}
               />
             ),
-            [Step.finalized]: () => <Finalized />,
+            [Step.finalized]: () => (
+              <Finalized
+                requiredVouches={contractData[chainId].requiredNumberOfVouches}
+              />
+            ),
           }}
         </Switch>
       </>

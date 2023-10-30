@@ -16,7 +16,7 @@ export function nameToChain(name: string): SupportedChain {
     //   return mainnet;
     case sepolia.name.toLowerCase():
       return sepolia;
-    case gnosis.name:
+    case gnosis.name.toLowerCase():
       return gnosis;
     default:
       throw new Error("chain not supported");

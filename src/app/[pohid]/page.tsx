@@ -42,15 +42,14 @@ async function Profile({ params: { pohid } }: PageProps) {
   console.log(
     "~~~~~",
     homeChain!.name,
-    contractData[homeChain!.id].contract!.latestArbitratorHistory!.arbitrator
+    contractData[homeChain!.id].arbitrationInfo.arbitrator
   );
 
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
         homeChain,
-        contractData[homeChain.id].contract!.latestArbitratorHistory!
-          .arbitrator,
-        contractData[homeChain.id].contract!.latestArbitratorHistory!.extraData
+        contractData[homeChain.id].arbitrationInfo.arbitrator,
+        contractData[homeChain.id].arbitrationInfo.extraData
       )
     : 0n;
 
@@ -113,7 +112,7 @@ async function Profile({ params: { pohid } }: PageProps) {
     homeChain &&
     +humanity[homeChain.id]!.humanity!.registration!.expirationTime -
       Date.now() / 1000 <
-      +contractData[homeChain.id].contract!.renewalPeriodDuration;
+      +contractData[homeChain.id].renewalPeriodDuration;
 
   return (
     <div className="content">
@@ -130,8 +129,10 @@ async function Profile({ params: { pohid } }: PageProps) {
         </div>
         <div className="flex flex-col items-center">
           <span className="text-xs text-slate-400">POH ID</span>
-          <span className="mb-12 font-semibold text-xl">
-            {prettifyId(pohId)}
+          <span className="mb-12 font-semibold text-xl text-center">
+            {prettifyId(pohId).slice(0, 20)}
+            <wbr />
+            {prettifyId(pohId).slice(20)}
           </span>
         </div>
 
@@ -166,7 +167,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 time={
                   +humanity[homeChain.id]!.humanity!.registration!
                     .expirationTime -
-                  +contractData[homeChain.id].contract?.renewalPeriodDuration
+                  +contractData[homeChain.id].renewalPeriodDuration
                 }
               />
             </span>
@@ -182,13 +183,10 @@ async function Profile({ params: { pohid } }: PageProps) {
 
             <Revoke
               pohId={pohId}
-              arbitrationInfo={
-                contractData[homeChain.id].contract!.latestArbitratorHistory!
-              }
+              arbitrationInfo={contractData[homeChain.id].arbitrationInfo!}
               homeChain={homeChain}
               cost={
-                arbitrationCost +
-                BigInt(contractData[homeChain.id].contract!.baseDeposit)
+                arbitrationCost + BigInt(contractData[homeChain.id].baseDeposit)
               }
             />
 

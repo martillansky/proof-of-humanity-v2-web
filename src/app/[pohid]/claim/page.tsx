@@ -47,7 +47,7 @@ export default async function Claim({ params: { pohid } }: PageProps) {
     registrationChain &&
     +registrationData[registrationChain.id]!.expirationTime -
       Date.now() / 1000 <
-      +contractData[registrationChain.id].contract!.renewalPeriodDuration;
+      +contractData[registrationChain.id].renewalPeriodDuration;
 
   if (registrationChain && !isRenewal)
     redirect(`/${pohid}`, RedirectType.replace);
