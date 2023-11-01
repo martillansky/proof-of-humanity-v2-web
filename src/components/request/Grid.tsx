@@ -29,6 +29,8 @@ import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
+import { getRequestsInitData } from "data/request";
+import Image from "next/image";
 
 enableReactUse();
 
@@ -74,10 +76,6 @@ interface RequestFilter {
   cursor: number;
 }
 
-interface RequestsGridProps {
-  initialChainStacks?: Record<SupportedChainId, RequestsQueryItem[]>;
-}
-
 const filter$ = observable<RequestFilter>({
   search: "",
   status: "all",
@@ -85,9 +83,14 @@ const filter$ = observable<RequestFilter>({
   cursor: 1,
 });
 
-function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
+function RequestsGrid() {
   const filter = filter$.use();
-  const chainStacks$ = useObservable(initialChainStacks);
+  const chainStacks$ = useObservable(
+    supportedChains.reduce(
+      (acc, chain) => ({ ...acc, [chain.id]: [] }),
+      {} as Record<SupportedChainId, RequestsQuery["requests"]>
+    )
+  );
   const requests = useSelector(() =>
     normalize(chainStacks$.get()).slice(0, REQUESTS_BATCH_SIZE * filter.cursor)
   );
@@ -104,7 +107,10 @@ function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  useMountOnce(() =>
+  useMountOnce(() => {
+    (async () => {
+      chainStacks$.set(await getRequestsInitData());
+    })();
     filter$.onChange(
       async ({
         value: { chainId: chainFilter, search, status, cursor },
@@ -172,8 +178,19 @@ function RequestsGrid({ initialChainStacks }: RequestsGridProps) {
 
         loading.stop();
       }
-    )
-  );
+    );
+  });
+
+  if (!requests.length)
+    return (
+      <Image
+        alt="logo loading"
+        className="mx-auto animate-flip my-40"
+        src="/logo/poh-colored.svg"
+        width={256}
+        height={256}
+      />
+    );
 
   return (
     <>

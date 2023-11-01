@@ -16,7 +16,7 @@ import { useLoading } from "hooks/useLoading";
 import { toast } from "react-toastify";
 import DocumentIcon from "icons/NoteMajor.svg";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
-import { useChainId } from "wagmi";
+import { useChainId, useSwitchNetwork } from "wagmi";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import { ContractData } from "data/contract";
 
@@ -43,6 +43,7 @@ export default withClientConnected<RevokeProps>(function Revoke({
   const [pending] = loading.use();
   const connectedChainId = useChainId() as SupportedChainId;
   const web3Loaded = useWeb3Loaded();
+  const { switchNetwork } = useSwitchNetwork();
 
   const [prepare] = usePoHWrite(
     "revokeHumanity",
@@ -81,9 +82,12 @@ export default withClientConnected<RevokeProps>(function Revoke({
 
   if (web3Loaded && homeChain.id !== connectedChainId)
     return (
-      <span className="mb-4 text-slate-500">
-        Connect to <strong>{homeChain.name}</strong> to revoke.
-      </span>
+      <button
+        onClick={() => switchNetwork?.(homeChain.id)}
+        className="btn-sec mb-4"
+      >
+        Connect to {homeChain.name} to revoke
+      </button>
     );
 
   return (

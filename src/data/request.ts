@@ -5,7 +5,7 @@ import { sdk } from "config/subgraph";
 import { RequestsQuery } from "generated/graphql";
 import { Hash, concat, keccak256, toHex } from "viem";
 
-export const getRequestsInitData = cache(async () => {
+export const getRequestsInitData = async () => {
   const res = await Promise.all(
     supportedChains.map((chain) =>
       sdk[chain.id].Requests({ first: REQUESTS_DISPLAY_BATCH * 4 })
@@ -16,7 +16,7 @@ export const getRequestsInitData = cache(async () => {
     (acc, chain, i) => ({ ...acc, [chain.id]: res[i].requests }),
     {} as Record<SupportedChainId, RequestsQuery["requests"]>
   );
-});
+};
 
 const genRequestId = (pohId: Hash, index: number) => {
   return keccak256(

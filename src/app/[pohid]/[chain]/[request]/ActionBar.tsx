@@ -3,15 +3,15 @@
 import ExternalLink from "components/ExternalLink";
 import { colorForStatus } from "config/misc";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
-import { Address, Hash, formatEther } from "viem";
+import { Address, Hash, encodeFunctionData, formatEther } from "viem";
 import Vouch from "./Vouch";
 import TimeAgo from "components/TimeAgo";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import FundButton from "./Funding";
 import Challenge from "./Challenge";
 import { RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import withClientConnected from "components/high-order/withClientConnected";
 import { camelToTitle } from "utils/case";
 import useChainParam from "hooks/useChainParam";
@@ -20,15 +20,18 @@ import { ActionType } from "utils/enums";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { ContractData } from "data/contract";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
+import useWagmiWrite from "contracts/hooks/useWagmiWrite";
+import { Contract } from "contracts";
+import abis from "contracts/abis";
 
 enableReactUse();
 
-// const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
-//   encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
-//     abi: abis.ProofOfHumanity,
-//     functionName: "advanceState",
-//     args: [claimer, vouchers, []],
-//   });
+const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
+  encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
+    abi: abis.ProofOfHumanity,
+    functionName: "advanceState",
+    args: [claimer, vouchers, []],
+  });
 
 interface ActionBarProps extends JSX.IntrinsicAttributes {
   pohId: Hash;
@@ -66,19 +69,20 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const loading = useLoading();
   const [pending] = loading.use();
   const web3Loaded = useWeb3Loaded();
-  // const [prepareAdvanceState, advanceState] = useWagmiWrite(
-  //   "Multicall3",
-  //   "aggregate",
-  //   useMemo(
-  //     () => ({
-  //       onLoading() {
-  //         loading.start();
-  //       },
-  //     }),
-  //     [loading]
-  //   )
-  // );
-  const [prepareExecute, executeRequest] = usePoHWrite(
+  const userChainId = useChainId();
+  const [prepareMulticallAdvance, multicallAdvanceFire] = useWagmiWrite(
+    "Multicall3",
+    "aggregate",
+    useMemo(
+      () => ({
+        onLoading() {
+          loading.start();
+        },
+      }),
+      [loading]
+    )
+  );
+  const [prepareExecute, execute] = usePoHWrite(
     "executeRequest",
     useMemo(
       () => ({
@@ -89,7 +93,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
-  const [prepareAdvanceState, advanceState] = usePoHWrite(
+  const [prepareAdvance, advanceFire] = usePoHWrite(
     "advanceState",
     useMemo(
       () => ({
@@ -100,7 +104,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
-  const [prepareWithdrawRequest, withdrawRequest] = usePoHWrite(
+  const [prepareWithdraw, withdraw, withdrawState] = usePoHWrite(
     "withdrawRequest",
     useMemo(
       () => ({
@@ -111,26 +115,36 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
+  const advance = useCallback(
+    () => (advanceFire || multicallAdvanceFire)(),
+    [advanceFire, multicallAdvanceFire]
+  );
 
   useEffectOnce(() => {
-    if (action === ActionType.ADVANCE && !revocation)
-      prepareAdvanceState({
-        args: [requester, [], []],
-        // [
-        //   [
-        //     {
-        //       target: Contract.ProofOfHumanity[chain.id],
-        //       callData: encodeClaimToAdvance(requester, []),
-        //     },
-        //     ...advanceRequestsOnChainVouches!
-        //       .map((vouch) => ({
-        //         target: Contract.ProofOfHumanity[chain.id],
-        //         callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
-        //       }))
-        //       .slice(0, 1),
-        //   ],
-        // ],
-      });
+    if (action === ActionType.ADVANCE && !revocation) {
+      if (advanceRequestsOnChainVouches) {
+        prepareMulticallAdvance({
+          args: [
+            [
+              {
+                target: Contract.ProofOfHumanity[chain.id],
+                callData: encodeClaimToAdvance(requester, []),
+              },
+              ...advanceRequestsOnChainVouches!
+                .map((vouch) => ({
+                  target: Contract.ProofOfHumanity[chain.id],
+                  callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
+                }))
+                .slice(0, 1),
+            ],
+          ],
+        });
+      } else {
+        prepareAdvance({
+          args: [requester, [], []],
+        });
+      }
+    }
 
     if (action === ActionType.EXECUTE)
       prepareExecute({ args: [requester, BigInt(index)] });
@@ -139,13 +153,22 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   useEffect(() => {
     if (
       !revocation &&
+      chain.id === userChainId &&
       requester === address?.toLowerCase() &&
       (action === ActionType.VOUCH ||
         action === ActionType.FUND ||
         action === ActionType.ADVANCE)
     )
-      prepareWithdrawRequest();
-  }, [address, prepareWithdrawRequest, action, requester, revocation]);
+      prepareWithdraw();
+  }, [
+    address,
+    prepareWithdraw,
+    action,
+    requester,
+    revocation,
+    chain,
+    userChainId,
+  ]);
 
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation);
@@ -201,9 +224,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
                 {requester === address?.toLowerCase() ? (
                   <button
-                    disabled={pending}
+                    disabled={pending || withdrawState.prepare !== "success"}
                     className="btn-main mb-2"
-                    onClick={withdrawRequest}
+                    onClick={withdraw}
                   >
                     Withdraw
                   </button>
@@ -221,9 +244,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             <div className="flex gap-4">
               {requester === address?.toLowerCase() ? (
                 <button
-                  disabled={pending}
+                  disabled={pending || withdrawState.prepare !== "success"}
                   className="btn-sec mb-2"
-                  onClick={withdrawRequest}
+                  onClick={withdraw}
                 >
                   Withdraw
                 </button>
@@ -233,7 +256,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               <button
                 disabled={pending}
                 className="btn-main mb-2"
-                onClick={advanceState}
+                onClick={advance}
               >
                 Advance
               </button>
@@ -248,7 +271,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             <button
               disabled={pending}
               className="btn-main mb-2"
-              onClick={executeRequest}
+              onClick={execute}
             >
               Execute
             </button>
