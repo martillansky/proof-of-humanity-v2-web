@@ -10,7 +10,7 @@ import { Show, Switch, useObservable } from "@legendapp/state/react";
 import { useAccount, useChainId } from "wagmi";
 import withClientConnected from "components/high-order/withClientConnected";
 import { useParams } from "next/navigation";
-import { Hash } from "viem";
+import { Hash, parseEther } from "viem";
 import cn from "classnames";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import Connect from "./Connect";
@@ -70,7 +70,7 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
       uri: "",
     });
     const state = state$.use();
-    const selfFunded$ = useObservable(0n);
+    const selfFunded$ = useObservable(0);
     const selfFunded = selfFunded$.use();
     const loading = useLoading();
     const [, loadingMessage] = loading.use();
@@ -126,14 +126,19 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
 
     state$.onChange(({ value }) => {
       if (!value.uri) return;
+      const selfFundedWei = BigInt(parseEther(selfFunded.toString()));
+      const funded =
+        selfFundedWei > totalCosts[chainId]
+          ? totalCosts[chainId]
+          : selfFundedWei;
       if (renewal)
         prepareRenewHumanity({
-          value: selfFunded,
+          value: funded,
           args: [value.uri],
         });
       else
         prepareClaimHumanity({
-          value: selfFunded,
+          value: funded,
           args: [value.pohId, value.uri, value.name],
         });
     });
@@ -145,6 +150,8 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
     //       : ["Info", "Photo", "Video", "Review"],
     //   [renewal]
     // );
+
+    console.log(renewal?.chain.id, chainId);
 
     if (
       !isConnected ||

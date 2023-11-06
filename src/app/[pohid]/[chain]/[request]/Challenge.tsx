@@ -19,16 +19,16 @@ import { ContractData } from "data/contract";
 type Reason =
   | "none"
   | "incorrectSubmission"
-  | "deceased"
-  | "duplicate"
-  | "doesNotExist";
+  | "identityTheft"
+  | "sybilAttack"
+  | "deceased";
 
 const reasonToImage: Record<Reason, string> = {
   none: "",
-  incorrectSubmission: "reason-incorrect.png",
-  deceased: "reason-duplicate.png",
-  duplicate: "reason-duplicate.png",
-  doesNotExist: "reason-dne.png",
+  incorrectSubmission: "/reason/incorrect.png",
+  identityTheft: "/reason/duplicate.png",
+  sybilAttack: "/reason/dne.png",
+  deceased: "/reason/deceased.png",
 };
 
 function reasonToIdx(reason: Reason) {
@@ -37,11 +37,11 @@ function reasonToIdx(reason: Reason) {
       return 0;
     case "incorrectSubmission":
       return 1;
-    case "deceased":
+    case "identityTheft":
       return 2;
-    case "duplicate":
+    case "sybilAttack":
       return 3;
-    case "doesNotExist":
+    case "deceased":
       return 4;
     default:
       return 0;
@@ -157,17 +157,17 @@ export default function Challenge({
                 text="Incorrect Submission"
                 current={reason$}
               />
+              <ReasonCard
+                reason="identityTheft"
+                text="Identity Theft"
+                current={reason$}
+              />
+              <ReasonCard
+                reason="sybilAttack"
+                text="Sybil Attack"
+                current={reason$}
+              />
               <ReasonCard reason="deceased" text="Deceased" current={reason$} />
-              <ReasonCard
-                reason="duplicate"
-                text="Duplicate"
-                current={reason$}
-              />
-              <ReasonCard
-                reason="doesNotExist"
-                text="Does Not Exist"
-                current={reason$}
-              />
             </div>
           </>
         )}

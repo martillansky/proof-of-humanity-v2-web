@@ -22,7 +22,7 @@ export default withClientConnected<RenewProps>(function Renew({
   if (!web3Loaded || claimer !== address?.toLowerCase()) return null;
 
   return (
-    <Link className="btn-main mb-4" href={`/${prettifyId(pohId)}/claim`}>
+    <Link className="btn-main mt-6 mb-4" href={`/${prettifyId(pohId)}/claim`}>
       Renew
     </Link>
   );

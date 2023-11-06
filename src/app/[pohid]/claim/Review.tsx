@@ -6,7 +6,7 @@ import { formatEth } from "utils/misc";
 import { useAccount, useBalance, useChainId } from "wagmi";
 import { ObservableObject, ObservablePrimitiveBaseFns } from "@legendapp/state";
 import { MediaState, SubmissionState } from "./Form";
-import { formatEther, parseEther } from "viem";
+import { formatEther } from "viem";
 import { SupportedChainId, idToChain } from "config/chains";
 import ExternalLink from "components/ExternalLink";
 import Image from "next/image";
@@ -17,7 +17,7 @@ import { ContractData } from "data/contract";
 interface ReviewProps {
   arbitrationInfo: ContractData["arbitrationInfo"];
   totalCost: bigint;
-  selfFunded$: ObservablePrimitiveBaseFns<bigint>;
+  selfFunded$: ObservablePrimitiveBaseFns<number>;
   state$: ObservableObject<SubmissionState>;
   media$: ObservableObject<MediaState>;
   loadingMessage?: string;
@@ -130,15 +130,13 @@ function Review({
                 step="any"
                 min={0}
                 max={formatEther(totalCost)}
-                value={formatEther(selfFunded)}
-                onChange={(event) =>
-                  selfFunded$.set(parseEther(event.target.value))
-                }
+                value={selfFunded}
+                onChange={(event) => selfFunded$.set(+event.target.value)}
               />
             </div>
             of
             <span
-              onClick={() => selfFunded$.set(totalCost)}
+              onClick={() => selfFunded$.set(formatEth(totalCost))}
               className="mx-1 text-theme font-semibold underline underline-offset-2 cursor-pointer"
             >
               {formatEther(totalCost)}

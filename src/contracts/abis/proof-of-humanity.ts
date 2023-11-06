@@ -86,12 +86,6 @@ export default [
       {
         indexed: false,
         internalType: "string",
-        name: "evidence",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
         name: "name",
         type: "string",
       },
@@ -197,21 +191,27 @@ export default [
     inputs: [
       {
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint40",
         name: "humanityLifespan",
-        type: "uint64",
+        type: "uint40",
       },
       {
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint40",
         name: "renewalPeriodDuration",
-        type: "uint64",
+        type: "uint40",
       },
       {
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint40",
         name: "challengePeriodDuration",
-        type: "uint64",
+        type: "uint40",
+      },
+      {
+        indexed: false,
+        internalType: "uint40",
+        name: "failedRevocationCooldown",
+        type: "uint40",
       },
     ],
     name: "DurationsChanged",
@@ -326,6 +326,19 @@ export default [
         name: "humanityId",
         type: "bytes20",
       },
+    ],
+    name: "HumanityDischargedDirectly",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
       {
         indexed: true,
         internalType: "address",
@@ -334,12 +347,12 @@ export default [
       },
       {
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint40",
         name: "expirationTime",
-        type: "uint64",
+        type: "uint40",
       },
     ],
-    name: "HumanityGrantedManually",
+    name: "HumanityGrantedDirectly",
     type: "event",
   },
   {
@@ -359,19 +372,6 @@ export default [
       },
     ],
     name: "HumanityRevoked",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes20",
-        name: "humanityId",
-        type: "bytes20",
-      },
-    ],
-    name: "HumanityRevokedManually",
     type: "event",
   },
   {
@@ -419,12 +419,6 @@ export default [
         internalType: "uint256",
         name: "requestId",
         type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
       },
     ],
     name: "RenewalRequest",
@@ -476,12 +470,6 @@ export default [
         name: "disputeId",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
-      },
     ],
     name: "RequestChallenged",
     type: "event",
@@ -510,9 +498,9 @@ export default [
     inputs: [
       {
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint32",
         name: "requiredNumberOfVouches",
-        type: "uint64",
+        type: "uint32",
       },
     ],
     name: "RequiredNumberOfVouchesChanged",
@@ -538,12 +526,6 @@ export default [
         internalType: "uint256",
         name: "requestId",
         type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "evidence",
-        type: "string",
       },
     ],
     name: "RevocationRequest",
@@ -745,9 +727,9 @@ export default [
       {
         components: [
           {
-            internalType: "uint64",
+            internalType: "uint40",
             name: "expirationTime",
-            type: "uint64",
+            type: "uint40",
           },
           {
             internalType: "uint8",
@@ -783,7 +765,7 @@ export default [
         type: "uint256",
       },
     ],
-    name: "arbitratorDataList",
+    name: "arbitratorDataHistory",
     outputs: [
       {
         internalType: "uint96",
@@ -824,13 +806,66 @@ export default [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+    ],
+    name: "ccDischargeHumanity",
+    outputs: [
+      {
+        internalType: "bytes20",
+        name: "humanityId",
+        type: "bytes20",
+      },
+      {
+        internalType: "uint40",
+        name: "expirationTime",
+        type: "uint40",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes20",
+        name: "_humanityId",
+        type: "bytes20",
+      },
+      {
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+      {
+        internalType: "uint40",
+        name: "_expirationTime",
+        type: "uint40",
+      },
+    ],
+    name: "ccGrantHumanity",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "success",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "challengePeriodDuration",
     outputs: [
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "",
-        type: "uint64",
+        type: "uint40",
       },
     ],
     stateMutability: "view",
@@ -844,9 +879,9 @@ export default [
         type: "bytes20",
       },
       {
-        internalType: "uint64",
+        internalType: "uint256",
         name: "_requestId",
-        type: "uint64",
+        type: "uint256",
       },
       {
         internalType: "enum ProofOfHumanity.Reason",
@@ -879,7 +914,7 @@ export default [
     ],
     name: "changeArbitrator",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -892,30 +927,35 @@ export default [
     ],
     name: "changeCrossChainProofOfHumanity",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_humanityLifespan",
-        type: "uint64",
+        type: "uint40",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_renewalPeriodDuration",
-        type: "uint64",
+        type: "uint40",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_challengePeriodDuration",
-        type: "uint64",
+        type: "uint40",
+      },
+      {
+        internalType: "uint40",
+        name: "_failedRevocationCooldown",
+        type: "uint40",
       },
     ],
     name: "changeDurations",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -928,7 +968,7 @@ export default [
     ],
     name: "changeGovernor",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -946,7 +986,7 @@ export default [
     ],
     name: "changeMetaEvidence",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -959,20 +999,20 @@ export default [
     ],
     name: "changeRequestBaseDeposit",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "uint64",
+        internalType: "uint32",
         name: "_requiredNumberOfVouches",
-        type: "uint64",
+        type: "uint32",
       },
     ],
     name: "changeRequiredNumberOfVouches",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -995,7 +1035,7 @@ export default [
     ],
     name: "changeStakeMultipliers",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -1017,24 +1057,6 @@ export default [
       },
     ],
     name: "claimHumanity",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_evidence",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_name",
-        type: "string",
-      },
-    ],
-    name: "claimHumanityDefault",
     outputs: [],
     stateMutability: "payable",
     type: "function",
@@ -1105,20 +1127,28 @@ export default [
     type: "function",
   },
   {
+    inputs: [],
+    name: "failedRevocationCooldown",
+    outputs: [
+      {
+        internalType: "uint40",
+        name: "",
+        type: "uint40",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
-        internalType: "bytes20",
-        name: "_humanityId",
-        type: "bytes20",
+        internalType: "address",
+        name: "_arbitrator",
+        type: "address",
       },
       {
         internalType: "uint256",
-        name: "_requestId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_challengeId",
+        name: "_disputeId",
         type: "uint256",
       },
       {
@@ -1152,7 +1182,7 @@ export default [
   },
   {
     inputs: [],
-    name: "getArbitratorDataListCount",
+    name: "getArbitratorDataHistoryCount",
     outputs: [
       {
         internalType: "uint256",
@@ -1296,9 +1326,9 @@ export default [
         type: "uint48",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "expirationTime",
-        type: "uint64",
+        type: "uint40",
       },
       {
         internalType: "address",
@@ -1374,9 +1404,9 @@ export default [
         type: "uint16",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "challengePeriodStart",
-        type: "uint64",
+        type: "uint40",
       },
       {
         internalType: "address payable",
@@ -1470,42 +1500,13 @@ export default [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "bytes20",
-        name: "_humanityId",
-        type: "bytes20",
-      },
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address",
-      },
-      {
-        internalType: "uint64",
-        name: "_expirationTime",
-        type: "uint64",
-      },
-    ],
-    name: "grantManually",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "success",
-        type: "bool",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "humanityLifespan",
     outputs: [
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "",
-        type: "uint64",
+        type: "uint40",
       },
     ],
     stateMutability: "view",
@@ -1533,6 +1534,11 @@ export default [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "_wNative",
+        type: "address",
+      },
+      {
         internalType: "contract IArbitrator",
         name: "_arbitrator",
         type: "address",
@@ -1558,19 +1564,24 @@ export default [
         type: "uint256",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_humanityLifespan",
-        type: "uint64",
+        type: "uint40",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_renewalPeriodDuration",
-        type: "uint64",
+        type: "uint40",
       },
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "_challengePeriodDuration",
-        type: "uint64",
+        type: "uint40",
+      },
+      {
+        internalType: "uint40",
+        name: "_failedRevocationCooldown",
+        type: "uint40",
       },
       {
         internalType: "uint256[3]",
@@ -1578,14 +1589,14 @@ export default [
         type: "uint256[3]",
       },
       {
-        internalType: "uint64",
+        internalType: "uint32",
         name: "_requiredNumberOfVouches",
-        type: "uint64",
+        type: "uint32",
       },
     ],
     name: "initialize",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -1711,9 +1722,9 @@ export default [
     name: "renewalPeriodDuration",
     outputs: [
       {
-        internalType: "uint64",
+        internalType: "uint40",
         name: "",
-        type: "uint64",
+        type: "uint40",
       },
     ],
     stateMutability: "view",
@@ -1737,9 +1748,9 @@ export default [
     name: "requiredNumberOfVouches",
     outputs: [
       {
-        internalType: "uint64",
+        internalType: "uint32",
         name: "",
-        type: "uint64",
+        type: "uint32",
       },
     ],
     stateMutability: "view",
@@ -1761,30 +1772,6 @@ export default [
     name: "revokeHumanity",
     outputs: [],
     stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address",
-      },
-    ],
-    name: "revokeManually",
-    outputs: [
-      {
-        internalType: "uint64",
-        name: "expirationTime",
-        type: "uint64",
-      },
-      {
-        internalType: "bytes20",
-        name: "humanityId",
-        type: "bytes20",
-      },
-    ],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -1865,6 +1852,19 @@ export default [
         internalType: "bool",
         name: "",
         type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "wNative",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

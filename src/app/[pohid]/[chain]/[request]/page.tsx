@@ -2,9 +2,8 @@ import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
 import { paramToChain } from "config/chains";
 import ActionBar from "./ActionBar";
-import { Address } from "viem";
 import Evidence from "./Evidence";
-import { getRequestData, getRequestsToAdvance } from "data/request";
+import { getOffChainVouches, getRequestData } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
@@ -92,31 +91,34 @@ export default async function Request({ params }: PageProps) {
       : null;
   }
 
-  let advanceRequestsOnChainVouches: {
-    claimer: Address;
-    vouchers: Address[];
-  }[] = [];
-  if (action === ActionType.ADVANCE)
-    advanceRequestsOnChainVouches = (await getRequestsToAdvance(chain.id))
-      .map((req) => {
-        if (
-          BigInt(req.challenges[0].rounds[0].requesterFund.amount) !==
-          BigInt(contractData.baseDeposit) + arbitrationCost
-        )
-          return null;
+  // let advanceRequests: {
+  //   offChain: { claimer: Address; vouchers: Address[] }[];
+  //   onChain: { claimer: Address; vouchers: Address[] }[];
+  // } = { onChain: [], offChain: [] };
+  // if (action === ActionType.ADVANCE) {
+  //   advanceRequests.onChain = (await getRequestsToAdvance(chain.id))
+  //     .map((req) => {
+  //       if (
+  //         BigInt(req.challenges[0].rounds[0].requesterFund.amount) !==
+  //         BigInt(contractData.baseDeposit) + arbitrationCost
+  //       )
+  //         return null;
 
-        const onChainVouches = req.claimer.vouchesReceived
-          .filter(
-            (vouch) =>
-              vouch.humanity.id === req.humanity.id && !vouch.humanity.usedVouch
-          )
-          .map((vouch) => vouch.from.id);
+  //       const onChainVouches = req.claimer.vouchesReceived
+  //         .filter(
+  //           (vouch) =>
+  //             vouch.humanity.id === req.humanity.id && !vouch.humanity.usedVouch
+  //         )
+  //         .map((vouch) => vouch.from.id);
 
-        return onChainVouches.length
-          ? { claimer: req.claimer.id, vouchers: onChainVouches }
-          : null;
-      })
-      .filter((vouch) => vouch) as { claimer: Address; vouchers: Address[] }[];
+  //       return onChainVouches.length
+  //         ? { claimer: req.claimer.id, vouchers: onChainVouches }
+  //         : null;
+  //     })
+  //     .filter((vouch) => vouch) as { claimer: Address; vouchers: Address[] }[];
+
+  // advanceRequests.offChain =
+  // }
 
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
@@ -135,7 +137,14 @@ export default async function Request({ params }: PageProps) {
             ? BigInt(request.challenges[0].rounds[0].requesterFund.amount)
             : 0n
         }
-        advanceRequestsOnChainVouches={advanceRequestsOnChainVouches}
+        onChainVouches={request.claimer.vouchesReceived
+          .filter((v) => v.from.registration)
+          .map((v) => v.from.id)}
+        offChainVouches={
+          request.status.id === "vouching"
+            ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
+            : []
+        }
       />
 
       <div className="mb-6 border shadow bg-white rounded">

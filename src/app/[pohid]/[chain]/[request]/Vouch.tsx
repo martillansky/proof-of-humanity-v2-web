@@ -70,12 +70,12 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
     >
       <div className="p-4 flex flex-col items-center">
         <span className="txt m-2">
-          Make sure the person exists and that you have physically encountered
-          them. Note that in the case of a dispute, if a submission is rejected
-          for reason “Duplicate” or “Does not exist”, everyone who had vouched
-          for it will get removed from the registry. Note that your vouch will
-          only be counted when and as long as you are registered, and another
-          submission is not using your vouch.
+          Make sure the person exists and only vouch for people you have
+          physically encountered. Note that in case a profile is removed for
+          (Duplicate) or (Does not exist), all people who had vouched for it get
+          removed as well. Profiles that do not follow the Policy risk being
+          challenged and removed. Make sure you read and understand the Policy
+          before proceeding.
         </span>
         <button
           className={cn(

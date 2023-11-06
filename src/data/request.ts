@@ -3,7 +3,8 @@ import { SupportedChainId, supportedChains } from "config/chains";
 import { REQUESTS_DISPLAY_BATCH } from "config/misc";
 import { sdk } from "config/subgraph";
 import { RequestsQuery } from "generated/graphql";
-import { Hash, concat, keccak256, toHex } from "viem";
+import { Address, Hash, concat, keccak256, toHex } from "viem";
+import axios from "axios";
 
 export const getRequestsInitData = async () => {
   const res = await Promise.all(
@@ -41,3 +42,11 @@ export const getRequestsToAdvance = cache(
   async (chainId: SupportedChainId) =>
     (await sdk[chainId]["RequestsToAdvance"]()).status!.requests
 );
+
+export const getOffChainVouches = async (
+  chainId: SupportedChainId,
+  claimer: Address,
+  pohId: Hash
+) =>
+  (await axios.get(`/vouch/${chainId}/for-request/${claimer}/${pohId}`))
+    .data as { voucher: Address; expiration: number; signature: Hash }[];

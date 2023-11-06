@@ -143,7 +143,7 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
             <ExternalLink href="https://t.me/proofhumanity">
               Get Help (English)
             </ExternalLink>
-            <ExternalLink href="https://t.me/proofhumanity">
+            <ExternalLink href="https://t.me/proofofhumanityenespanol">
               Get Help (Spanish)
             </ExternalLink>
             <ExternalLink href="https://gov.proofofhumanity.id/">
@@ -152,10 +152,10 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
             <ExternalLink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
               Report a bug
             </ExternalLink>
-            <ExternalLink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
+            <ExternalLink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/proof-of-humanity-tutorial">
               Tutorial
             </ExternalLink>
-            <ExternalLink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/proof-of-humanity-tutorial">
+            <ExternalLink href="https://t.me/pohDebug">
               Report a bug
             </ExternalLink>
             <ExternalLink href="https://ethereum.org/en/wallets">

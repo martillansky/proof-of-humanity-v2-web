@@ -3,7 +3,7 @@
 import ExternalLink from "components/ExternalLink";
 import { colorForStatus } from "config/misc";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
-import { Address, Hash, encodeFunctionData, formatEther } from "viem";
+import { Address, Hash, formatEther, hexToSignature } from "viem";
 import Vouch from "./Vouch";
 import TimeAgo from "components/TimeAgo";
 import { useAccount, useChainId } from "wagmi";
@@ -20,18 +20,15 @@ import { ActionType } from "utils/enums";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { ContractData } from "data/contract";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
-import useWagmiWrite from "contracts/hooks/useWagmiWrite";
-import { Contract } from "contracts";
-import abis from "contracts/abis";
 
 enableReactUse();
 
-const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
-  encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
-    abi: abis.ProofOfHumanity,
-    functionName: "advanceState",
-    args: [claimer, vouchers, []],
-  });
+// const encodeClaimToAdvance = (claimer: Address, vouchers: Address[]) =>
+//   encodeFunctionData<typeof abis.ProofOfHumanity, "advanceState">({
+//     abi: abis.ProofOfHumanity,
+//     functionName: "advanceState",
+//     args: [claimer, vouchers, []],
+//   });
 
 interface ActionBarProps extends JSX.IntrinsicAttributes {
   pohId: Hash;
@@ -48,6 +45,8 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
     NonNullable<NonNullable<RequestQuery>["request"]>["challenges"]
   >;
   advanceRequestsOnChainVouches?: { claimer: Address; vouchers: Address[] }[];
+  onChainVouches: Address[];
+  offChainVouches: { voucher: Address; expiration: number; signature: Hash }[];
 }
 
 export default withClientConnected<ActionBarProps>(function ActionBar({
@@ -62,7 +61,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   arbitrationCost,
   contractData,
   currentChallenge,
-  advanceRequestsOnChainVouches,
+  onChainVouches,
+  offChainVouches,
+  // advanceRequestsOnChainVouches,
 }) {
   const chain = useChainParam()!;
   const { address } = useAccount();
@@ -70,18 +71,18 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const [pending] = loading.use();
   const web3Loaded = useWeb3Loaded();
   const userChainId = useChainId();
-  const [prepareMulticallAdvance, multicallAdvanceFire] = useWagmiWrite(
-    "Multicall3",
-    "aggregate",
-    useMemo(
-      () => ({
-        onLoading() {
-          loading.start();
-        },
-      }),
-      [loading]
-    )
-  );
+  // const [prepareMulticallAdvance, multicallAdvanceFire] = useWagmiWrite(
+  //   "Multicall3",
+  //   "aggregate",
+  //   useMemo(
+  //     () => ({
+  //       onLoading() {
+  //         loading.start();
+  //       },
+  //     }),
+  //     [loading]
+  //   )
+  // );
   const [prepareExecute, execute] = usePoHWrite(
     "executeRequest",
     useMemo(
@@ -116,34 +117,51 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     )
   );
   const advance = useCallback(
-    () => (advanceFire || multicallAdvanceFire)(),
-    [advanceFire, multicallAdvanceFire]
+    () => advanceFire(),
+    // || multicallAdvanceFire
+    [
+      advanceFire,
+      //  multicallAdvanceFire
+    ]
   );
 
   useEffectOnce(() => {
     if (action === ActionType.ADVANCE && !revocation) {
-      if (advanceRequestsOnChainVouches) {
-        prepareMulticallAdvance({
-          args: [
-            [
-              {
-                target: Contract.ProofOfHumanity[chain.id],
-                callData: encodeClaimToAdvance(requester, []),
-              },
-              ...advanceRequestsOnChainVouches!
-                .map((vouch) => ({
-                  target: Contract.ProofOfHumanity[chain.id],
-                  callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
-                }))
-                .slice(0, 1),
-            ],
-          ],
-        });
-      } else {
-        prepareAdvance({
-          args: [requester, [], []],
-        });
-      }
+      // if (advanceRequestsOnChainVouches) {
+      //   prepareMulticallAdvance({
+      //     args: [
+      //       [
+      //         {
+      //           target: Contract.ProofOfHumanity[chain.id],
+      //           callData: encodeClaimToAdvance(requester, []),
+      //         },
+      //         ...advanceRequestsOnChainVouches!
+      //           .map((vouch) => ({
+      //             target: Contract.ProofOfHumanity[chain.id],
+      //             callData: encodeClaimToAdvance(vouch.claimer, vouch.vouchers),
+      //           }))
+      //           .slice(0, 1),
+      //       ],
+      //     ],
+      //   });
+      // } else {
+      // }
+
+      prepareAdvance({
+        args: [
+          requester,
+          onChainVouches,
+          offChainVouches.map((v) => {
+            const sig = hexToSignature(v.signature);
+            return {
+              expirationTime: v.expiration,
+              v: Number(sig.v),
+              r: sig.r,
+              s: sig.s,
+            };
+          }),
+        ],
+      });
     }
 
     if (action === ActionType.EXECUTE)
@@ -160,15 +178,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         action === ActionType.ADVANCE)
     )
       prepareWithdraw();
-  }, [
-    address,
-    prepareWithdraw,
-    action,
-    requester,
-    revocation,
-    chain,
-    userChainId,
-  ]);
+  }, [address, prepareWithdraw, action, requester, revocation, chain, userChainId]);
 
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation);

@@ -39,12 +39,6 @@ async function Profile({ params: { pohid } }: PageProps) {
     (chain) => !!humanity[chain.id]?.humanity?.registration
   );
 
-  console.log(
-    "~~~~~",
-    homeChain!.name,
-    contractData[homeChain!.id].arbitrationInfo.arbitrator
-  );
-
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
         homeChain,
@@ -154,31 +148,35 @@ async function Profile({ params: { pohid } }: PageProps) {
             </div>
 
             <span className="mb-2 text-slate-500">
-              Expires{" "}
+              {humanity[homeChain.id]!.humanity!.registration!.expirationTime <
+              Date.now() / 1000
+                ? "Expired "
+                : "Expires "}
               <TimeAgo
                 time={
                   humanity[homeChain.id]!.humanity!.registration!.expirationTime
                 }
               />
             </span>
-            <span className="mb-8 text-slate-500">
-              Renewal available{" "}
-              <TimeAgo
-                time={
-                  +humanity[homeChain.id]!.humanity!.registration!
-                    .expirationTime -
-                  +contractData[homeChain.id].renewalPeriodDuration
-                }
-              />
-            </span>
 
-            {canRenew && (
+            {canRenew ? (
               <Renew
                 claimer={
                   humanity[homeChain.id]!.humanity!.registration!.claimer.id
                 }
                 pohId={pohId}
               />
+            ) : (
+              <span className="text-slate-500">
+                Renewal available{" "}
+                <TimeAgo
+                  time={
+                    +humanity[homeChain.id]!.humanity!.registration!
+                      .expirationTime -
+                    +contractData[homeChain.id].renewalPeriodDuration
+                  }
+                />
+              </span>
             )}
 
             <Revoke

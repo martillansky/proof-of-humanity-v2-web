@@ -5,6 +5,7 @@ import Modal from "components/Modal";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Hash, formatEther, parseEther } from "viem";
 import useChainParam from "hooks/useChainParam";
+import { formatEth } from "utils/misc";
 
 interface FundButtonProps {
   pohId: Hash;
@@ -20,7 +21,7 @@ const FundButton: React.FC<FundButtonProps> = ({
   funded,
 }) => {
   const chain = useChainParam()!;
-  const addedFund$ = useObservable(0n);
+  const addedFund$ = useObservable(0);
   const addedFund = addedFund$.use();
   const [prepare] = usePoHWrite(
     "fundRequest",
@@ -43,7 +44,7 @@ const FundButton: React.FC<FundButtonProps> = ({
       <div className="p-4 flex flex-col">
         <div className="w-full p-4 flex justify-center rounded font-bold">
           <span
-            onClick={() => addedFund$.set(totalCost - funded)}
+            onClick={() => addedFund$.set(formatEth(totalCost - funded))}
             className="mx-1 text-theme font-semibold underline underline-offset-2 cursor-pointer"
           >
             {formatEther(totalCost - funded)}
@@ -51,18 +52,21 @@ const FundButton: React.FC<FundButtonProps> = ({
           {chain.nativeCurrency.symbol} Needed
         </div>
         <Field
-          type="number"
           className="no-spinner"
           label="Amount funding"
           min={0}
           max={formatEther(totalCost - funded)}
-          value={formatEther(addedFund)}
-          onChange={(event) => addedFund$.set(parseEther(event.target.value))}
+          step={formatEther((totalCost - funded) / 10n)}
+          value={addedFund}
+          onChange={(e) => addedFund$.set(+e.target.value)}
         />
         <button
           disabled={!addedFund}
           onClick={() =>
-            prepare({ value: addedFund, args: [pohId, BigInt(index)] })
+            prepare({
+              value: BigInt(parseEther(addedFund.toString())),
+              args: [pohId, BigInt(index)],
+            })
           }
           className="btn-main mt-12"
         >

@@ -96,7 +96,7 @@ function RequestsGrid() {
   );
 
   const loading = useLoading();
-  const [pending] = loading.use();
+  const [pending, loadingType] = loading.use();
 
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
@@ -109,8 +109,11 @@ function RequestsGrid() {
 
   useMountOnce(() => {
     (async () => {
+      loading.start("init");
       chainStacks$.set(await getRequestsInitData());
+      loading.stop();
     })();
+
     filter$.onChange(
       async ({
         value: { chainId: chainFilter, search, status, cursor },
@@ -181,7 +184,7 @@ function RequestsGrid() {
     );
   });
 
-  if (!requests.length)
+  if (pending && loadingType === "init")
     return (
       <Image
         alt="logo loading"

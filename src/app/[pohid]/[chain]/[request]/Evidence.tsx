@@ -8,12 +8,12 @@ import Label from "components/Label";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
 import Uploader from "components/Uploader";
-import { ipfs, uploadToIPFS } from "utils/ipfs";
+import { ipfs, ipfsFetch, uploadToIPFS } from "utils/ipfs";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Address, Hash } from "viem";
 import useChainParam from "hooks/useChainParam";
 import useIPFS from "hooks/useIPFS";
-import { EvidenceFile } from "types/docs";
+import { EvidenceFile, MetaEvidenceFile } from "types/docs";
 import { romanize } from "utils/misc";
 import { explorerLink, shortenAddress } from "utils/address";
 import Identicon from "components/Identicon";
@@ -24,6 +24,7 @@ import DocumentIcon from "icons/NoteMajor.svg";
 import { toast } from "react-toastify";
 import { useLoading } from "hooks/useLoading";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+import useSWR from "swr";
 
 enableReactUse();
 
@@ -86,6 +87,11 @@ export default withClientConnected<EvidenceProps>(function Evidence({
   list,
   arbitrationInfo,
 }) {
+  const { data: policy } = useSWR(
+    arbitrationInfo.registrationMeta,
+    async (metaEvidenceLink) =>
+      (await ipfsFetch<MetaEvidenceFile>(metaEvidenceLink)).fileURI
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const loading = useLoading(false, "Revoke");
   const [pending] = loading.use();
@@ -120,10 +126,14 @@ export default withClientConnected<EvidenceProps>(function Evidence({
     const data = new FormData();
     data.append("###", "evidence.json");
     data.append("name", title);
-    data.append("description", description);
+    if (description) data.append("description", description);
     if (file) data.append("evidence", file, file.name);
 
+    console.log(data);
+
     prepare({ args: [pohId, BigInt(requestIndex), await uploadToIPFS(data)] });
+
+    loading.stop();
   };
 
   return (
@@ -143,21 +153,23 @@ export default withClientConnected<EvidenceProps>(function Evidence({
           }
         >
           <div className="p-4 flex flex-col">
-            <div className="centered flex-col">
-              <ExternalLink
-                className="flex"
-                href={ipfs(arbitrationInfo.registrationMeta)}
-              >
-                <DocumentIcon className="fill-theme w-6 h-6" />
-                <strong className="mr-1 text-theme font-semibold">
-                  Registration Policy
-                </strong>
-                (at the time of submission)
-              </ExternalLink>
-              <span className="text-sm text-slate-400">
-                Updated: <TimeAgo time={arbitrationInfo.updateTime} />
-              </span>
-            </div>
+            {policy && (
+              <div className="centered flex-col">
+                <ExternalLink
+                  className="flex"
+                  href={ipfs(arbitrationInfo.registrationMeta)}
+                >
+                  <DocumentIcon className="fill-theme w-6 h-6" />
+                  <strong className="mr-1 text-theme font-semibold">
+                    Registration Policy
+                  </strong>
+                  (at the time of submission)
+                </ExternalLink>
+                <span className="text-sm text-slate-400">
+                  Updated: <TimeAgo time={arbitrationInfo.updateTime} />
+                </span>
+              </div>
+            )}
 
             <Field
               label="Title"
@@ -187,7 +199,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
               className="btn-main mt-12"
               onClick={submit}
             >
-              Submit evidence
+              Submit
             </button>
           </div>
         </Modal>

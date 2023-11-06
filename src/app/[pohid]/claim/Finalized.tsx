@@ -25,7 +25,7 @@ const Finalized: React.FC<FinalizedProps> = ({ requiredVouches }) => (
         </span>
       </div>
       <div className="my-8 text-slate-400">
-        What do you need to advance:
+        What you need to advance:
         <ul className="ml-6 list-disc">
           {requiredVouches && (
             <li>
