@@ -228,7 +228,7 @@ function RequestsGrid() {
         <Dropdown
           title={camelToTitle(
             filter.chainId
-              ? idToChain(filter.chainId as SupportedChainId).name
+              ? idToChain(filter.chainId as SupportedChainId)!.name
               : "All"
           )}
         >

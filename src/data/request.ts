@@ -4,7 +4,7 @@ import { REQUESTS_DISPLAY_BATCH } from "config/misc";
 import { sdk } from "config/subgraph";
 import { RequestsQuery } from "generated/graphql";
 import { Address, Hash, concat, keccak256, toHex } from "viem";
-import axios from "axios";
+// import axios from "axios";
 
 export const getRequestsInitData = async () => {
   const res = await Promise.all(

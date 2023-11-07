@@ -6,7 +6,7 @@ import { WinnerClaimFragment } from "generated/graphql";
 import { camelToTitle } from "utils/case";
 import { prettifyId } from "utils/identifier";
 import { idToChain, SupportedChainId } from "config/chains";
-import { Address } from "viem";
+import { Address, Hash } from "viem";
 import { ipfs } from "utils/ipfs";
 import { shortenAddress } from "utils/address";
 import Link from "next/link";
@@ -23,7 +23,7 @@ interface ContentProps {
   evidence: RequestsQueryItem["evidenceGroup"]["evidence"];
   claimer: RequestsQueryItem["claimer"];
   requester: Address;
-  humanity: { id: string } & WinnerClaimFragment;
+  humanity: { id: Hash } & WinnerClaimFragment;
 }
 
 interface CardInterface extends ContentProps {
@@ -94,7 +94,7 @@ function Card({
   const statusTitle = queryToStatus(status, revocation);
   const statusColor = colorForStatus(status, revocation);
 
-  const chain = idToChain(chainId);
+  const chain = idToChain(chainId)!;
 
   return (
     <Link

@@ -17,6 +17,8 @@ export async function GET(
 
     const chain = paramToChain(params.chain);
 
+    if (!chain) throw new Error("unsupported chain");
+
     // Currently only taking one vouch as min
     const { data, error } = await datalake
       .from("poh-vouchdb")

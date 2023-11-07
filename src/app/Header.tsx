@@ -68,7 +68,7 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
 
       <div className="my-2 sm:place-self-end grid grid-cols-2 sm:flex gap-x-8 sm:gap-x-12 whitespace-nowrap">
         {web3Loaded && chain.id === sepolia.id && (
-          <ExternalLink href={"https://docs.scroll.io/en/user-guide/faucet/"}>
+          <ExternalLink href="https://docs.scroll.io/en/user-guide/faucet/">
             Faucet
           </ExternalLink>
         )}

@@ -41,7 +41,7 @@ function Review({
 
   const { data: balance } = useBalance({ address, chainId });
 
-  const { nativeCurrency } = idToChain(chainId);
+  const { nativeCurrency } = idToChain(chainId)!;
 
   return (
     <>

@@ -3,7 +3,7 @@ import { ipfs, ipfsFetch } from "utils/ipfs";
 import { paramToChain } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
-import { getOffChainVouches, getRequestData } from "data/request";
+import { getRequestData } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
@@ -26,6 +26,8 @@ interface PageProps {
 
 export default async function Request({ params }: PageProps) {
   const chain = paramToChain(params.chain);
+
+  if (!chain) throw new Error("unsupported chain");
 
   const pohId = machinifyId(params.pohid)!;
 
@@ -141,9 +143,10 @@ export default async function Request({ params }: PageProps) {
           .filter((v) => v.from.registration)
           .map((v) => v.from.id)}
         offChainVouches={
-          request.status.id === "vouching"
-            ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
-            : []
+          []
+          // request.status.id === "vouching"
+          // ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
+          // :
         }
       />
 

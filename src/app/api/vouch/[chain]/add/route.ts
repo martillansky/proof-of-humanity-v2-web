@@ -44,6 +44,8 @@ export async function POST(
 
     const chain = paramToChain(params.chain);
 
+    if (!chain) throw new Error("unsupported chain");
+
     const { pohId, claimer, voucher, expiration, signature }: AddVouchBody =
       await request.json();
 

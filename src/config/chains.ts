@@ -10,7 +10,7 @@ export const tokenChain = gnosis;
 export type SupportedChain = ArrayElement<typeof supportedChains>;
 export type SupportedChainId = SupportedChain["id"];
 
-export function nameToChain(name: string): SupportedChain {
+export function nameToChain(name: string): SupportedChain | null {
   switch (name.toLowerCase()) {
     // case mainnet.name:
     //   return mainnet;
@@ -19,11 +19,12 @@ export function nameToChain(name: string): SupportedChain {
     case gnosis.name.toLowerCase():
       return gnosis;
     default:
-      throw new Error("chain not supported");
+      return null;
+    // throw new Error("chain not supported");
   }
 }
 
-export function idToChain(id: number): SupportedChain {
+export function idToChain(id: number): SupportedChain | null {
   switch (id) {
     // case mainnet.id:
     //   return mainnet;
@@ -32,16 +33,18 @@ export function idToChain(id: number): SupportedChain {
     case gnosis.id:
       return gnosis;
     default:
-      throw new Error("chain not supported");
+      return null;
+    // throw new Error("chain not supported");
   }
 }
 
-export function paramToChain(param: string): SupportedChain {
-  try {
-    return nameToChain(param);
-  } catch {
-    return idToChain(+param);
-  }
+export function paramToChain(param: string): SupportedChain | null {
+  if (nameToChain(param)) return nameToChain(param);
+  else return idToChain(+param);
+  // try {
+  //   return ;
+  // } catch (err) {
+  // }
 }
 
 export function getChainRpc(id: number): string {
