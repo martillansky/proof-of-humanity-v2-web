@@ -37,7 +37,11 @@ export function idToChain(id: number): SupportedChain {
 }
 
 export function paramToChain(param: string): SupportedChain {
-  return nameToChain(param) ? nameToChain(param) : idToChain(+param);
+  try {
+    return nameToChain(param);
+  } catch {
+    return idToChain(+param);
+  }
 }
 
 export function getChainRpc(id: number): string {
