@@ -44,7 +44,7 @@ const pinToFilebase = async (data: globalThis.FormData) => {
 
 export async function POST(request: NextRequest) {
   try {
-    logtail.info("pohv2 ipfs-upload formData", request.formData);
+    logtail.info("pohv2 ipfs-upload", request);
     if (!request.formData) {
       logtail.error("pohv2 ipfs-upload weird form data", request.formData);
       throw new Error("weird form data");
