@@ -1,4 +1,4 @@
-import { gnosis, mainnet, sepolia } from "viem/chains";
+import { gnosis, sepolia } from "viem/chains";
 
 export const supportedChains = [gnosis, sepolia];
 export const defaultChain = supportedChains[0];
@@ -12,8 +12,6 @@ export type SupportedChainId = SupportedChain["id"];
 
 export function nameToChain(name: string): SupportedChain | null {
   switch (name.toLowerCase()) {
-    // case mainnet.name:
-    //   return mainnet;
     case sepolia.name.toLowerCase():
       return sepolia;
     case gnosis.name.toLowerCase():
@@ -26,8 +24,6 @@ export function nameToChain(name: string): SupportedChain | null {
 
 export function idToChain(id: number): SupportedChain | null {
   switch (id) {
-    // case mainnet.id:
-    //   return mainnet;
     case sepolia.id:
       return sepolia;
     case gnosis.id:
@@ -49,8 +45,6 @@ export function paramToChain(param: string): SupportedChain | null {
 
 export function getChainRpc(id: number): string {
   switch (id) {
-    case mainnet.id:
-      return process.env.MAINNET_RPC;
     case sepolia.id:
       return process.env.SEPOLIA_RPC;
     case gnosis.id:
