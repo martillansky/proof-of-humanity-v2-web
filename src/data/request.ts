@@ -48,11 +48,11 @@ export const getOffChainVouches = async (
   claimer: Address,
   pohId: Hash
 ) => {
-  try {
-    return (
-      await axios.get(`/api/vouch/${chainId}/for-request/${claimer}/${pohId}`)
-    ).data as { voucher: Address; expiration: number; signature: Hash }[];
-  } catch {
-    return [];
-  }
+  // try {
+  //   return (
+  //     await axios.get(`/api/vouch/${chainId}/for-request/${claimer}/${pohId}`)
+  //   ).data as { voucher: Address; expiration: number; signature: Hash }[];
+  // } catch {
+  return [];
+  // }
 };
