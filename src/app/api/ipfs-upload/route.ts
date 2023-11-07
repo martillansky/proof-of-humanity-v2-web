@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const uri = await pinToFilebase(await request.formData());
     return NextResponse.json({ uri });
   } catch (err: any) {
-    logtail.error("pohv2 ipfs-upload", { err, request });
+    logtail.error("pohv2 ipfs-upload", { err });
     await logtail.flush();
     return NextResponse.error();
   }
