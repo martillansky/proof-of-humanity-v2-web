@@ -8,6 +8,7 @@
     "@graphql-codegen/typescript": "2.4.9",
     "@graphql-codegen/typescript-graphql-request": "^4.4.6",
     "@graphql-codegen/typescript-operations": "2.3.6",
+    "@netlify/plugin-nextjs": "^4.41.1",
     "@supabase/supabase-js": "^2.36.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/forms": "^0.5.2",
@@ -66,7 +67,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node prebuild.js",
     "build": "next build",
     "start": "next start",
     "gql": "graphql-codegen --config codegen.yml",
