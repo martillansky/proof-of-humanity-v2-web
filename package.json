@@ -66,6 +66,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node prebuild.js",
     "build": "next build",
     "start": "next start",
     "gql": "graphql-codegen --config codegen.yml",
