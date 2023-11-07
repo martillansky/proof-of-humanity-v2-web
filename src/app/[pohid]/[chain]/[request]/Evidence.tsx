@@ -129,8 +129,6 @@ export default withClientConnected<EvidenceProps>(function Evidence({
     if (description) data.append("description", description);
     if (file) data.append("evidence", file, file.name);
 
-    console.log(data);
-
     prepare({ args: [pohId, BigInt(requestIndex), await uploadToIPFS(data)] });
 
     loading.stop();

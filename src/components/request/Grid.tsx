@@ -95,7 +95,7 @@ function RequestsGrid() {
     normalize(chainStacks$.get()).slice(0, REQUESTS_BATCH_SIZE * filter.cursor)
   );
 
-  const loading = useLoading();
+  const loading = useLoading(true, "init");
   const [pending, loadingType] = loading.use();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -109,7 +109,6 @@ function RequestsGrid() {
 
   useMountOnce(() => {
     (async () => {
-      loading.start("init");
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
     })();

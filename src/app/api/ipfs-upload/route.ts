@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Blob, File, FilebaseClient } from "@filebase/client";
+import logtail from "config/logtail";
 
 const PARENT_NAME_KEY = "###";
 const PARENT_FILETYPE = "application/json";
@@ -45,8 +46,9 @@ export async function POST(request: NextRequest) {
   try {
     const uri = await pinToFilebase(await request.formData());
     return NextResponse.json({ uri });
-  } catch (err) {
-    console.warn("~~~", { err });
+  } catch (err: any) {
+    logtail.error("pohv2 ipfs-upload", err);
+    await logtail.flush();
     return NextResponse.error();
   }
 }
