@@ -7,8 +7,6 @@ const PARENT_FILETYPE = "application/json";
 
 const filebase = new FilebaseClient({ token: process.env.FILEBASE_TOKEN });
 
-export const config = { api: { bodyParser: false } };
-
 const pinToFilebase = async (data: globalThis.FormData) => {
   let uri = "";
   let fileCount = 0;
@@ -46,7 +44,13 @@ const pinToFilebase = async (data: globalThis.FormData) => {
 
 export async function POST(request: NextRequest) {
   try {
-    const uri = await pinToFilebase(await request.formData());
+    logtail.info("pohv2 ipfs-upload formData", request.formData);
+    if (!request.formData) {
+      logtail.error("pohv2 ipfs-upload weird form data", request.formData);
+      throw new Error("weird form data");
+    }
+    const formData = await request.formData();
+    const uri = await pinToFilebase(formData);
     return NextResponse.json({ uri });
   } catch (err: any) {
     logtail.error("pohv2 ipfs-upload", { err });
