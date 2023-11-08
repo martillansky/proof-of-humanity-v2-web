@@ -52,11 +52,12 @@ const FundButton: React.FC<FundButtonProps> = ({
           {chain.nativeCurrency.symbol} Needed
         </div>
         <Field
+          type="number"
           className="no-spinner"
           label="Amount funding"
+          step="any"
           min={0}
           max={formatEther(totalCost - funded)}
-          step={formatEther((totalCost - funded) / 10n)}
           value={addedFund}
           onChange={(e) => addedFund$.set(+e.target.value)}
         />

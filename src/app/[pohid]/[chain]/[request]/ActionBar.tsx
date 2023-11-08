@@ -307,11 +307,11 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {action === ActionType.DISPUTED && currentChallenge && (
+        {action === ActionType.DISPUTED && !!currentChallenge && (
           <>
             <span className="text-slate-400">
               The request was challenged
-              {!revocation && <> for {currentChallenge.reason}</>}.
+              {!revocation && <> for {currentChallenge.reason.id}</>}.
             </span>
 
             <ExternalLink

@@ -3,7 +3,7 @@ import { ipfs, ipfsFetch } from "utils/ipfs";
 import { paramToChain } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
-import { getRequestData } from "data/request";
+import { getOffChainVouches, getRequestData } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
@@ -134,6 +134,9 @@ export default async function Request({ params }: PageProps) {
         pohId={pohId}
         lastStatusChange={+request.lastStatusChange}
         revocation={request.revocation}
+        currentChallenge={
+          request.challenges.length ? request.challenges.at(-1) : undefined
+        }
         funded={
           request.index >= 0
             ? BigInt(request.challenges[0].rounds[0].requesterFund.amount)
@@ -143,10 +146,9 @@ export default async function Request({ params }: PageProps) {
           .filter((v) => v.from.registration)
           .map((v) => v.from.id)}
         offChainVouches={
-          []
-          // request.status.id === "vouching"
-          // ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
-          // :
+          request.status.id === "vouching"
+            ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
+            : []
         }
       />
 
