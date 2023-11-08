@@ -311,7 +311,16 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           <>
             <span className="text-slate-400">
               The request was challenged
-              {!revocation && <> for {currentChallenge.reason.id}</>}.
+              {!revocation && (
+                <>
+                  {" "}
+                  for{" "}
+                  <strong className="text-status-challenged">
+                    {camelToTitle(currentChallenge.reason.id)}
+                  </strong>
+                </>
+              )}
+              .
             </span>
 
             <ExternalLink

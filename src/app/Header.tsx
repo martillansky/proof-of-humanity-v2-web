@@ -87,7 +87,7 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
                     : `/${prettifyId(address!)}/claim`
                 }
               >
-                Claim
+                Register
               </Link>
             )
           ))}

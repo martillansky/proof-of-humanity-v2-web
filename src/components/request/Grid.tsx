@@ -202,7 +202,11 @@ function RequestsGrid() {
           placeholder="Search (case sensitive)"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Dropdown title={camelToTitle(filter.status)}>
+        <Dropdown
+          title={
+            filter.status === "all" ? "Status" : camelToTitle(filter.status)
+          }
+        >
           {statusFilters.map((status) => (
             <DropdownItem
               key={status}
@@ -228,7 +232,7 @@ function RequestsGrid() {
           title={camelToTitle(
             filter.chainId
               ? idToChain(filter.chainId as SupportedChainId)!.name
-              : "All"
+              : "Chain"
           )}
         >
           <DropdownItem
