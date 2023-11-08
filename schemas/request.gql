@@ -8,6 +8,11 @@ query Request($id: ID!) {
     requester
     creationTime
     lastStatusChange
+    vouches {
+      humanity {
+        id
+      }
+    }
     humanity {
       id
       nbRequests

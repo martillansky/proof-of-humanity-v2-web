@@ -48,16 +48,16 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
       },
       types: {
         IsHumanVoucher: [
-          { name: "vouchedHuman", type: "address" },
+          { name: "vouched", type: "address" },
           { name: "humanityId", type: "bytes20" },
-          { name: "voucherExpirationTimestamp", type: "uint256" },
+          { name: "expirationTimestamp", type: "uint256" },
         ],
       },
       primaryType: "IsHumanVoucher",
       message: {
-        vouchedHuman: claimer,
+        vouched: claimer,
         humanityId: pohId,
-        voucherExpirationTimestamp: BigInt(expiration),
+        expirationTimestamp: BigInt(expiration),
       },
     });
   };
