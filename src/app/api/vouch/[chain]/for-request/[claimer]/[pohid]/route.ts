@@ -15,19 +15,18 @@ export async function GET(
   { params }: { params: RequestParams }
 ) {
   try {
-    if (!params.chain || !params.claimer || !params.pohid)
-      throw new Error("Invalid query");
-
     const chain = paramToChain(params.chain);
 
     if (!chain) throw new Error("unsupported chain");
+
+    console.log(params);
 
     const { data, error } = await datalake
       .from("poh-vouchdb")
       .select("*")
       .eq("chainId", chain.id)
-      .eq("pohId", params.pohid)
-      .eq("claimer", params.claimer);
+      .eq("pohId", params.pohid.toLowerCase())
+      .eq("claimer", params.claimer.toLowerCase());
 
     if (error) throw new Error(error.message);
 

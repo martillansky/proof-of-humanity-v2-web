@@ -4,7 +4,7 @@ import { REQUESTS_DISPLAY_BATCH } from "config/misc";
 import { sdk } from "config/subgraph";
 import { RequestsQuery } from "generated/graphql";
 import { Address, Hash, concat, keccak256, toHex } from "viem";
-// import axios from "axios";
+import axios from "axios";
 
 export const getRequestsInitData = async () => {
   const res = await Promise.all(
@@ -48,11 +48,15 @@ export const getOffChainVouches = async (
   claimer: Address,
   pohId: Hash
 ) => {
-  // try {
-  //   return (
-  //     await axios.get(`/api/vouch/${chainId}/for-request/${claimer}/${pohId}`)
-  //   ).data as { voucher: Address; expiration: number; signature: Hash }[];
-  // } catch {
-  return [];
-  // }
+  try {
+    return (
+      await axios.get(
+        `https://v2.poh.id/api/vouch/${chainId}/for-request/${claimer}/${pohId}`
+      )
+    ).data as { voucher: Address; expiration: number; signature: Hash }[];
+  } catch (err: any) {
+    console.log(err);
+
+    return [];
+  }
 };

@@ -13,8 +13,6 @@ export async function GET(
   { params }: { params: RequestParams }
 ) {
   try {
-    if (!params.chain || !params.min) throw new Error("Invalid query");
-
     const chain = paramToChain(params.chain);
 
     if (!chain) throw new Error("unsupported chain");

@@ -40,8 +40,6 @@ export async function POST(
   { params }: { params: AddVouchParams }
 ) {
   try {
-    if (!params.chain) throw new Error("No chain param given");
-
     const chain = paramToChain(params.chain);
 
     if (!chain) throw new Error("unsupported chain");
@@ -72,13 +70,17 @@ export async function POST(
       },
       types: {
         IsHumanVoucher: [
-          { name: "claimer", type: "address" },
-          { name: "pohId", type: "bytes20" },
-          { name: "expiration", type: "uint256" },
+          { name: "vouched", type: "address" },
+          { name: "humanityId", type: "bytes20" },
+          { name: "expirationTimestamp", type: "uint256" },
         ],
       },
       primaryType: "IsHumanVoucher",
-      message: { claimer, pohId, expiration: BigInt(expiration) },
+      message: {
+        vouched: claimer,
+        humanityId: pohId,
+        expirationTimestamp: BigInt(expiration),
+      },
       signature,
     });
 
@@ -89,18 +91,18 @@ export async function POST(
         .from("poh-vouchdb")
         .upsert({
           chainId: chain.id,
-          pohId,
-          claimer,
-          voucher,
+          pohId: pohId.toLowerCase(),
+          claimer: claimer.toLowerCase(),
+          voucher: voucher.toLowerCase(),
           expiration,
-          signature,
+          signature: signature.toLowerCase(),
         })
         .select(),
       datalake
         .from("poh-vouchdb")
         .delete()
-        .eq("pohId", pohId)
-        .eq("voucher", voucher),
+        .eq("pohId", pohId.toLowerCase())
+        .eq("voucher", voucher.toLowerCase()),
     ]);
 
     return NextResponse.json(
