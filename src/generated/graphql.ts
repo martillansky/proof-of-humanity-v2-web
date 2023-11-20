@@ -1195,6 +1195,7 @@ export enum Humanity_OrderBy {
   Requests = 'requests',
   UsedVouch = 'usedVouch',
   UsedVouchId = 'usedVouch__id',
+  UsedVouchProcessed = 'usedVouch__processed',
   Vouching = 'vouching'
 }
 
@@ -3045,59 +3046,17 @@ export type Vouch = {
 
 export type VouchInProcess = {
   __typename?: 'VouchInProcess';
-  from: Humanity;
-  humanity: Humanity;
   id: Scalars['Bytes'];
+  processed: Scalars['Boolean'];
   request: Request;
   vouch: Vouch;
+  voucher: Humanity;
 };
 
 export type VouchInProcess_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<VouchInProcess_Filter>>>;
-  from?: InputMaybe<Scalars['String']>;
-  from_?: InputMaybe<Humanity_Filter>;
-  from_contains?: InputMaybe<Scalars['String']>;
-  from_contains_nocase?: InputMaybe<Scalars['String']>;
-  from_ends_with?: InputMaybe<Scalars['String']>;
-  from_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  from_gt?: InputMaybe<Scalars['String']>;
-  from_gte?: InputMaybe<Scalars['String']>;
-  from_in?: InputMaybe<Array<Scalars['String']>>;
-  from_lt?: InputMaybe<Scalars['String']>;
-  from_lte?: InputMaybe<Scalars['String']>;
-  from_not?: InputMaybe<Scalars['String']>;
-  from_not_contains?: InputMaybe<Scalars['String']>;
-  from_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  from_not_ends_with?: InputMaybe<Scalars['String']>;
-  from_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  from_not_in?: InputMaybe<Array<Scalars['String']>>;
-  from_not_starts_with?: InputMaybe<Scalars['String']>;
-  from_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  from_starts_with?: InputMaybe<Scalars['String']>;
-  from_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  humanity?: InputMaybe<Scalars['String']>;
-  humanity_?: InputMaybe<Humanity_Filter>;
-  humanity_contains?: InputMaybe<Scalars['String']>;
-  humanity_contains_nocase?: InputMaybe<Scalars['String']>;
-  humanity_ends_with?: InputMaybe<Scalars['String']>;
-  humanity_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  humanity_gt?: InputMaybe<Scalars['String']>;
-  humanity_gte?: InputMaybe<Scalars['String']>;
-  humanity_in?: InputMaybe<Array<Scalars['String']>>;
-  humanity_lt?: InputMaybe<Scalars['String']>;
-  humanity_lte?: InputMaybe<Scalars['String']>;
-  humanity_not?: InputMaybe<Scalars['String']>;
-  humanity_not_contains?: InputMaybe<Scalars['String']>;
-  humanity_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  humanity_not_ends_with?: InputMaybe<Scalars['String']>;
-  humanity_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  humanity_not_in?: InputMaybe<Array<Scalars['String']>>;
-  humanity_not_starts_with?: InputMaybe<Scalars['String']>;
-  humanity_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  humanity_starts_with?: InputMaybe<Scalars['String']>;
-  humanity_starts_with_nocase?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['Bytes']>;
   id_contains?: InputMaybe<Scalars['Bytes']>;
   id_gt?: InputMaybe<Scalars['Bytes']>;
@@ -3109,6 +3068,10 @@ export type VouchInProcess_Filter = {
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   or?: InputMaybe<Array<InputMaybe<VouchInProcess_Filter>>>;
+  processed?: InputMaybe<Scalars['Boolean']>;
+  processed_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  processed_not?: InputMaybe<Scalars['Boolean']>;
+  processed_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   request?: InputMaybe<Scalars['String']>;
   request_?: InputMaybe<Request_Filter>;
   request_contains?: InputMaybe<Scalars['String']>;
@@ -3151,26 +3114,32 @@ export type VouchInProcess_Filter = {
   vouch_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   vouch_starts_with?: InputMaybe<Scalars['String']>;
   vouch_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  voucher?: InputMaybe<Scalars['String']>;
+  voucher_?: InputMaybe<Humanity_Filter>;
+  voucher_contains?: InputMaybe<Scalars['String']>;
+  voucher_contains_nocase?: InputMaybe<Scalars['String']>;
+  voucher_ends_with?: InputMaybe<Scalars['String']>;
+  voucher_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  voucher_gt?: InputMaybe<Scalars['String']>;
+  voucher_gte?: InputMaybe<Scalars['String']>;
+  voucher_in?: InputMaybe<Array<Scalars['String']>>;
+  voucher_lt?: InputMaybe<Scalars['String']>;
+  voucher_lte?: InputMaybe<Scalars['String']>;
+  voucher_not?: InputMaybe<Scalars['String']>;
+  voucher_not_contains?: InputMaybe<Scalars['String']>;
+  voucher_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  voucher_not_ends_with?: InputMaybe<Scalars['String']>;
+  voucher_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  voucher_not_in?: InputMaybe<Array<Scalars['String']>>;
+  voucher_not_starts_with?: InputMaybe<Scalars['String']>;
+  voucher_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  voucher_starts_with?: InputMaybe<Scalars['String']>;
+  voucher_starts_with_nocase?: InputMaybe<Scalars['String']>;
 };
 
 export enum VouchInProcess_OrderBy {
-  From = 'from',
-  FromClaimerName = 'from__claimerName',
-  FromId = 'from__id',
-  FromNbLegacyRequests = 'from__nbLegacyRequests',
-  FromNbPendingRequests = 'from__nbPendingRequests',
-  FromNbRequests = 'from__nbRequests',
-  FromPendingRevocation = 'from__pendingRevocation',
-  FromVouching = 'from__vouching',
-  Humanity = 'humanity',
-  HumanityClaimerName = 'humanity__claimerName',
-  HumanityId = 'humanity__id',
-  HumanityNbLegacyRequests = 'humanity__nbLegacyRequests',
-  HumanityNbPendingRequests = 'humanity__nbPendingRequests',
-  HumanityNbRequests = 'humanity__nbRequests',
-  HumanityPendingRevocation = 'humanity__pendingRevocation',
-  HumanityVouching = 'humanity__vouching',
   Id = 'id',
+  Processed = 'processed',
   Request = 'request',
   RequestChallengePeriodEnd = 'request__challengePeriodEnd',
   RequestCreationTime = 'request__creationTime',
@@ -3182,7 +3151,15 @@ export enum VouchInProcess_OrderBy {
   RequestResolutionTime = 'request__resolutionTime',
   RequestRevocation = 'request__revocation',
   Vouch = 'vouch',
-  VouchId = 'vouch__id'
+  VouchId = 'vouch__id',
+  Voucher = 'voucher',
+  VoucherClaimerName = 'voucher__claimerName',
+  VoucherId = 'voucher__id',
+  VoucherNbLegacyRequests = 'voucher__nbLegacyRequests',
+  VoucherNbPendingRequests = 'voucher__nbPendingRequests',
+  VoucherNbRequests = 'voucher__nbRequests',
+  VoucherPendingRevocation = 'voucher__pendingRevocation',
+  VoucherVouching = 'voucher__vouching'
 }
 
 export type Vouch_Filter = {
@@ -3355,7 +3332,7 @@ export type RequestQueryVariables = Exact<{
 }>;
 
 
-export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', index: any, revocation: boolean, requester: any, creationTime: any, lastStatusChange: any, status: { __typename?: 'Status', id: string }, vouches: Array<{ __typename?: 'VouchInProcess', humanity: { __typename?: 'Humanity', id: any } }>, humanity: { __typename?: 'Humanity', id: any, nbRequests: any, nbLegacyRequests: any, registration?: { __typename?: 'Registration', claimer: { __typename?: 'Claimer', id: any } } | null, winnerClaim: Array<{ __typename?: 'Request', index: any, resolutionTime: any, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', uri: string }> } }> }, claimer: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any, registration?: { __typename?: 'Registration', expirationTime: any, humanity: { __typename?: 'Humanity', vouching: boolean } } | null }, humanity: { __typename?: 'Humanity', id: any } }> }, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', id: any, uri: string, creationTime: any, submitter: any }> }, challenges: Array<{ __typename?: 'Challenge', id: any, disputeId: any, nbRounds: any, reason: { __typename?: 'Reason', id: string }, challenger?: { __typename?: 'Challenger', id: any } | null, rounds: Array<{ __typename?: 'Round', requesterFund: { __typename?: 'RequesterFund', amount: any }, challengerFund?: { __typename?: 'ChallengerFund', amount: any } | null }> }>, arbitratorHistory: { __typename?: 'ArbitratorHistory', updateTime: any, registrationMeta: string } } | null };
+export type RequestQuery = { __typename?: 'Query', request?: { __typename?: 'Request', index: any, revocation: boolean, requester: any, creationTime: any, lastStatusChange: any, status: { __typename?: 'Status', id: string }, vouches: Array<{ __typename?: 'VouchInProcess', voucher: { __typename?: 'Humanity', id: any } }>, humanity: { __typename?: 'Humanity', id: any, nbRequests: any, nbLegacyRequests: any, registration?: { __typename?: 'Registration', claimer: { __typename?: 'Claimer', id: any } } | null, winnerClaim: Array<{ __typename?: 'Request', index: any, resolutionTime: any, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', uri: string }> } }> }, claimer: { __typename?: 'Claimer', id: any, name?: string | null, vouchesReceived: Array<{ __typename?: 'Vouch', from: { __typename?: 'Claimer', id: any, registration?: { __typename?: 'Registration', expirationTime: any, humanity: { __typename?: 'Humanity', vouching: boolean } } | null }, humanity: { __typename?: 'Humanity', id: any } }> }, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', id: any, uri: string, creationTime: any, submitter: any }> }, challenges: Array<{ __typename?: 'Challenge', id: any, disputeId: any, nbRounds: any, reason: { __typename?: 'Reason', id: string }, challenger?: { __typename?: 'Challenger', id: any } | null, rounds: Array<{ __typename?: 'Round', requesterFund: { __typename?: 'RequesterFund', amount: any }, challengerFund?: { __typename?: 'ChallengerFund', amount: any } | null }> }>, arbitratorHistory: { __typename?: 'ArbitratorHistory', updateTime: any, registrationMeta: string } } | null };
 
 export type RequestsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']>;
@@ -3536,7 +3513,7 @@ export const RequestDocument = gql`
     creationTime
     lastStatusChange
     vouches {
-      humanity {
+      voucher {
         id
       }
     }

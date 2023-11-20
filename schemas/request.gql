@@ -9,7 +9,7 @@ query Request($id: ID!) {
     creationTime
     lastStatusChange
     vouches {
-      humanity {
+      voucher {
         id
       }
     }
