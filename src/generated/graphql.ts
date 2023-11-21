@@ -3301,6 +3301,13 @@ export type RequestsToAdvanceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type RequestsToAdvanceQuery = { __typename?: 'Query', status?: { __typename?: 'Status', requests: Array<{ __typename?: 'Request', claimer: { __typename?: 'Claimer', id: any, vouchesReceived: Array<{ __typename?: 'Vouch', humanity: { __typename?: 'Humanity', id: any, usedVouch?: { __typename?: 'VouchInProcess', id: any } | null }, from: { __typename?: 'Claimer', id: any } }> }, humanity: { __typename?: 'Humanity', id: any }, challenges: Array<{ __typename?: 'Challenge', rounds: Array<{ __typename?: 'Round', requesterFund: { __typename?: 'RequesterFund', amount: any } }> }> }> } | null };
 
+export type ClaimerQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type ClaimerQuery = { __typename?: 'Query', claimer?: { __typename?: 'Claimer', id: any, name?: string | null, registration?: { __typename?: 'Registration', humanity: { __typename?: 'Humanity', id: any, winnerClaim: Array<{ __typename?: 'Request', index: any, resolutionTime: any, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', uri: string }> } }> } } | null } | null };
+
 export type ContractQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3409,6 +3416,20 @@ export const RequestsToAdvanceDocument = gql`
   }
 }
     `;
+export const ClaimerDocument = gql`
+    query Claimer($id: ID!) {
+  claimer(id: $id) {
+    id
+    name
+    registration {
+      humanity {
+        id
+        ...winnerClaim
+      }
+    }
+  }
+}
+    ${WinnerClaimFragmentDoc}`;
 export const ContractDocument = gql`
     query Contract {
   contract(id: "0x00") {
@@ -3644,6 +3665,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     RequestsToAdvance(variables?: RequestsToAdvanceQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RequestsToAdvanceQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<RequestsToAdvanceQuery>(RequestsToAdvanceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'RequestsToAdvance', 'query');
+    },
+    Claimer(variables: ClaimerQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ClaimerQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<ClaimerQuery>(ClaimerDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Claimer', 'query');
     },
     Contract(variables?: ContractQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ContractQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ContractQuery>(ContractDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Contract', 'query');

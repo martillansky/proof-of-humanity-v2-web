@@ -1,0 +1,12 @@
+query Claimer($id: ID!) {
+  claimer(id: $id) {
+    id
+    name
+    registration {
+      humanity {
+        id
+        ...winnerClaim
+      }
+    }
+  }
+}

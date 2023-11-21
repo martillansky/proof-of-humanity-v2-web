@@ -1,6 +1,6 @@
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
-import { paramToChain } from "config/chains";
+import { paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
 import { getOffChainVouches, getRequestData } from "data/request";
@@ -21,6 +21,7 @@ import ChainLogo from "components/ChainLogo";
 import Info from "./Info";
 import { Address } from "viem";
 import { Hash } from "@wagmi/core";
+import { getClaimerData } from "data/claimer";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -46,6 +47,9 @@ export default async function Request({ params }: PageProps) {
     contractData.arbitrationInfo.extraData
   );
 
+  const onChainVouches = request.claimer.vouchesReceived
+    .filter((v) => v.from.registration)
+    .map((v) => v.from.id as Address);
   const offChainVouches: {
     voucher: Address;
     expiration: number;
@@ -67,7 +71,7 @@ export default async function Request({ params }: PageProps) {
     )
       action = ActionType.FUND;
     else if (
-      request.claimer.vouchesReceived.length + offChainVouches.length >=
+      onChainVouches.length + offChainVouches.length >=
       contractData.requiredNumberOfVouches
     )
       action = ActionType.ADVANCE;
@@ -133,6 +137,48 @@ export default async function Request({ params }: PageProps) {
   // advanceRequests.offChain =
   // }
 
+  const vouchersData = await Promise.all(
+    (
+      await Promise.all([
+        ...offChainVouches.map((vouch) => getClaimerData(vouch.voucher)),
+        ...onChainVouches.map((voucher) => getClaimerData(voucher)),
+      ])
+    )
+      .map((voucher) => {
+        const voucherEvidenceChain = supportedChains.find(
+          (chain) =>
+            voucher[chain.id].claimer?.registration?.humanity.winnerClaim
+        );
+        if (voucherEvidenceChain)
+          return {
+            pohId:
+              voucher[voucherEvidenceChain.id].claimer!.registration!.humanity
+                .id,
+            uri: voucher[voucherEvidenceChain.id]
+              .claimer!.registration!.humanity.winnerClaim.at(0)
+              ?.evidenceGroup.evidence.at(0)?.uri,
+          };
+        return {
+          voucher: voucher[chain.id].claimer?.id as Address,
+          pohId: undefined,
+          uri: undefined,
+        };
+      })
+      .map(async ({ voucher, pohId, uri }) => {
+        if (!uri || !pohId) return { voucher };
+        try {
+          const evFile = await ipfsFetch<EvidenceFile>(uri);
+          if (!evFile?.fileURI) return { pohId };
+          return {
+            pohId,
+            photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,
+          };
+        } catch {
+          return { pohId };
+        }
+      })
+  );
+
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
       <ActionBar
@@ -153,9 +199,7 @@ export default async function Request({ params }: PageProps) {
             ? BigInt(request.challenges[0].rounds[0].requesterFund.amount)
             : 0n
         }
-        onChainVouches={request.claimer.vouchesReceived
-          .filter((v) => v.from.registration)
-          .map((v) => v.from.id)}
+        onChainVouches={onChainVouches}
         offChainVouches={offChainVouches}
       />
 
@@ -262,7 +306,7 @@ export default async function Request({ params }: PageProps) {
                   uri={ipfs(registrationFile.photo)}
                   trigger={
                     <Image
-                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
+                      className="w-32 h-32 rounded-full cursor-pointer"
                       alt="image"
                       src={ipfs(registrationFile.photo)}
                       width={144}
@@ -284,6 +328,29 @@ export default async function Request({ params }: PageProps) {
                 controls
               />
             )}
+
+            <div className="mt-8 flex flex-col">
+              Vouched by
+              <div className="flex gap-2">
+                {vouchersData.map(({ photo, pohId, voucher }, idx) =>
+                  photo ? (
+                    <Link key={idx} href={`/${prettifyId(pohId)}`}>
+                      <Image
+                        className="w-8 h-8 rounded-full cursor-pointer"
+                        alt="image"
+                        src={ipfs(photo)}
+                        width={64}
+                        height={64}
+                      />
+                    </Link>
+                  ) : (
+                    <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
+                      <Identicon key={idx} address={voucher} diameter={32} />
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
 
             <Label className="md:hidden mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />
