@@ -20,6 +20,7 @@ import { ActionType } from "utils/enums";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { ContractData } from "data/contract";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
+import { toast } from "react-toastify";
 
 enableReactUse();
 
@@ -87,8 +88,15 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     "executeRequest",
     useMemo(
       () => ({
+        onError() {
+          toast.error("Transaction rejected");
+        },
         onLoading() {
           loading.start();
+          toast.info("Transaction pending");
+        },
+        onSuccess() {
+          toast.success("Requested executed successfully");
         },
       }),
       [loading]
@@ -98,8 +106,15 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     "advanceState",
     useMemo(
       () => ({
+        onError() {
+          toast.error("Transaction rejected");
+        },
         onLoading() {
           loading.start();
+          toast.info("Transaction pending");
+        },
+        onSuccess() {
+          toast.success("Request advanced to resolving state");
         },
       }),
       [loading]
@@ -109,8 +124,15 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     "withdrawRequest",
     useMemo(
       () => ({
+        onError() {
+          toast.error("Transaction rejected");
+        },
         onLoading() {
           loading.start();
+          toast.info("Transaction pending");
+        },
+        onSuccess() {
+          toast.success("Request withdrawn successfully");
         },
       }),
       [loading]

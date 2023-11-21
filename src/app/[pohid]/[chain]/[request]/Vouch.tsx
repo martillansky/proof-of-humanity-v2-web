@@ -8,6 +8,7 @@ import { useEffectOnce } from "@legendapp/state/react";
 import axios from "axios";
 import { Contract } from "contracts";
 import cn from "classnames";
+import { toast } from "react-toastify";
 
 interface VouchButtonProps {
   pohId: Hash;
@@ -15,7 +16,23 @@ interface VouchButtonProps {
 }
 
 export default function Vouch({ pohId, claimer }: VouchButtonProps) {
-  const [prepare, addVouch] = usePoHWrite("addVouch");
+  const [prepare, addVouch] = usePoHWrite(
+    "addVouch",
+    useMemo(
+      () => ({
+        onError() {
+          toast.error("Transaction rejected");
+        },
+        onLoading() {
+          toast.info("Transaction pending");
+        },
+        onSuccess() {
+          toast.success("Vouched successfully");
+        },
+      }),
+      []
+    )
+  );
   const { address } = useAccount();
 
   useEffectOnce(() => {
@@ -29,14 +46,21 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
   );
 
   const { signTypedData } = useSignTypedData({
-    onSuccess: async (signature) =>
-      await axios.post(`/api/vouch/${chain.name}/add`, {
-        claimer,
-        pohId,
-        voucher: address!,
-        expiration,
-        signature,
-      }),
+    onSuccess: async (signature) => {
+      try {
+        await axios.post(`/api/vouch/${chain.name}/add`, {
+          claimer,
+          pohId,
+          voucher: address!,
+          expiration,
+          signature,
+        });
+        toast.success("Vouched successfully");
+      } catch (err) {
+        console.error(err);
+        toast.error("Some error occurred");
+      }
+    },
   });
 
   const gaslessVouch = () => {
