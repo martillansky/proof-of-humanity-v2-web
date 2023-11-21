@@ -19,6 +19,8 @@ import Link from "next/link";
 import Attachment from "components/Attachment";
 import ChainLogo from "components/ChainLogo";
 import Info from "./Info";
+import { Address } from "viem";
+import { Hash } from "@wagmi/core";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -44,19 +46,28 @@ export default async function Request({ params }: PageProps) {
     contractData.arbitrationInfo.extraData
   );
 
+  const offChainVouches: {
+    voucher: Address;
+    expiration: number;
+    signature: Hash;
+  }[] = [];
+
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
     action = ActionType.NONE;
   else if (request.index < 0) action = ActionType.OLD_ACTIVE;
   else if (request.status.id === "disputed") action = ActionType.DISPUTED;
   else if (request.status.id === "vouching") {
+    offChainVouches.push(
+      ...(await getOffChainVouches(chain.id, request.claimer.id, pohId))
+    );
     if (
       BigInt(request.challenges[0].rounds[0].requesterFund.amount) <
       arbitrationCost + BigInt(contractData.baseDeposit)
     )
       action = ActionType.FUND;
     else if (
-      request.claimer.vouchesReceived.length >=
+      request.claimer.vouchesReceived.length + offChainVouches.length >=
       contractData.requiredNumberOfVouches
     )
       action = ActionType.ADVANCE;
@@ -145,11 +156,7 @@ export default async function Request({ params }: PageProps) {
         onChainVouches={request.claimer.vouchesReceived
           .filter((v) => v.from.registration)
           .map((v) => v.from.id)}
-        offChainVouches={
-          request.status.id === "vouching"
-            ? await getOffChainVouches(chain.id, request.claimer.id, pohId)
-            : []
-        }
+        offChainVouches={offChainVouches}
       />
 
       <div className="mb-6 border shadow bg-white rounded">
