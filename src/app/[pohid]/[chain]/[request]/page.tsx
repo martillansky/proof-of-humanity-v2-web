@@ -329,28 +329,30 @@ export default async function Request({ params }: PageProps) {
               />
             )}
 
-            <div className="mt-8 flex flex-col">
-              Vouched by
-              <div className="flex gap-2">
-                {vouchersData.map(({ photo, pohId, voucher }, idx) =>
-                  photo ? (
-                    <Link key={idx} href={`/${prettifyId(pohId)}`}>
-                      <Image
-                        className="w-8 h-8 rounded-full cursor-pointer"
-                        alt="image"
-                        src={ipfs(photo)}
-                        width={64}
-                        height={64}
-                      />
-                    </Link>
-                  ) : (
-                    <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
-                      <Identicon key={idx} address={voucher} diameter={32} />
-                    </Link>
-                  )
-                )}
+            {vouchersData.find((v) => v) && (
+              <div className="mt-8 flex flex-col">
+                Vouched by
+                <div className="flex gap-2">
+                  {vouchersData.map(({ photo, pohId, voucher }, idx) =>
+                    photo ? (
+                      <Link key={idx} href={`/${prettifyId(pohId)}`}>
+                        <Image
+                          className="w-8 h-8 rounded-full cursor-pointer"
+                          alt="image"
+                          src={ipfs(photo)}
+                          width={64}
+                          height={64}
+                        />
+                      </Link>
+                    ) : (
+                      <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
+                        <Identicon key={idx} address={voucher} diameter={32} />
+                      </Link>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <Label className="md:hidden mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />
