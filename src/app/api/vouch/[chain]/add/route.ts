@@ -86,24 +86,23 @@ export async function POST(
 
     if (!validSignature) throw new Error("Invalid signature");
 
-    await Promise.all([
-      datalake
-        .from("poh-vouchdb")
-        .upsert({
-          chainId: chain.id,
-          pohId: pohId.toLowerCase(),
-          claimer: claimer.toLowerCase(),
-          voucher: voucher.toLowerCase(),
-          expiration,
-          signature: signature.toLowerCase(),
-        })
-        .select(),
-      datalake
-        .from("poh-vouchdb")
-        .delete()
-        .eq("pohId", pohId.toLowerCase())
-        .eq("voucher", voucher.toLowerCase()),
-    ]);
+    await datalake
+      .from("poh-vouchdb")
+      .delete()
+      .eq("pohId", pohId.toLowerCase())
+      .eq("voucher", voucher.toLowerCase());
+
+    await datalake
+      .from("poh-vouchdb")
+      .upsert({
+        chainId: chain.id,
+        pohId: pohId.toLowerCase(),
+        claimer: claimer.toLowerCase(),
+        voucher: voucher.toLowerCase(),
+        expiration,
+        signature: signature.toLowerCase(),
+      })
+      .select();
 
     return NextResponse.json(
       { message: "Vouch added" },
