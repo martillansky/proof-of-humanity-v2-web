@@ -14,6 +14,7 @@ import { getArbitrationCost } from "data/costs";
 import TimeAgo from "components/TimeAgo";
 import Renew from "./Renew";
 import CrossChain from "./CrossChain";
+import { ipfs } from "utils/ipfs";
 
 type PoHRequest = ArrayElement<
   NonNullable<HumanityQuery["humanity"]>["requests"]
@@ -75,11 +76,27 @@ async function Profile({ params: { pohid } }: PageProps) {
     [] as PoHRequest[]
   );
 
+  const expired = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000;
+
+  const winnerClaimRequest =
+    lastEvidenceChain &&
+    !(expired) && // It did not expired
+    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0];
+  
+  // pastRequests must not contain pendingRequests nor winningClaimRequest if it did not expired
   const pastRequests = supportedChains.reduce(
     (acc, chain) => [
       ...acc,
       ...(humanity[chain.id].humanity
-        ? humanity[chain.id]!.humanity!.requests.map((req) => ({
+        ? humanity[chain.id]!.humanity!.requests.filter(
+          (req) => (
+            !pendingRequests.some((pending) => req.id === pending.id) && // No pending requests
+            (
+              winnerClaimRequest && req.index !== winnerClaimRequest.index || // No winnerClaimRequest if it did not expired
+              !winnerClaimRequest // if winnerClaimRequest has expired it is left as pastRequest
+            )
+          )
+        ).map((req) => ({
             ...req,
             chainId: chain.id,
           }))
@@ -88,9 +105,6 @@ async function Profile({ params: { pohid } }: PageProps) {
     [] as PoHRequest[]
   );
 
-  const winnerClaimRequest =
-    lastEvidenceChain &&
-    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0];
 
   const lastTransferChain = supportedChains.sort((chain1, chain2) => {
     const out1 = humanity[chain1.id]?.outTransfer;
@@ -107,6 +121,12 @@ async function Profile({ params: { pohid } }: PageProps) {
     +humanity[homeChain.id]!.humanity!.registration!.expirationTime -
       Date.now() / 1000 <
       +contractData[homeChain.id].renewalPeriodDuration;
+
+  // Still remains to obtain the policy for a request with no humanity available
+  const policyLink = 
+    homeChain ? 
+      contractData[homeChain.id].arbitrationInfo!.policy 
+    : null;
 
   return (
     <div className="content">
@@ -130,7 +150,7 @@ async function Profile({ params: { pohid } }: PageProps) {
           </span>
         </div>
 
-        {lastEvidenceChain && homeChain ? (
+        {lastEvidenceChain && homeChain && !expired ? (
           <>
             <div className="mb-2 flex text-emerald-500">
               Claimed by
@@ -208,6 +228,16 @@ async function Profile({ params: { pohid } }: PageProps) {
             </Link>
           </>
         )}
+        {policyLink && !(expired)? (
+          <Link 
+            className="ml-2 underline underline-offset-2" 
+            href={ipfs(policyLink)}
+          >
+            Policy in force at the moment of the claim
+          </Link>
+        ) : (
+          null
+        )}
       </div>
 
       <div className={"flex flex-col sm:flex-row sm:gap-4"}>
@@ -237,6 +267,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 }
                 revocation={false}
                 status="resolved"
+                expired={false}
               />
             </div>
           </div>
@@ -270,6 +301,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                   requester={req.requester}
                   revocation={req.revocation}
                   status={req.status.id}
+                  expired={false}
                 />
               ))}
             </div>
@@ -298,6 +330,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 requester={req.requester}
                 revocation={req.revocation}
                 status={req.status.id}
+                expired={req.status.id=="resolved" && !(req.revocation)}
               />
             ))}
           </div>

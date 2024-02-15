@@ -186,8 +186,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       });
     }
 
-    if (action === ActionType.EXECUTE)
-      prepareExecute({ args: [requester, BigInt(index)] });
+    if (action === ActionType.EXECUTE) prepareExecute({ args: [pohId, BigInt(index)] });
   });
 
   useEffect(() => {

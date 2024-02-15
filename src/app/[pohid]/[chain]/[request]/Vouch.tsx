@@ -96,7 +96,7 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
         <span className="txt m-2">
           Make sure the person exists and only vouch for people you have
           physically encountered. Note that in case a profile is removed for
-          (Duplicate) or (Does not exist), all people who had vouched for it get
+          (Sybil attack) or (Identity theft), all people who had vouched for it get
           removed as well. Profiles that do not follow the Policy risk being
           challenged and removed. Make sure you read and understand the Policy
           before proceeding.

@@ -13,12 +13,12 @@ export type queryReturnType<Q extends queryType> = Record<
 export const sdk = {
   [sepolia.id]: getSdk(
     new GraphQLClient(
-      "https://api.studio.thegraph.com/query/42323/proof-of-humanity-sepolia/version/latest"
+      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
     )
   ),
   [gnosis.id]: getSdk(
     new GraphQLClient(
-      "https://api.studio.thegraph.com/query/42323/proof-of-humanity-gnosis/version/latest"
+      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
     )
   ),
 };
