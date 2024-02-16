@@ -48,6 +48,7 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   advanceRequestsOnChainVouches?: { claimer: Address; vouchers: Address[] }[];
   onChainVouches: Address[];
   offChainVouches: { voucher: Address; expiration: number; signature: Hash }[];
+  expired: boolean;
 }
 
 export default withClientConnected<ActionBarProps>(function ActionBar({
@@ -65,6 +66,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   onChainVouches,
   offChainVouches,
   // advanceRequestsOnChainVouches,
+  expired,
 }) {
   const chain = useChainParam()!;
   const { address } = useAccount();
@@ -138,6 +140,24 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
+  const [prepareRemoveVouch, remove_vouch] = usePoHWrite(
+    "removeVouch",
+    useMemo(
+      () => ({
+        onError() {
+          toast.error("Transaction rejected");
+        },
+        onLoading() {
+          loading.start();
+          toast.info("Transaction pending");
+        },
+        onSuccess() {
+          toast.success("Request remove vouch successful");
+        },
+      }),
+      [loading]
+    )
+  );
   const advance = useCallback(
     () => advanceFire(),
     // || multicallAdvanceFire
@@ -201,8 +221,23 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       prepareWithdraw();
   }, [address, prepareWithdraw, action, requester, revocation, chain, userChainId]);
 
+  useEffect(() => {
+    if ((action === ActionType.REMOVE_VOUCH) && isRemoveVouchAvailable())
+      prepareRemoveVouch({ args: [requester, pohId] });
+  }, [address, prepareRemoveVouch, action, chain, userChainId]);
+
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
-  const statusColor = colorForStatus(status, revocation);
+  const statusColor = colorForStatus(status, revocation, expired);
+
+  const isRemoveVouchAvailable = () => {
+    return (
+      (onChainVouches.length + offChainVouches.length >= 0) && 
+      (
+        (onChainVouches.some(voucherAddress => voucherAddress === address?.toLocaleLowerCase())) || 
+        (offChainVouches.some(voucher => voucher.voucher === address?.toLocaleLowerCase()))
+      )
+    );
+  }
 
   return (
     <div className="paper p-6 flex flex-col md:flex-row justify-between items-center gap-2 border-b">
@@ -211,12 +246,16 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         <span
           className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}
         >
-          {camelToTitle(status)}
+          {expired && !revocation?
+            'Expired'
+          :
+            camelToTitle(status)
+          }
         </span>
       </div>
       <div className="w-full ml-8 flex flex-col md:flex-row md:items-center justify-between gap-2 font-normal">
         {web3Loaded &&
-          (action === ActionType.VOUCH || action === ActionType.FUND) && (
+          (action === ActionType.REMOVE_VOUCH || action === ActionType.VOUCH || action === ActionType.FUND) && (
             <>
               <div className="flex gap-6">
                 <span className="text-slate-400">
@@ -253,14 +292,23 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   />
                 )}
 
-                {requester === address?.toLowerCase() ? (
+                {action === ActionType.REMOVE_VOUCH && isRemoveVouchAvailable() ? (
                   <button
-                    disabled={pending || withdrawState.prepare !== "success"}
+                    disabled={pending/*  || removeVouchState.prepare !== "success" */}
                     className="btn-main mb-2"
-                    onClick={withdraw}
+                    onClick={remove_vouch}
                   >
-                    Withdraw
+                    Remove Vouch
                   </button>
+                ) : 
+                  requester === address?.toLowerCase() ? (
+                    <button
+                      disabled={pending || withdrawState.prepare !== "success"}
+                      className="btn-main mb-2"
+                      onClick={withdraw}
+                    >
+                      Withdraw
+                    </button>
                 ) : (
                   <Vouch pohId={pohId} claimer={requester} />
                 )}
@@ -280,6 +328,14 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   onClick={withdraw}
                 >
                   Withdraw
+                </button>
+              ) : isRemoveVouchAvailable() ? (
+                <button
+                  disabled={pending/*  || removeVouchState.prepare !== "success" */}
+                  className="btn-main mb-2"
+                  onClick={remove_vouch}
+                >
+                  Remove Vouch
                 </button>
               ) : (
                 <Vouch pohId={pohId} claimer={requester} />

@@ -7,4 +7,5 @@ export enum ActionType {
   CHALLENGE,
   DISPUTED,
   EXECUTE,
+  REMOVE_VOUCH,
 }

@@ -95,7 +95,7 @@ function Card({
   expired,
 }: CardInterface) {
   const statusTitle = queryToStatus(status, revocation);
-  const statusColor = colorForStatus(status, revocation);
+  const statusColor = colorForStatus(status, revocation, expired);
 
   const chain = idToChain(chainId)!;
 

@@ -58,17 +58,17 @@ const normalize = (
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
           expired: 
+            request.status.id === "resolved" && 
             request.humanity.winnerClaim.length>0 && 
-            !!humanityLifespan &&
-            request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
-            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000
+            !!humanityLifespan && 
+            ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
+            request.humanity.winnerClaim[0].index !== request.index)
         })),
       ]},
       []
     )
     .sort((req1, req2) => req2.index - req1.index);
-
-    console.log(">>>>>>>>>>>>>>>>>>>>>> ", requests)
     
     const uniqueIds = new Map();
     // requests are ordered by creation time, 
@@ -77,9 +77,10 @@ const normalize = (
     requests.forEach(req => {
       if (
         !uniqueIds.has(req.humanity.id) ||
-        (req.status.id !== "resolved" &&
-        uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
-        (uniqueIds.get(req.humanity.id).status.id === "resolved" && (uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired)))
+        (req.status.id !== "resolved" && 
+        req.status.id !== "withdrawn" &&
+        (uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
+        (uniqueIds.get(req.humanity.id).status.id === "resolved" && (uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired))))
       ) {
         uniqueIds.set(req.humanity.id, req);
       }

@@ -13,11 +13,13 @@ module.exports = {
         status: {
           vouching: "#be75ff",
           registered: "#00d9a1",
-          removed: "#999999",
+          //removed: "#999999",
+          removed: "#E879F9",
           revocation: "#f60c6e",
           claim: "#00d1ff",
           challenged: "#ff9900",
           withdrawn: "#888888",
+          expired: "#15803D",
         },
         shade: {
           50: "#fffcfa",
@@ -56,6 +58,7 @@ module.exports = {
     "bg-status-claim",
     "bg-status-challenged",
     "bg-status-withdrawn",
+    "bg-status-expired",
     "text-status-vouching",
     "text-status-registered",
     "text-status-removed",
@@ -63,6 +66,7 @@ module.exports = {
     "text-status-claim",
     "text-status-challenged",
     "text-status-withdrawn",
+    "text-status-expired",
     "border-status-vouching",
     "border-status-registered",
     "border-status-removed",
@@ -70,5 +74,6 @@ module.exports = {
     "border-status-claim",
     "border-status-challenged",
     "border-status-withdrawn",
+    "border-status-expired",
   ],
 };

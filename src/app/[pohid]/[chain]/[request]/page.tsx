@@ -22,6 +22,7 @@ import Info from "./Info";
 import { Address } from "viem";
 import { Hash } from "@wagmi/core";
 import { getClaimerData } from "data/claimer";
+import { Request } from "generated/graphql";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -56,6 +57,14 @@ export default async function Request({ params }: PageProps) {
     signature: Hash;
   }[] = [];
 
+  const expired = 
+    request.status.id === "resolved" && 
+    !request.revocation &&
+    request.humanity.winnerClaim.length>0 && 
+    (request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+    (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
+    request.humanity.winnerClaim[0].index !== request.index);
+
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
     action = ActionType.NONE;
@@ -75,6 +84,8 @@ export default async function Request({ params }: PageProps) {
       contractData.requiredNumberOfVouches
     )
       action = ActionType.ADVANCE;
+    else if (onChainVouches.length + offChainVouches.length >= 0)
+      action = ActionType.REMOVE_VOUCH;
     else action = ActionType.VOUCH;
   } else if (request.status.id == "resolving")
     action =
@@ -186,6 +197,7 @@ export default async function Request({ params }: PageProps) {
         arbitrationCost={arbitrationCost}
         index={request.index}
         status={request.status.id}
+        expired={expired}
         requester={request.requester}
         contractData={contractData}
         pohId={pohId}
