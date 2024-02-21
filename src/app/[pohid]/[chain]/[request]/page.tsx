@@ -61,10 +61,11 @@ export default async function Request({ params }: PageProps) {
     request.status.id === "resolved" && 
     !request.revocation &&
     request.humanity.winnerClaim.length>0 && 
-    (request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
-    (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
+    !!contractData.humanityLifespan && 
+    ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+    Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
     request.humanity.winnerClaim[0].index !== request.index);
-
+  
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
     action = ActionType.NONE;
@@ -344,6 +345,7 @@ export default async function Request({ params }: PageProps) {
             {vouchersData.find((v) => v) && (
               <div className="mt-8 flex flex-col">
                 Vouched by
+                <div className="w-full flex flex-col md:flex-row md:items-center justify-between font-normal">
                 <div className="flex gap-2">
                   {vouchersData.map(({ photo, pohId, voucher }, idx) =>
                     photo ? (
@@ -362,6 +364,7 @@ export default async function Request({ params }: PageProps) {
                       </Link>
                     )
                   )}
+                </div>
                 </div>
               </div>
             )}

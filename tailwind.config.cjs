@@ -11,15 +11,14 @@ module.exports = {
       colors: {
         theme: "#ff9966",
         status: {
-          vouching: "#be75ff",
-          registered: "#00d9a1",
-          //removed: "#999999",
-          removed: "#E879F9",
-          revocation: "#f60c6e",
-          claim: "#00d1ff",
-          challenged: "#ff9900",
-          withdrawn: "#888888",
-          expired: "#15803D",
+          vouching: "#BE75FF",
+          registered: "#00D9A1",
+          removed: "#F60C36",
+          revocation: "#FF7A00",
+          claim: "#00D1FF",
+          challenged: "#FFBE66",
+          withdrawn: "#999999",
+          expired: "#000000",
         },
         shade: {
           50: "#fffcfa",

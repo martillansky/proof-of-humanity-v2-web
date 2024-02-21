@@ -109,9 +109,9 @@ function Card({
         <div className="p-2 centered font-medium">
           <span className={`text-status-${statusColor}`}>
             {expired && !revocation?
-              'Expired Humanity'
+              'Expired'
             :
-              camelToTitle(statusTitle)
+              camelToTitle(statusTitle, revocation, expired)
             }
           </span>
           <span className={`dot ml-2 bg-status-${statusColor}`} />

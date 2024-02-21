@@ -11,7 +11,7 @@ import FundButton from "./Funding";
 import Challenge from "./Challenge";
 import { RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import withClientConnected from "components/high-order/withClientConnected";
 import { camelToTitle } from "utils/case";
 import useChainParam from "hooks/useChainParam";
@@ -21,6 +21,7 @@ import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { ContractData } from "data/contract";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import { toast } from "react-toastify";
+import RemoveVouch from "./RemoveVouch";
 
 enableReactUse();
 
@@ -140,24 +141,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
-  const [prepareRemoveVouch, remove_vouch] = usePoHWrite(
-    "removeVouch",
-    useMemo(
-      () => ({
-        onError() {
-          toast.error("Transaction rejected");
-        },
-        onLoading() {
-          loading.start();
-          toast.info("Transaction pending");
-        },
-        onSuccess() {
-          toast.success("Request remove vouch successful");
-        },
-      }),
-      [loading]
-    )
-  );
   const advance = useCallback(
     () => advanceFire(),
     // || multicallAdvanceFire
@@ -166,6 +149,32 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       //  multicallAdvanceFire
     ]
   );
+
+  const [isVouchGranted, setIsVouchGranted] = useState({didIVouchFor: false, isVouchOnchain: false});
+
+  useEffect(() => {
+    const didIVouchFor = () => {
+      console.log("onChainVouches >>>>>>>>>>>> ", onChainVouches);
+      console.log("offChainVouches >>>>>>>>>>> ", offChainVouches);
+      return (
+        (onChainVouches.length + offChainVouches.length >= 0) && 
+        (
+          (onChainVouches.some(voucherAddress => {
+            if (voucherAddress === address?.toLocaleLowerCase()) {
+              setIsVouchGranted({...isVouchGranted, isVouchOnchain: true});
+              return true;
+            }
+            return false;
+            })
+          ) || 
+          (offChainVouches.some(voucher => voucher.voucher === address?.toLocaleLowerCase()))
+        )
+      );
+    }
+
+    if (didIVouchFor()) 
+      setIsVouchGranted({...isVouchGranted, didIVouchFor: true});
+  }, [address, action, requester, revocation, chain, userChainId]);
 
   useEffectOnce(() => {
     if (action === ActionType.ADVANCE && !revocation) {
@@ -221,23 +230,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       prepareWithdraw();
   }, [address, prepareWithdraw, action, requester, revocation, chain, userChainId]);
 
-  useEffect(() => {
-    if ((action === ActionType.REMOVE_VOUCH) && isRemoveVouchAvailable())
-      prepareRemoveVouch({ args: [requester, pohId] });
-  }, [address, prepareRemoveVouch, action, chain, userChainId]);
-
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation, expired);
-
-  const isRemoveVouchAvailable = () => {
-    return (
-      (onChainVouches.length + offChainVouches.length >= 0) && 
-      (
-        (onChainVouches.some(voucherAddress => voucherAddress === address?.toLocaleLowerCase())) || 
-        (offChainVouches.some(voucher => voucher.voucher === address?.toLocaleLowerCase()))
-      )
-    );
-  }
 
   return (
     <div className="paper p-6 flex flex-col md:flex-row justify-between items-center gap-2 border-b">
@@ -249,7 +243,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           {expired && !revocation?
             'Expired'
           :
-            camelToTitle(status)
+            camelToTitle(status, revocation, expired)
           }
         </span>
       </div>
@@ -292,16 +286,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   />
                 )}
 
-                {action === ActionType.REMOVE_VOUCH && isRemoveVouchAvailable() ? (
-                  <button
-                    disabled={pending/*  || removeVouchState.prepare !== "success" */}
-                    className="btn-main mb-2"
-                    onClick={remove_vouch}
-                  >
-                    Remove Vouch
-                  </button>
-                ) : 
-                  requester === address?.toLowerCase() ? (
+                {requester === address?.toLowerCase() ? (
                     <button
                       disabled={pending || withdrawState.prepare !== "success"}
                       className="btn-main mb-2"
@@ -310,7 +295,14 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                       Withdraw
                     </button>
                 ) : (
+                  !isVouchGranted.didIVouchFor ? 
                   <Vouch pohId={pohId} claimer={requester} />
+                :
+                  <RemoveVouch 
+                    requester={requester}
+                    pohId={pohId}
+                    isOnchain={isVouchGranted.isVouchOnchain}
+                  />
                 )}
               </div>
             </>
@@ -329,16 +321,15 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                 >
                   Withdraw
                 </button>
-              ) : isRemoveVouchAvailable() ? (
-                <button
-                  disabled={pending/*  || removeVouchState.prepare !== "success" */}
-                  className="btn-main mb-2"
-                  onClick={remove_vouch}
-                >
-                  Remove Vouch
-                </button>
               ) : (
-                <Vouch pohId={pohId} claimer={requester} />
+                !isVouchGranted.didIVouchFor ? 
+                  <Vouch pohId={pohId} claimer={requester} />
+                :
+                  <RemoveVouch 
+                    requester={requester}
+                    pohId={pohId}
+                    isOnchain={isVouchGranted.isVouchOnchain}
+                  />
               )}
               <button
                 disabled={pending}
@@ -350,18 +341,27 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             </div>
           </>
         )}
-
         {action === ActionType.EXECUTE && (
           <>
             <span className="text-slate-400">Ready to finalize.</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between font-normal gap-4">
+              {isVouchGranted.didIVouchFor ? 
+                <RemoveVouch 
+                  requester={requester}
+                  pohId={pohId}
+                  isOnchain={isVouchGranted.isVouchOnchain}
+                />
+                : null
+              }
 
-            <button
-              disabled={pending}
-              className="btn-main mb-2"
-              onClick={execute}
-            >
-              Execute
-            </button>
+              <button
+                disabled={pending}
+                className="btn-main mb-2"
+                onClick={execute}
+              >
+                Execute
+              </button>
+            </div>
           </>
         )}
 
@@ -393,7 +393,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   {" "}
                   for{" "}
                   <strong className="text-status-challenged">
-                    {camelToTitle(currentChallenge.reason.id)}
+                    {camelToTitle(currentChallenge.reason.id, revocation, expired)}
                   </strong>
                 </>
               )}
@@ -410,6 +410,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         )}
 
         {status === "resolved" && (
+          <>
           <span>
             Request was accepted
             <TimeAgo
@@ -418,6 +419,17 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             />
             .
           </span>
+          <div className="flex flex-col md:flex-row md:items-center justify-between font-normal gap-4">
+            {isVouchGranted.didIVouchFor ? 
+              <RemoveVouch 
+                requester={requester}
+                pohId={pohId}
+                isOnchain={isVouchGranted.isVouchOnchain}
+              />
+              : null
+            }
+          </div>
+          </>
         )}
 
         {index < 0 && (

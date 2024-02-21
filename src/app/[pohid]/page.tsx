@@ -308,7 +308,6 @@ async function Profile({ params: { pohid } }: PageProps) {
           </div>
         )}
       </div>
-
       {pastRequests.length > 0 && (
         <>
           <div className="p-4 mt-8 mb-1">
@@ -330,7 +329,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 requester={req.requester}
                 revocation={req.revocation}
                 status={req.status.id}
-                expired={req.status.id=="resolved" && !(req.revocation)}
+                expired={((req.status.id=="resolved") && !(req.revocation))}
               />
             ))}
           </div>
