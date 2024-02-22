@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useEffectOnce } from "@legendapp/state/react";
 import axios from "axios";
 import useChainParam from "hooks/useChainParam";
+import { useAccount } from "wagmi";
 
 enableReactUse();
 
@@ -21,7 +22,7 @@ export default function RemoveVouch({ pohId, requester, isOnchain }: RemoveVouch
   const [pending] = loading.use();
   const chain = useChainParam()!;
 
-  const [prepareRemoveVouch, remove_onchain_vouch] = usePoHWrite(
+  const [prepareRemoveVouch, removeOnchainVouch] = usePoHWrite(
     "removeVouch",
     useMemo(
       () => ({
@@ -44,27 +45,29 @@ export default function RemoveVouch({ pohId, requester, isOnchain }: RemoveVouch
     prepareRemoveVouch({ args: [requester, pohId] });
   });
 
-  /* const remove_offchain_vouch = async () => {
+  const { address } = useAccount();
+  const voucher = address!.toLowerCase();
+
+  const removeOffchainVouch = async () => {
     try {
       await axios.delete(`/api/vouch/${chain.name}/remove`, {
-        requester,
-        pohId,
-        voucher: address!,
-        expiration,
-        signature,
+        data: {
+          pohId: pohId,
+          voucher: voucher
+        }
       });
-      toast.success("Vouched successfully");
+      toast.success("Vouch removed successfully");
     } catch (err) {
       console.error(err);
       toast.error("Some error occurred");
     }
-  }; */
+  };
   
   const removeVouch = () => {
     if (isOnchain)
-      remove_onchain_vouch()
+      removeOnchainVouch()
     else
-      remove_onchain_vouch() //remove_offchain_vouch()
+      removeOffchainVouch()
   }
 
   return (
