@@ -7,7 +7,8 @@ import { toast } from "react-toastify";
 import { useEffectOnce } from "@legendapp/state/react";
 import axios from "axios";
 import useChainParam from "hooks/useChainParam";
-import { useAccount } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
+import { Contract } from "contracts";
 
 enableReactUse();
 
@@ -47,8 +48,54 @@ export default function RemoveVouch({ pohId, requester, isOnchain }: RemoveVouch
 
   const { address } = useAccount();
   const voucher = address!.toLowerCase();
+  const expiration = useMemo(
+    () => Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 * 6,
+    []
+  );
 
-  const removeOffchainVouch = async () => {
+  const { signTypedData } = useSignTypedData({
+    onSuccess: async (signature) => {
+      try {
+        await axios.delete(`/api/vouch/${chain.name}/remove`, {
+          data: {
+            pohId: pohId,
+            voucher: voucher,
+            claimer: requester,
+            expiration: expiration,
+            signature
+          }
+        });
+        toast.success("Vouch removed successfully");
+      } catch (err) {
+        console.error(err);
+        toast.error("Some error occurred");
+      }
+    },
+  });
+
+  const removeOffchainVouch = () => {
+    signTypedData({
+      domain: {
+        name: "Proof of Humanity",
+        chainId: chain.id,
+        verifyingContract: Contract.ProofOfHumanity[chain.id],
+      },
+      types: {
+        IsHumanVoucher: [
+          { name: "vouched", type: "address" },
+          { name: "humanityId", type: "bytes20" },
+          { name: "expirationTimestamp", type: "uint256" },
+        ],
+      },
+      primaryType: "IsHumanVoucher",
+      message: {
+        vouched: requester,
+        humanityId: pohId,
+        expirationTimestamp: BigInt(expiration),
+      },
+    });
+  };
+  /* const removeOffchainVouch = async () => {
     try {
       await axios.delete(`/api/vouch/${chain.name}/remove`, {
         data: {
@@ -62,7 +109,7 @@ export default function RemoveVouch({ pohId, requester, isOnchain }: RemoveVouch
       toast.error("Some error occurred");
     }
   };
-  
+   */
   const removeVouch = () => {
     if (isOnchain)
       removeOnchainVouch()
