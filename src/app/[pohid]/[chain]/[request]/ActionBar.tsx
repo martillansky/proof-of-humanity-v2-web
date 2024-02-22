@@ -161,7 +161,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         (
           (onChainVouches.some(voucherAddress => {
             if (voucherAddress === address?.toLocaleLowerCase()) {
-              setIsVouchGranted({...isVouchGranted, isVouchOnchain: true});
+              setIsVouchGranted(prevState => ({...prevState, isVouchOnchain: true}));
               return true;
             }
             return false;
@@ -173,7 +173,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     }
 
     if (didIVouchFor()) 
-      setIsVouchGranted({...isVouchGranted, didIVouchFor: true});
+      setIsVouchGranted(prevState => ({...prevState, didIVouchFor: true}));
   }, [address, action, requester, revocation, chain, userChainId]);
 
   useEffectOnce(() => {

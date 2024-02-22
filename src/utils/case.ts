@@ -1,5 +1,4 @@
 export const camelToTitle = (strIn: string, revocation?: boolean, expired?: boolean) => {
-  console.log(strIn)
   let str: string = strIn;
   switch (strIn) {
     case "vouching":

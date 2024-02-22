@@ -95,23 +95,9 @@ export default function RemoveVouch({ pohId, requester, isOnchain }: RemoveVouch
       },
     });
   };
-  /* const removeOffchainVouch = async () => {
-    try {
-      await axios.delete(`/api/vouch/${chain.name}/remove`, {
-        data: {
-          pohId: pohId,
-          voucher: voucher
-        }
-      });
-      toast.success("Vouch removed successfully");
-    } catch (err) {
-      console.error(err);
-      toast.error("Some error occurred");
-    }
-  };
-   */
+  
   const removeVouch = () => {
-    if (isOnchain)
+    if (isOnchain) 
       removeOnchainVouch()
     else
       removeOffchainVouch()
