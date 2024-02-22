@@ -436,7 +436,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           <span>
             Check submission on
             <ExternalLink
-              className={`ml-1 text-status-${statusColor}`}
+              className={`ml-1 text-status-${statusColor} ml-2 underline underline-offset-2`}
               href={`https://app.proofofhumanity.id/profile/${pohId}`}
             >
               old interface

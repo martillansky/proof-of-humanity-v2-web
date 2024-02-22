@@ -14,7 +14,6 @@ import { getArbitrationCost } from "data/costs";
 import TimeAgo from "components/TimeAgo";
 import Renew from "./Renew";
 import CrossChain from "./CrossChain";
-import { ipfs } from "utils/ipfs";
 
 type PoHRequest = ArrayElement<
   NonNullable<HumanityQuery["humanity"]>["requests"]
@@ -122,12 +121,6 @@ async function Profile({ params: { pohid } }: PageProps) {
       Date.now() / 1000 <
       +contractData[homeChain.id].renewalPeriodDuration;
 
-  // Still remains to obtain the policy for a request with no humanity available
-  const policyLink = 
-    homeChain ? 
-      contractData[homeChain.id].arbitrationInfo!.policy 
-    : null;
-
   return (
     <div className="content">
       <div className="mt-24 paper pt-20 relative flex flex-col items-center">
@@ -227,16 +220,6 @@ async function Profile({ params: { pohid } }: PageProps) {
               Claim humanity
             </Link>
           </>
-        )}
-        {policyLink && !(expired)? (
-          <Link 
-            className="ml-2 underline underline-offset-2" 
-            href={ipfs(policyLink)}
-          >
-            Policy in force at the moment of the claim
-          </Link>
-        ) : (
-          null
         )}
       </div>
 

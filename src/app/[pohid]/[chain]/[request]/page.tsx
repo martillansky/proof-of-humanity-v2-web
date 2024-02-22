@@ -191,6 +191,9 @@ export default async function Request({ params }: PageProps) {
       })
   );
 
+  const policyLink = contractData.arbitrationInfo!.policy;
+  const policyUpdate = contractData.arbitrationInfo!.updateTime;
+
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
       <ActionBar
@@ -342,32 +345,43 @@ export default async function Request({ params }: PageProps) {
               />
             )}
 
-            {vouchersData.find((v) => v) && (
-              <div className="mt-8 flex flex-col">
-                Vouched by
-                <div className="w-full flex flex-col md:flex-row md:items-center justify-between font-normal">
-                <div className="flex gap-2">
-                  {vouchersData.map(({ photo, pohId, voucher }, idx) =>
-                    photo ? (
-                      <Link key={idx} href={`/${prettifyId(pohId)}`}>
-                        <Image
-                          className="w-8 h-8 rounded-full cursor-pointer"
-                          alt="image"
-                          src={ipfs(photo)}
-                          width={64}
-                          height={64}
-                        />
-                      </Link>
-                    ) : (
-                      <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
-                        <Identicon key={idx} address={voucher} diameter={32} />
-                      </Link>
-                    )
-                  )}
+            <div className="w-full md:flex-row md:items-center justify-between">
+              {vouchersData.find((v) => v) && (
+                <div className="mt-8 flex flex-col">
+                  Vouched by
+                  
+                  <div className="flex gap-2">
+                    {vouchersData.map(({ photo, pohId, voucher }, idx) =>
+                      photo ? (
+                        <Link key={idx} href={`/${prettifyId(pohId)}`}>
+                          <Image
+                            className="w-8 h-8 rounded-full cursor-pointer"
+                            alt="image"
+                            src={ipfs(photo)}
+                            width={64}
+                            height={64}
+                          />
+                        </Link>
+                      ) : (
+                        <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
+                          <Identicon key={idx} address={voucher} diameter={32} />
+                        </Link>
+                      )
+                    )}
+                  </div>
                 </div>
+              )}
+              {policyLink && (
+                <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
+                  <Link 
+                    className="ml-2 underline underline-offset-2" 
+                    href={ipfs(policyLink)}
+                  >
+                    Policy in force (Updated on {new Date(policyUpdate * 1000).toDateString()})
+                  </Link>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <Label className="md:hidden mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />
