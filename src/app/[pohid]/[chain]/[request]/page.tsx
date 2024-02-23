@@ -22,6 +22,7 @@ import Info from "./Info";
 import { Address } from "viem";
 import { Hash } from "@wagmi/core";
 import { getClaimerData } from "data/claimer";
+import { Request } from "generated/graphql";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -56,6 +57,15 @@ export default async function Request({ params }: PageProps) {
     signature: Hash;
   }[] = [];
 
+  const expired = 
+    request.status.id === "resolved" && 
+    !request.revocation &&
+    request.humanity.winnerClaim.length>0 && 
+    !!contractData.humanityLifespan && 
+    ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+    Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
+    request.humanity.winnerClaim[0].index !== request.index);
+  
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
     action = ActionType.NONE;
@@ -75,6 +85,8 @@ export default async function Request({ params }: PageProps) {
       contractData.requiredNumberOfVouches
     )
       action = ActionType.ADVANCE;
+    else if (onChainVouches.length + offChainVouches.length >= 0)
+      action = ActionType.REMOVE_VOUCH;
     else action = ActionType.VOUCH;
   } else if (request.status.id == "resolving")
     action =
@@ -179,6 +191,9 @@ export default async function Request({ params }: PageProps) {
       })
   );
 
+  const policyLink = contractData.arbitrationInfo!.policy;
+  const policyUpdate = contractData.arbitrationInfo!.updateTime;
+
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
       <ActionBar
@@ -186,6 +201,7 @@ export default async function Request({ params }: PageProps) {
         arbitrationCost={arbitrationCost}
         index={request.index}
         status={request.status.id}
+        expired={expired}
         requester={request.requester}
         contractData={contractData}
         pohId={pohId}
@@ -329,30 +345,43 @@ export default async function Request({ params }: PageProps) {
               />
             )}
 
-            {vouchersData.find((v) => v) && (
-              <div className="mt-8 flex flex-col">
-                Vouched by
-                <div className="flex gap-2">
-                  {vouchersData.map(({ photo, pohId, voucher }, idx) =>
-                    photo ? (
-                      <Link key={idx} href={`/${prettifyId(pohId)}`}>
-                        <Image
-                          className="w-8 h-8 rounded-full cursor-pointer"
-                          alt="image"
-                          src={ipfs(photo)}
-                          width={64}
-                          height={64}
-                        />
-                      </Link>
-                    ) : (
-                      <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
-                        <Identicon key={idx} address={voucher} diameter={32} />
-                      </Link>
-                    )
-                  )}
+            <div className="w-full md:flex-row md:items-center justify-between">
+              {vouchersData.find((v) => v) && (
+                <div className="mt-8 flex flex-col">
+                  Vouched by
+                  
+                  <div className="flex gap-2">
+                    {vouchersData.map(({ photo, pohId, voucher }, idx) =>
+                      photo ? (
+                        <Link key={idx} href={`/${prettifyId(pohId)}`}>
+                          <Image
+                            className="w-8 h-8 rounded-full cursor-pointer"
+                            alt="image"
+                            src={ipfs(photo)}
+                            width={64}
+                            height={64}
+                          />
+                        </Link>
+                      ) : (
+                        <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
+                          <Identicon key={idx} address={voucher} diameter={32} />
+                        </Link>
+                      )
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+              {policyLink && (
+                <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
+                  <Link 
+                    className="ml-2 underline underline-offset-2" 
+                    href={ipfs(policyLink)}
+                  >
+                    Policy in force (Updated on {new Date(policyUpdate * 1000).toDateString()})
+                  </Link>
+                </div>
+              )}
+            </div>
 
             <Label className="md:hidden mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />

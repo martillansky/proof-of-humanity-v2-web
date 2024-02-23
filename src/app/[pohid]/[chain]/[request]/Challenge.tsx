@@ -67,7 +67,13 @@ const ReasonCard: React.FC<ReasonCardInterface> = ({
     onClick={() => current.set(reason)}
   >
     <div className="flex flex-col h-full p-4 bg-white rounded-sm text-center">
-      <Image alt={reason} src={reasonToImage[reason]} />
+      <Image 
+        width={500}
+        height={200}
+        className="object-cover"
+        alt={reason} 
+        src={reasonToImage[reason]} 
+      />
       {text}
     </div>
   </div>
@@ -167,7 +173,11 @@ export default function Challenge({
                 text="Sybil Attack"
                 current={reason$}
               />
-              <ReasonCard reason="deceased" text="Deceased" current={reason$} />
+              <ReasonCard 
+                reason="deceased" 
+                text="Deceased" 
+                current={reason$} 
+              />
             </div>
           </>
         )}
@@ -184,7 +194,7 @@ export default function Challenge({
         </div>
 
         <button
-          disabled={revocation !== !reason || !justification}
+          disabled={(!revocation? !justification || reason === 'none': !justification)}
           className="btn-main mt-12"
           onClick={submit}
         >

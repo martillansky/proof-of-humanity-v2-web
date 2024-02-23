@@ -72,7 +72,7 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
             Faucet
           </ExternalLink>
         )}
-        {pathname !== "/" && <Link href="/">Requests</Link>}
+        {pathname !== "/" && <Link href="/">Profiles</Link>}
         {me &&
           (me.pohId ? (
             <Link href={`/${prettifyId(me.pohId)}`}>PoH ID</Link>

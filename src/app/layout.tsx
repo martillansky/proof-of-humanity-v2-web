@@ -4,7 +4,7 @@ import cn from "classnames";
 import Footer from "./Footer";
 import { getContractData } from "data/contract";
 import { defaultChain } from "config/chains";
-import { ipfs, ipfsFetch } from "utils/ipfs";
+import { ipfs } from "utils/ipfs";
 import { Metadata } from "next";
 import Toastify from "./Toastify";
 import "./globals.css";

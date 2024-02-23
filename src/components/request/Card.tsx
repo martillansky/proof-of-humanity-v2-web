@@ -24,6 +24,7 @@ interface ContentProps {
   claimer: RequestsQueryItem["claimer"];
   requester: Address;
   humanity: { id: Hash } & WinnerClaimFragment;
+  expired: boolean;
 }
 
 interface CardInterface extends ContentProps {
@@ -55,6 +56,7 @@ const Content = ({
   evidence,
   requester,
   claimer,
+  expired,
 }: ContentProps) => {
   const [evidenceURI] = useIPFS<EvidenceFile>(
     revocation
@@ -90,9 +92,10 @@ function Card({
   claimer,
   evidence,
   humanity: { id: pohId, winnerClaim },
+  expired,
 }: CardInterface) {
   const statusTitle = queryToStatus(status, revocation);
-  const statusColor = colorForStatus(status, revocation);
+  const statusColor = colorForStatus(status, revocation, expired);
 
   const chain = idToChain(chainId)!;
 
@@ -105,7 +108,11 @@ function Card({
         <div className={`w-full h-1 bg-status-${statusColor}`} />
         <div className="p-2 centered font-medium">
           <span className={`text-status-${statusColor}`}>
-            {camelToTitle(statusTitle)}
+            {expired && !revocation?
+              'Expired'
+            :
+              camelToTitle(statusTitle, revocation, expired)
+            }
           </span>
           <span className={`dot ml-2 bg-status-${statusColor}`} />
         </div>
@@ -123,6 +130,7 @@ function Card({
             humanity={{ id: pohId, winnerClaim }}
             requester={requester}
             revocation={revocation}
+            expired={expired}
           />
         </Suspense>
       </ErrorBoundary>

@@ -45,7 +45,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   const web3Loaded = useWeb3Loaded();
   const chainId = useChainId();
 
-  const [prepareTransfer] = useCCPoHWrite(
+  const [prepareTransfer, doTransfer] = useCCPoHWrite(
     "transferHumanity",
     useMemo(
       () => ({
@@ -107,7 +107,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
           <Modal
             formal
             header="Transfer"
-            trigger={<button className="text-sky-500">Transfer</button>}
+            trigger={<button className="text-sky-500" onClick={doTransfer}>Transfer</button>}
           >
             <div className="p-4">
               <span className="txt m-2">

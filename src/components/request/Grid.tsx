@@ -31,8 +31,11 @@ import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
 import { getRequestsInitData } from "data/request";
 import Image from "next/image";
+import { getContractDataAllChains } from "data/contract";
 
 enableReactUse();
+
+var humanityLifespanAllChains: Partial<Record<SupportedChainId, string>> = {};
 
 export type RequestsQueryItem = ArrayElement<RequestsQuery["requests"]>;
 
@@ -41,21 +44,52 @@ interface RequestInterface extends RequestsQueryItem {
 }
 
 const normalize = (
-  requestsData: Record<SupportedChainId, RequestsQueryItem[]>
-) =>
+  requestsData: Record<SupportedChainId, RequestsQueryItem[]>,
+) => {  
+  const requests = 
   Object.keys(requestsData)
     .reduce<RequestInterface[]>(
-      (acc, chainId) => [
+      (acc, chainId) => {
+        const humanityLifespan = !!humanityLifespanAllChains && humanityLifespanAllChains[Number(chainId) as SupportedChainId];
+        return [
         ...acc,
         ...requestsData[Number(chainId) as SupportedChainId].map((request) => ({
           ...request,
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
+          expired: 
+            request.status.id === "resolved" && 
+            request.humanity.winnerClaim.length>0 && 
+            !!humanityLifespan && 
+            ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
+            request.humanity.winnerClaim[0].index !== request.index)
         })),
-      ],
+      ]},
       []
     )
-    .sort((req1, req2) => req2.creationTime - req1.creationTime);
+    .sort((req1, req2) => req2.index - req1.index);
+    
+    const uniqueIds = new Map();
+    // requests are ordered by creation time, 
+    // we keep only the last active (pending) request from which the status of the profile is determined. 
+    // Thus a withdrawn status can be more recent but shouldn't be the actual status if a pending status still prevails.
+    requests.forEach(req => {
+      if (
+        !uniqueIds.has(req.humanity.id) ||
+        (req.status.id !== "resolved" && 
+        req.status.id !== "withdrawn" &&
+        (uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
+        (uniqueIds.get(req.humanity.id).status.id === "resolved" && (uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired))))
+      ) {
+        uniqueIds.set(req.humanity.id, req);
+      }
+    });
+    const requestsOut = [...uniqueIds.values()]
+      .sort((req1, req2) => req2.creationTime - req1.creationTime);
+
+    return requestsOut
+}
 
 const filterChainStacksForChain = (
   chainStacks: Record<SupportedChainId, RequestsQueryItem[]>,
@@ -91,6 +125,17 @@ function RequestsGrid() {
       {} as Record<SupportedChainId, RequestsQuery["requests"]>
     )
   );
+  
+  useEffect(() => {
+    const getLifespanData = async () => {
+      const [contractData] = await Promise.all([getContractDataAllChains()]);
+      Object.keys(contractData).map(
+        (chainId) => humanityLifespanAllChains[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan
+      );
+    }
+    getLifespanData();
+  }, []);
+
   const requests = useSelector(() =>
     normalize(chainStacks$.get()).slice(0, REQUESTS_BATCH_SIZE * filter.cursor)
   );
@@ -102,7 +147,7 @@ function RequestsGrid() {
   useEffect(() => {
     const timer = setTimeout(
       () => filter$.assign({ search: searchQuery, cursor: 1 }),
-      500
+      100
     );
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -269,6 +314,7 @@ function RequestsGrid() {
             status={request.status.id}
             revocation={request.revocation}
             evidence={request.evidenceGroup.evidence}
+            expired={request.expired}
           />
         ))}
       </div>
