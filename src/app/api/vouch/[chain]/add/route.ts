@@ -86,12 +86,12 @@ export async function POST(
 
     if (!validSignature) throw new Error("Invalid signature");
 
-    await datalake
+/*     await datalake
       .from("poh-vouchdb")
       .delete()
       .eq("pohId", pohId.toLowerCase())
       .eq("voucher", voucher.toLowerCase());
-
+ */
     await datalake
       .from("poh-vouchdb")
       .upsert({

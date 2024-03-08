@@ -297,12 +297,12 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                 ) : (
                   !isVouchGranted.didIVouchFor ? 
                   <Vouch pohId={pohId} claimer={requester} />
-                :
+                : isVouchGranted.isVouchOnchain ? 
                   <RemoveVouch 
                     requester={requester}
                     pohId={pohId}
-                    isOnchain={isVouchGranted.isVouchOnchain}
                   />
+                : null
                 )}
               </div>
             </>
@@ -324,12 +324,12 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               ) : (
                 !isVouchGranted.didIVouchFor ? 
                   <Vouch pohId={pohId} claimer={requester} />
-                :
+                : isVouchGranted.isVouchOnchain ? 
                   <RemoveVouch 
                     requester={requester}
                     pohId={pohId}
-                    isOnchain={isVouchGranted.isVouchOnchain}
                   />
+                : null
               )}
               <button
                 disabled={pending}
@@ -345,15 +345,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           <>
             <span className="text-slate-400">Ready to finalize.</span>
             <div className="flex flex-col md:flex-row md:items-center justify-between font-normal gap-4">
-              {isVouchGranted.didIVouchFor ? 
-                <RemoveVouch 
-                  requester={requester}
-                  pohId={pohId}
-                  isOnchain={isVouchGranted.isVouchOnchain}
-                />
-                : null
-              }
-
               <button
                 disabled={pending}
                 className="btn-main mb-2"
@@ -419,16 +410,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             />
             .
           </span>
-          <div className="flex flex-col md:flex-row md:items-center justify-between font-normal gap-4">
-            {isVouchGranted.didIVouchFor ? 
-              <RemoveVouch 
-                requester={requester}
-                pohId={pohId}
-                isOnchain={isVouchGranted.isVouchOnchain}
-              />
-              : null
-            }
-          </div>
           </>
         )}
 

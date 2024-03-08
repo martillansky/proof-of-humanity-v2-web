@@ -99,7 +99,8 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
           (Sybil attack) or (Identity theft), all people who had vouched for it get
           removed as well. Profiles that do not follow the Policy risk being
           challenged and removed. Make sure you read and understand the Policy
-          before proceeding.
+          before proceeding. Also take into account that although a gasless vouch is possible, 
+          it cannot be removed. Gasless vouches expire after one year. 
         </span>
         <button
           className={cn(
