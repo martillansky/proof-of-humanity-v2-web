@@ -41,6 +41,7 @@ export type RequestsQueryItem = ArrayElement<RequestsQuery["requests"]>;
 
 interface RequestInterface extends RequestsQueryItem {
   chainId: SupportedChainId;
+  expired: boolean;
 }
 
 const normalize = (
@@ -69,7 +70,6 @@ const normalize = (
       []
     )
     .sort((req1, req2) => req2.index - req1.index);
-    
     const uniqueIds = new Map();
     // requests are ordered by creation time, 
     // we keep only the last active (pending) request from which the status of the profile is determined. 
@@ -77,6 +77,7 @@ const normalize = (
     requests.forEach(req => {
       if (
         !uniqueIds.has(req.humanity.id) ||
+        (req.status.id === "resolved" && req.humanity.winnerClaim.length>0 && req.humanity.winnerClaim[0].index === req.index && !req.expired) ||
         (req.status.id !== "resolved" && 
         req.status.id !== "withdrawn" &&
         (uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||

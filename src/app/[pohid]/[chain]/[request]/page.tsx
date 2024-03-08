@@ -1,6 +1,6 @@
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
-import { paramToChain, supportedChains } from "config/chains";
+import { SupportedChain, getChainRpc, paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
 import { getOffChainVouches, getRequestData } from "data/request";
@@ -19,10 +19,12 @@ import Link from "next/link";
 import Attachment from "components/Attachment";
 import ChainLogo from "components/ChainLogo";
 import Info from "./Info";
-import { Address } from "viem";
+import { Address, createPublicClient, getContract, http } from "viem";
 import { Hash } from "@wagmi/core";
 import { getClaimerData } from "data/claimer";
 import { Request } from "generated/graphql";
+import abis from "contracts/abis";
+import { Contract } from "contracts";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -149,6 +151,22 @@ export default async function Request({ params }: PageProps) {
   // advanceRequests.offChain =
   // }
 
+  const getProofOfHumanity = (chain: SupportedChain) =>
+  getContract({
+    abi: abis.ProofOfHumanity,
+    address: Contract.ProofOfHumanity[chain.id],
+    publicClient: createPublicClient({
+      chain,
+      transport: http(getChainRpc(chain.id)),
+    }),
+  });
+
+  const isVoucherHuman = async (voucher: `0x${string}`, chain: SupportedChain): Promise<boolean> => {
+    const poh = getProofOfHumanity(chain);
+    const result = await poh.read.isHuman([voucher]);
+    return result;
+  }
+
   const vouchersData = await Promise.all(
     (
       await Promise.all([
@@ -161,22 +179,26 @@ export default async function Request({ params }: PageProps) {
           (chain) =>
             voucher[chain.id].claimer?.registration?.humanity.winnerClaim
         );
-        if (voucherEvidenceChain)
+        
+        if (voucherEvidenceChain) {
           return {
-            pohId:
-              voucher[voucherEvidenceChain.id].claimer!.registration!.humanity
-                .id,
+            pohId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
             uri: voucher[voucherEvidenceChain.id]
               .claimer!.registration!.humanity.winnerClaim.at(0)
               ?.evidenceGroup.evidence.at(0)?.uri,
-          };
+            chain: voucherEvidenceChain,
+            voucherId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
+          }
+        };
         return {
           voucher: voucher[chain.id].claimer?.id as Address,
           pohId: undefined,
           uri: undefined,
+          chain: chain,
+          voucherId: voucher[chain.id].claimer!.registration!.humanity.id,
         };
       })
-      .map(async ({ voucher, pohId, uri }) => {
+      .map(async ({ voucher, pohId, uri, voucherId, chain }) => {
         if (!uri || !pohId) return { voucher };
         try {
           const evFile = await ipfsFetch<EvidenceFile>(uri);
@@ -184,6 +206,7 @@ export default async function Request({ params }: PageProps) {
           return {
             pohId,
             photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,
+            isHuman: await isVoucherHuman(voucherId, chain),
           };
         } catch {
           return { pohId };
@@ -351,11 +374,12 @@ export default async function Request({ params }: PageProps) {
                   Vouched by
                   
                   <div className="flex gap-2">
-                    {vouchersData.map(({ photo, pohId, voucher }, idx) =>
-                      photo ? (
+                    {vouchersData.map(({ photo, pohId, voucher, isHuman }, idx) => {
+                      const className = `w-8 h-8 rounded-full cursor-pointer ${!isHuman? 'opacity-25' : ''}`
+                      return photo ? (
                         <Link key={idx} href={`/${prettifyId(pohId)}`}>
                           <Image
-                            className="w-8 h-8 rounded-full cursor-pointer"
+                            className={className}
                             alt="image"
                             src={ipfs(photo)}
                             width={64}
@@ -367,7 +391,7 @@ export default async function Request({ params }: PageProps) {
                           <Identicon key={idx} address={voucher} diameter={32} />
                         </Link>
                       )
-                    )}
+                    })}
                   </div>
                 </div>
               )}
