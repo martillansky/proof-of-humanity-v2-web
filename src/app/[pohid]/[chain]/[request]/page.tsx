@@ -161,10 +161,22 @@ export default async function Request({ params }: PageProps) {
     }),
   });
 
-  const isVoucherHuman = async (voucher: `0x${string}`, chain: SupportedChain): Promise<boolean> => {
+  interface VouchStatus {
+    isValid: boolean; 
+    reason: string | undefined;
+  }
+  
+  const getVouchStatus = async (voucher: `0x${string}`, chain: SupportedChain): Promise<VouchStatus> => {
     const poh = getProofOfHumanity(chain);
-    const result = await poh.read.isHuman([voucher]);
-    return result;
+    const isHuman = await poh.read.isHuman([voucher]);
+    if (!isHuman) return {isValid: false, reason: "No personhood"};
+
+    const infoArray = await poh.read.getHumanityInfo([voucher]);
+    const isVouching = infoArray[0];
+    if (isVouching) return {isValid: false, reason: "Vouching"};
+    const isExpired = Number(infoArray[3]) <= Date.now() / 1000;
+    if (isExpired) return {isValid: false, reason: "Expired Vouch"};
+    return {isValid: true, reason: undefined};
   }
 
   const vouchersData = await Promise.all(
@@ -206,7 +218,7 @@ export default async function Request({ params }: PageProps) {
           return {
             pohId,
             photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,
-            isHuman: await isVoucherHuman(voucherId, chain),
+            vouchStatus: await getVouchStatus(voucherId, chain),
           };
         } catch {
           return { pohId };
@@ -374,17 +386,26 @@ export default async function Request({ params }: PageProps) {
                   Vouched by
                   
                   <div className="flex gap-2">
-                    {vouchersData.map(({ photo, pohId, voucher, isHuman }, idx) => {
-                      const className = `w-8 h-8 rounded-full cursor-pointer ${!isHuman? 'opacity-25' : ''}`
+                    {vouchersData.map(({ photo, pohId, voucher, vouchStatus }, idx) => {
+                      const className = `w-8 h-8 rounded-full cursor-pointer ${!vouchStatus?.isValid? 'opacity-25' : ''}`
                       return photo ? (
                         <Link key={idx} href={`/${prettifyId(pohId)}`}>
-                          <Image
-                            className={className}
-                            alt="image"
-                            src={ipfs(photo)}
-                            width={64}
-                            height={64}
-                          />
+                          <div className="group flex relative">
+                            <Image
+                              className={className}
+                              alt="image"
+                              src={ipfs(photo)}
+                              width={64}
+                              height={64}
+                            />
+                            {vouchStatus.reason?
+                              <span className="group-hover:opacity-100 transition-opacity bg-gray-600 px-1 text-xs text-gray-100 rounded-md absolute left-1/2 
+                                -translate-x-1/2 translate-y-full opacity-0 m-4 mx-auto"
+                              >
+                                {vouchStatus.reason}
+                              </span>
+                            : null}
+                          </div>
                         </Link>
                       ) : (
                         <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
