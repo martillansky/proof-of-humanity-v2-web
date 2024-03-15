@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+console.log(">>>>>>>> ", process.env.REACT_APP_IPFS_GATEWAY);
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) config.resolve.fallback.fs = false;
@@ -14,7 +15,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: `${process.env.REACT_APP_IPFS_GATEWAY.slice(8)}`,
+        hostname: process.env.REACT_APP_IPFS_GATEWAY,
         //hostname: "ipfs.kleros.io",
         port: "",
         pathname: "/ipfs/**",
