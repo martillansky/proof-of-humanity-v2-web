@@ -1,6 +1,5 @@
 import axios from "axios";
-
-export const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY || "ipfs.kleros.io";
+import { IPFS_GATEWAY } from "../config";
 
 export const uploadToIPFS = async (data: FormData) => {
   const result = await axios.post("/api/ipfs-upload", data);
