@@ -1,5 +1,4 @@
 /** @type {import('next').NextConfig} */
-console.log(">>>>>>>> ", process.env.REACT_APP_IPFS_GATEWAY);
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) config.resolve.fallback.fs = false;
