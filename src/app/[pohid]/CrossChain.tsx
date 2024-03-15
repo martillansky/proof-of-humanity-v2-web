@@ -31,6 +31,15 @@ interface CrossChainProps extends JSX.IntrinsicAttributes {
   lastTransferChain?: SupportedChain;
 }
 
+type TransferType = {
+  transferHash: string,
+  foreignProxy: Address,
+  transferTimestamp: string,
+  senderChain: SupportedChain | undefined,
+  receivingChain: SupportedChain,
+  received: boolean,
+}
+
 export default withClientConnected<CrossChainProps>(function CrossChain({
   pohId,
   contractData,
@@ -74,7 +83,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
     )
   );
 
-  const transfer$ = useObservable({
+  const transfer$ = useObservable<TransferType>({
     transferHash: lastTransfer?.transferHash,
     foreignProxy: lastTransfer?.foreignProxy,
     transferTimestamp: lastTransfer?.transferTimestamp,

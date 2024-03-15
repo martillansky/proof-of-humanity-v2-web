@@ -39,6 +39,14 @@ async function Profile({ params: { pohid } }: PageProps) {
     (chain) => !!humanity[chain.id]?.humanity?.registration
   );
 
+  const homeCrossChain = !(!!homeChain) && supportedChains.find(
+    (chain) => !!humanity[chain.id]?.crossChainRegistration
+  );
+
+  const humanityHomeChainRegistration = homeChain && humanity[homeChain.id]!.humanity!.registration;
+  const humanityCrossChainRegistration = homeCrossChain && humanity[homeCrossChain.id].crossChainRegistration;
+
+
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
         homeChain,
@@ -59,6 +67,8 @@ async function Profile({ params: { pohid } }: PageProps) {
       })[0]
     : null;
 
+  const humanityLEChainRegistration = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration;
+  
   const pendingRequests = supportedChains.reduce(
     (acc, chain) => [
       ...acc,
@@ -75,13 +85,19 @@ async function Profile({ params: { pohid } }: PageProps) {
     [] as PoHRequest[]
   );
 
-  const expired = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000;
 
-  const winnerClaimRequest =
-    lastEvidenceChain &&
-    !(expired) && // It did not expired
-    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0];
+  let expired = (lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000) 
   
+  let winnerClaimRequest =
+    (lastEvidenceChain &&
+    !(expired) && // It did not expired
+    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0]);
+  
+  if (!winnerClaimRequest) {
+    winnerClaimRequest = (!!homeCrossChain && humanity[homeCrossChain.id].humanity!.winnerClaim[0]);
+    expired = (!!humanityCrossChainRegistration && humanityCrossChainRegistration.expirationTime < Date.now() / 1000);
+  }
+
   // pastRequests must not contain pendingRequests nor winningClaimRequest if it did not expired
   const pastRequests = supportedChains.reduce(
     (acc, chain) => [
@@ -213,6 +229,18 @@ async function Profile({ params: { pohid } }: PageProps) {
               lastTransferChain={lastTransferChain}
             />
           </>
+        ) : homeCrossChain && humanityCrossChainRegistration ? (
+          <CrossChain
+            claimer={
+              humanityCrossChainRegistration!.claimer.id
+            }
+            contractData={contractData}
+            homeChain={homeCrossChain}
+            pohId={pohId}
+            humanity={humanity}
+            lastTransfer={humanity[lastTransferChain.id].outTransfer}
+            lastTransferChain={lastTransferChain}
+          />
         ) : (
           <>
             <span className="mb-6 text-theme">Not claimed</span>
@@ -224,34 +252,62 @@ async function Profile({ params: { pohid } }: PageProps) {
       </div>
 
       <div className={"flex flex-col sm:flex-row sm:gap-4"}>
-        {homeChain && winnerClaimRequest && (
+        {((homeChain && lastEvidenceChain) || (homeCrossChain)) && winnerClaimRequest && (
           <div>
-            <div className="p-4 mt-4 mb-1">Winning claim</div>
+            <div className="p-4 mt-4 mb-1">
+            {homeChain && lastEvidenceChain? 
+              'Winning claim'
+              :
+              'Crossing chain (update)'
+            }
+            </div>
             <div
               className={cn("grid", {
                 "gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4":
                   !pendingRequests.length,
               })}
             >
-              <Card
-                chainId={lastEvidenceChain.id}
-                claimer={
-                  humanity[lastEvidenceChain.id]!.humanity!.registration!
-                    .claimer.id
-                }
-                evidence={winnerClaimRequest.evidenceGroup.evidence}
-                humanity={{
-                  id: pohId,
-                  winnerClaim: humanity[homeChain.id]!.humanity!.winnerClaim,
-                }}
-                index={winnerClaimRequest.index}
-                requester={
-                  humanity[homeChain.id]!.humanity!.registration!.claimer.id
-                }
-                revocation={false}
-                status="resolved"
-                expired={false}
-              />
+              {homeChain && lastEvidenceChain? 
+                <Card
+                  chainId={lastEvidenceChain.id}
+                  claimer={
+                    humanity[lastEvidenceChain.id]!.humanity!.registration!
+                      .claimer.id
+                  }
+                  evidence={winnerClaimRequest.evidenceGroup.evidence}
+                  humanity={{
+                    id: pohId,
+                    winnerClaim: humanity[homeChain.id]!.humanity!.winnerClaim,
+                  }}
+                  index={winnerClaimRequest.index}
+                  requester={
+                    humanity[homeChain.id]!.humanity!.registration!.claimer.id
+                  }
+                  revocation={false}
+                  status="resolved"
+                  expired={false}
+                />
+              :
+                homeCrossChain && humanityCrossChainRegistration &&
+                <Card
+                  chainId={homeCrossChain.id}
+                  claimer={
+                    humanityCrossChainRegistration!.claimer.id
+                  }
+                  evidence={winnerClaimRequest.evidenceGroup.evidence}
+                  humanity={{
+                    id: pohId,
+                    winnerClaim: humanity[homeCrossChain.id]!.humanity!.winnerClaim,
+                  }}
+                  index={winnerClaimRequest.index}
+                  requester={
+                    humanityCrossChainRegistration!.claimer.id
+                  }
+                  revocation={false}
+                  status="resolved"
+                  expired={false}
+                />
+              }
             </div>
           </div>
         )}

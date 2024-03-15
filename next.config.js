@@ -14,7 +14,8 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "ipfs.kleros.io",
+        hostname: process.env.REACT_APP_IPFS_GATEWAY,
+        //hostname: "ipfs.kleros.io",
         port: "",
         pathname: "/ipfs/**",
       },

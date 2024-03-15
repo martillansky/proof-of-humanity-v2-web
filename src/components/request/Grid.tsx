@@ -58,7 +58,7 @@ const normalize = (
           ...request,
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
-          expired: 
+          expired:
             request.status.id === "resolved" && 
             request.humanity.winnerClaim.length>0 && 
             !!humanityLifespan && 
