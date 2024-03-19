@@ -25,6 +25,7 @@ import { getClaimerData } from "data/claimer";
 import { Request } from "generated/graphql";
 import abis from "contracts/abis";
 import { Contract } from "contracts";
+import Vouch from "components/Vouch";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -195,6 +196,7 @@ export default async function Request({ params }: PageProps) {
         if (voucherEvidenceChain) {
           return {
             pohId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
+            name: voucher[voucherEvidenceChain.id].claimer!.name,
             uri: voucher[voucherEvidenceChain.id]
               .claimer!.registration!.humanity.winnerClaim.at(0)
               ?.evidenceGroup.evidence.at(0)?.uri,
@@ -204,18 +206,20 @@ export default async function Request({ params }: PageProps) {
         };
         return {
           voucher: voucher[chain.id].claimer?.id as Address,
+          name: voucher[chain.id].claimer?.name,
           pohId: undefined,
           uri: undefined,
           chain: chain,
           voucherId: voucher[chain.id].claimer!.registration!.humanity.id,
         };
       })
-      .map(async ({ voucher, pohId, uri, voucherId, chain }) => {
+      .map(async ({ voucher, name, pohId, uri, voucherId, chain }) => {
         if (!uri || !pohId) return { voucher };
         try {
           const evFile = await ipfsFetch<EvidenceFile>(uri);
           if (!evFile?.fileURI) return { pohId };
           return {
+            name,
             pohId,
             photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,
             vouchStatus: await getVouchStatus(voucherId, chain),
@@ -384,33 +388,19 @@ export default async function Request({ params }: PageProps) {
               {vouchersData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched by
-                  
                   <div className="flex gap-2">
-                    {vouchersData.map(({ photo, pohId, voucher, vouchStatus }, idx) => {
-                      const className = `w-8 h-8 rounded-full cursor-pointer ${!vouchStatus?.isValid? 'opacity-25' : ''}`
-                      return photo ? (
-                        <Link key={idx} href={`/${prettifyId(pohId)}`}>
-                          <div className="group flex relative">
-                            <Image
-                              className={className}
-                              alt="image"
-                              src={ipfs(photo)}
-                              width={64}
-                              height={64}
-                            />
-                            {vouchStatus.reason?
-                              <span className="group-hover:opacity-100 transition-opacity bg-gray-600 px-1 text-xs text-gray-100 rounded-md absolute left-1/2 
-                                -translate-x-1/2 translate-y-full opacity-0 m-4 mx-auto"
-                              >
-                                {vouchStatus.reason}
-                              </span>
-                            : null}
-                          </div>
-                        </Link>
-                      ) : (
-                        <Link key={idx} href={pohId && `/${prettifyId(pohId)}`}>
-                          <Identicon key={idx} address={voucher} diameter={32} />
-                        </Link>
+                    {vouchersData.map(({ photo, pohId, voucher, name, vouchStatus }, idx) => {
+                      return (
+                        <Vouch 
+                          isActive = {vouchStatus?.isValid} 
+                          reason = {vouchStatus?.reason}
+                          name = {name}
+                          photo = {photo}
+                          key = {idx} 
+                          href = {`/${prettifyId(pohId)}`}
+                          pohId = {pohId}
+                          address = {voucher}
+                        />
                       )
                     })}
                   </div>
