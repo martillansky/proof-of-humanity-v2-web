@@ -43,9 +43,10 @@ async function Profile({ params: { pohid } }: PageProps) {
     (chain) => !!humanity[chain.id]?.crossChainRegistration
   );
 
-  const humanityHomeChainRegistration = homeChain && humanity[homeChain.id]!.humanity!.registration;
+  //const humanityHomeChainRegistration = homeChain && humanity[homeChain.id]!.humanity!.registration;
   const humanityCrossChainRegistration = homeCrossChain && humanity[homeCrossChain.id].crossChainRegistration;
 
+  console.log(">>>>>>>>> >>>>>>> >>>>> >>> > ", homeChain, homeCrossChain, humanityCrossChainRegistration);
 
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
@@ -67,7 +68,7 @@ async function Profile({ params: { pohid } }: PageProps) {
       })[0]
     : null;
 
-  const humanityLEChainRegistration = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration;
+  //const humanityLEChainRegistration = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration;
   
   const pendingRequests = supportedChains.reduce(
     (acc, chain) => [
@@ -86,16 +87,16 @@ async function Profile({ params: { pohid } }: PageProps) {
   );
 
 
-  let expired = (lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000) 
+  let expired = (lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000);
   
   let winnerClaimRequest =
     (lastEvidenceChain &&
     !(expired) && // It did not expired
     humanity[lastEvidenceChain.id].humanity!.winnerClaim[0]);
   
-  if (!winnerClaimRequest) {
-    winnerClaimRequest = (!!homeCrossChain && humanity[homeCrossChain.id].humanity!.winnerClaim[0]);
+  if (!(!!lastEvidenceChain) && !winnerClaimRequest) {
     expired = (!!humanityCrossChainRegistration && humanityCrossChainRegistration.expirationTime < Date.now() / 1000);
+    winnerClaimRequest = (!expired && !!homeCrossChain && humanity[homeCrossChain.id].humanity!.winnerClaim[0]);
   }
 
   // pastRequests must not contain pendingRequests nor winningClaimRequest if it did not expired
@@ -229,7 +230,7 @@ async function Profile({ params: { pohid } }: PageProps) {
               lastTransferChain={lastTransferChain}
             />
           </>
-        ) : homeCrossChain && humanityCrossChainRegistration ? (
+        ) : homeCrossChain && humanityCrossChainRegistration && !expired ? (
           <CrossChain
             claimer={
               humanityCrossChainRegistration!.claimer.id
@@ -356,7 +357,7 @@ async function Profile({ params: { pohid } }: PageProps) {
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             {pastRequests.map((req) => (
               <Card
-                key={req.id}
+                key={req.chainId+'/'+req.id}
                 chainId={req.chainId}
                 claimer={req.claimer.id}
                 evidence={req.evidenceGroup.evidence}

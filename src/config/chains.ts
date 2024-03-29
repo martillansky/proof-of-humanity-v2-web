@@ -1,6 +1,6 @@
-import { gnosis, sepolia } from "viem/chains";
+import { gnosis, sepolia, /* gnosisChiado */ } from "viem/chains";
 
-export const supportedChains = [gnosis, sepolia];
+export const supportedChains = [gnosis, sepolia, /* gnosisChiado */];
 export const defaultChain = supportedChains[0];
 
 export const legacyChain = sepolia;
@@ -16,6 +16,8 @@ export function nameToChain(name: string): SupportedChain | null {
       return sepolia;
     case gnosis.name.toLowerCase():
       return gnosis;
+    /* case gnosisChiado.name.toLowerCase():
+      return gnosisChiado; */
     default:
       return null;
     // throw new Error("chain not supported");
@@ -28,6 +30,8 @@ export function idToChain(id: number): SupportedChain | null {
       return sepolia;
     case gnosis.id:
       return gnosis;
+    /* case gnosisChiado.id:
+      return gnosisChiado; */
     default:
       return null;
     // throw new Error("chain not supported");
@@ -49,6 +53,8 @@ export function getChainRpc(id: number): string {
       return process.env.SEPOLIA_RPC;
     case gnosis.id:
       return process.env.GNOSIS_RPC;
+    /* case gnosisChiado.id:
+      return process.env.CHIADO_RPC; */
     default:
       throw new Error("chain not supported");
   }

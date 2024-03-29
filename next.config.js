@@ -10,12 +10,14 @@ const nextConfig = {
 
     return config;
   },
+  env: {
+    REACT_APP_IPFS_GATEWAY: process.env.REACT_APP_IPFS_GATEWAY,
+  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: process.env.REACT_APP_IPFS_GATEWAY,
-        //hostname: "ipfs.kleros.io",
         port: "",
         pathname: "/ipfs/**",
       },
