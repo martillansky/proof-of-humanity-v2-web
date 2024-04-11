@@ -12,6 +12,7 @@ const nextConfig = {
   },
   env: {
     REACT_APP_IPFS_GATEWAY: process.env.REACT_APP_IPFS_GATEWAY,
+    DEPLOYED_APP: process.env.DEPLOYED_APP,
   },
   images: {
     remotePatterns: [

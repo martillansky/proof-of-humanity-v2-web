@@ -151,8 +151,6 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
     //   [renewal]
     // );
 
-    console.log(renewal?.chain.id, chainId);
-
     if (
       !isConnected ||
       (renewal &&

@@ -43,10 +43,7 @@ async function Profile({ params: { pohid } }: PageProps) {
     (chain) => !!humanity[chain.id]?.crossChainRegistration
   );
 
-  //const humanityHomeChainRegistration = homeChain && humanity[homeChain.id]!.humanity!.registration;
   const humanityCrossChainRegistration = homeCrossChain && humanity[homeCrossChain.id].crossChainRegistration;
-
-  console.log(">>>>>>>>> >>>>>>> >>>>> >>> > ", homeChain, homeCrossChain, humanityCrossChainRegistration);
 
   const arbitrationCost = homeChain
     ? await getArbitrationCost(
@@ -56,7 +53,7 @@ async function Profile({ params: { pohid } }: PageProps) {
       )
     : 0n;
 
-  const lastEvidenceChain = homeChain
+  var lastEvidenceChain = homeChain
     ? supportedChains.sort((chain1, chain2) => {
         const req1 = humanity[chain1.id]?.humanity?.winnerClaim[0];
         const req2 = humanity[chain2.id]?.humanity?.winnerClaim[0];
@@ -68,15 +65,13 @@ async function Profile({ params: { pohid } }: PageProps) {
       })[0]
     : null;
 
-  //const humanityLEChainRegistration = lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration;
-  
   const pendingRequests = supportedChains.reduce(
     (acc, chain) => [
       ...acc,
       ...(humanity[chain.id].humanity
         ? humanity[chain.id]!.humanity!.requests.filter(
             ({ status }) =>
-              status.id !== "withdrawn" && status.id !== "resolved"
+              status.id !== "withdrawn" && status.id !== "resolved" && status.id !== "transferred" 
           ).map((req) => ({
             ...req,
             chainId: chain.id,
@@ -87,16 +82,20 @@ async function Profile({ params: { pohid } }: PageProps) {
   );
 
 
-  let expired = (lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000);
+  let registered = (lastEvidenceChain && humanity[lastEvidenceChain.id]!.humanity!.registration);
+  let expired = (lastEvidenceChain && registered && humanity[lastEvidenceChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000);
   
   let winnerClaimRequest =
-    (lastEvidenceChain &&
+  (
+    lastEvidenceChain && 
+    registered &&
     !(expired) && // It did not expired
-    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0]);
+    humanity[lastEvidenceChain.id].humanity!.winnerClaim[0]
+  );
   
-  if (!(!!lastEvidenceChain) && !winnerClaimRequest) {
+  if ((!(!!lastEvidenceChain) && !winnerClaimRequest) || (!(!! expired) && !(!! winnerClaimRequest))) {
     expired = (!!humanityCrossChainRegistration && humanityCrossChainRegistration.expirationTime < Date.now() / 1000);
-    winnerClaimRequest = (!expired && !!homeCrossChain && humanity[homeCrossChain.id].humanity!.winnerClaim[0]);
+    winnerClaimRequest = (!expired && !!homeCrossChain && !!humanity[homeCrossChain.id].humanity?.registration && humanity[homeCrossChain.id].humanity!.winnerClaim[0]);
   }
 
   // pastRequests must not contain pendingRequests nor winningClaimRequest if it did not expired
@@ -230,7 +229,7 @@ async function Profile({ params: { pohid } }: PageProps) {
               lastTransferChain={lastTransferChain}
             />
           </>
-        ) : homeCrossChain && humanityCrossChainRegistration && !expired ? (
+        ) : homeCrossChain && humanityCrossChainRegistration && !expired && !!winnerClaimRequest? (
           <CrossChain
             claimer={
               humanityCrossChainRegistration!.claimer.id
@@ -305,7 +304,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                     humanityCrossChainRegistration!.claimer.id
                   }
                   revocation={false}
-                  status="resolved"
+                  status="transferred"//"resolved"
                   expired={false}
                 />
               }
@@ -368,8 +367,8 @@ async function Profile({ params: { pohid } }: PageProps) {
                 index={req.index}
                 requester={req.requester}
                 revocation={req.revocation}
-                status={req.status.id}
-                expired={((req.status.id=="resolved") && !(req.revocation))}
+                status={req.status.id=="transferred"? "resolved": req.status.id}
+                expired={((req.status.id=="resolved" || req.status.id=="transferred") && !(req.revocation))}
               />
             ))}
           </div>

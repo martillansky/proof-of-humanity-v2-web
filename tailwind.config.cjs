@@ -19,6 +19,7 @@ module.exports = {
           challenged: "#FFBE66",
           withdrawn: "#999999",
           expired: "#000000",
+          transferred: "#3F6212",
         },
         shade: {
           50: "#fffcfa",
@@ -58,6 +59,7 @@ module.exports = {
     "bg-status-challenged",
     "bg-status-withdrawn",
     "bg-status-expired",
+    "bg-status-transferred",
     "text-status-vouching",
     "text-status-registered",
     "text-status-removed",
@@ -66,6 +68,7 @@ module.exports = {
     "text-status-challenged",
     "text-status-withdrawn",
     "text-status-expired",
+    "text-status-transferred",
     "border-status-vouching",
     "border-status-registered",
     "border-status-removed",
@@ -74,5 +77,6 @@ module.exports = {
     "border-status-challenged",
     "border-status-withdrawn",
     "border-status-expired",
+    "border-status-transferred",
   ],
 };

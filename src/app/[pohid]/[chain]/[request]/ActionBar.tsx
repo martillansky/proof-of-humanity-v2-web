@@ -154,8 +154,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
   useEffect(() => {
     const didIVouchFor = () => {
-      console.log("onChainVouches >>>>>>>>>>>> ", onChainVouches);
-      console.log("offChainVouches >>>>>>>>>>> ", offChainVouches);
       return (
         (onChainVouches.length + offChainVouches.length >= 0) && 
         (

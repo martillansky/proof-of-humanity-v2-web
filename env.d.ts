@@ -9,6 +9,7 @@ declare global {
       DATALAKE_KEY: string;
       LOGTAIL_SOURCE_TOKEN: string;
       REACT_APP_IPFS_GATEWAY: string;
+      DEPLOYED_APP: string;
     }
   }
 }

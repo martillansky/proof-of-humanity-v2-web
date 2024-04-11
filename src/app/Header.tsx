@@ -105,7 +105,7 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
                 chainId={chain.id}
                 className="w-4 h-4 mr-1 fill-white"
               />
-              {chain.name}
+              {chain.name.split(' ').at(-1)}
             </button>
             <button
               className="mr-2 px-2 h-8 centered border-2 border-white/50 rounded-r bg-white/10 hover:bg-white/40 text-white"
