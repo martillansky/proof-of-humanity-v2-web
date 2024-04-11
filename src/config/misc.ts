@@ -11,13 +11,6 @@ export const statusToColor = {
   resolvedClaim: "registered",
 };
 
-// vouching
-// registered
-// removed
-// revocation
-// claim
-// challenged
-
 export const colorForStatus = (status: string, revocation: boolean, expired: boolean) => {
   switch (status) {
     case "vouching":
@@ -29,6 +22,8 @@ export const colorForStatus = (status: string, revocation: boolean, expired: boo
       return "challenged";
     case "resolved":
       return revocation ? "removed" : expired? "expired" : "registered";
+    case "transferred":
+      return status;
     default:
       throw new Error("status error");
   }

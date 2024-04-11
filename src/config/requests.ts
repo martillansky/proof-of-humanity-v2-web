@@ -10,6 +10,7 @@ export const requestStatus = {
   resolvedClaim: { filter: { status: "resolved", revocation: false } },
   resolvedRevocation: { filter: { status: "resolved", revocation: true } },
   withdrawn: { filter: { status: "withdrawn" } },
+  transferred: { filter: { status: "transferred" } },
 } as Record<string, { filter: Request_Filter }>;
 
 export type RequestStatus = keyof typeof requestStatus;
@@ -20,6 +21,7 @@ export const queryToStatus = (
 ): RequestStatus => {
   switch (status) {
     case "vouching":
+    case "transferred":
     case "withdrawn":
       return status;
     case "resolving":

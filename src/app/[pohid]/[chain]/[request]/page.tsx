@@ -103,22 +103,25 @@ export default async function Request({ params }: PageProps) {
 
   if (request.revocation) {
     const [registrationEvidence, revocationEvidence] = await Promise.all([
+      (request.humanity.winnerClaim.length>0 && request.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.length>0)?
       ipfsFetch<EvidenceFile>(
         request.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.at(-1)!.uri
-      ),
+      ): null,
       ipfsFetch<EvidenceFile>(request.evidenceGroup.evidence.at(-1)!.uri),
     ]);
 
     revocationFile = revocationEvidence;
-    registrationFile = registrationEvidence.fileURI
+    registrationFile = registrationEvidence && registrationEvidence.fileURI
       ? await ipfsFetch<RegistrationFile>(registrationEvidence.fileURI)
       : null;
   } else {
-    const registrationEvidence = await ipfsFetch<EvidenceFile>(
-      request.evidenceGroup.evidence.at(-1)!.uri
-    );
+    const registrationEvidence = 
+      request.evidenceGroup.evidence.length>0?
+      await ipfsFetch<EvidenceFile>(
+        request.evidenceGroup.evidence.at(-1)!.uri
+      ) : null;
 
-    registrationFile = registrationEvidence.fileURI
+    registrationFile = registrationEvidence && registrationEvidence.fileURI
       ? await ipfsFetch<RegistrationFile>(registrationEvidence.fileURI)
       : null;
   }

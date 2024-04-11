@@ -94,8 +94,9 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
         lastTransfer?.foreignProxy
     )!,
     received: !!supportedChains.find(
-      (c) =>
-        Contract.CrossChainProofOfHumanity[c.id] === lastTransfer?.foreignProxy
+      (c) => 
+        Contract.CrossChainProofOfHumanity[c.id].toLowerCase() === 
+        lastTransfer?.foreignProxy
     ),
   });
   const transferState = transfer$.use();
@@ -205,7 +206,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
         </div>
       </Modal>
 
-      {transferState.receivingChain && (
+      {transferState.receivingChain && !(transferState.received) && (
         <Modal
           trigger={
             <button className="m-4 p-2 border-2 border-blue-500 text-blue-500 font-bold">

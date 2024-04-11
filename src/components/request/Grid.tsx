@@ -69,7 +69,7 @@ const normalize = (
       ]},
       []
     )
-    .sort((req1, req2) => req2.index - req1.index);
+    .sort((req1, req2) => req2.creationTime - req1.creationTime);
     const uniqueIds = new Map();
     // requests are ordered by creation time, 
     // we keep only the last active (pending) request from which the status of the profile is determined. 
