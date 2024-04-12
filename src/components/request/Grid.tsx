@@ -29,7 +29,7 @@ import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
-import { getRequestsInitData } from "data/request";
+import { checkDataIntegrity, getRequestsInitData } from "data/request";
 import Image from "next/image";
 import { getContractDataAllChains } from "data/contract";
 
@@ -59,13 +59,12 @@ const normalize = (
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
           expired:
-            request.status.id === "resolved" && 
+            (request.status.id === "resolved" || request.status.id === "transferred") && 
             request.humanity.winnerClaim.length>0 && 
             !!humanityLifespan && 
-            ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
-            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
-            request.humanity.winnerClaim[0].index !== request.index)
-        })),
+            request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000
+        }))
       ]},
       []
     )
@@ -74,14 +73,36 @@ const normalize = (
     // requests are ordered by creation time, 
     // we keep only the last active (pending) request from which the status of the profile is determined. 
     // Thus a withdrawn status can be more recent but shouldn't be the actual status if a pending status still prevails.
+    // Previous requests from different chains are not considered
     requests.forEach(req => {
       if (
-        !uniqueIds.has(req.humanity.id) ||
-        (req.status.id === "resolved" && req.humanity.winnerClaim.length>0 && req.humanity.winnerClaim[0].index === req.index && !req.expired) ||
-        (req.status.id !== "resolved" && 
-        req.status.id !== "withdrawn" &&
-        (uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
-        (uniqueIds.get(req.humanity.id).status.id === "resolved" && (uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired))))
+        // if this pohId has still not being included, then it is kept
+        !uniqueIds.has(req.humanity.id) || 
+        // some previous requests can be considered 
+        (
+          // any previous request should be in the same chain in order for it to be considered 
+          (req.chainId === uniqueIds.get(req.humanity.id).chainId) && 
+          (
+            // a previous resolved request will not override the one selected before if it was revoked  
+            (
+              req.status.id === "resolved" && req.humanity.winnerClaim.length>0 && req.humanity.winnerClaim[0].index === req.index && 
+              (!req.expired && !(uniqueIds.get(req.humanity.id).status.id === "resolved" && uniqueIds.get(req.humanity.id).revocation))
+            ) || 
+            (
+              req.status.id !== "resolved" && 
+              req.status.id !== "withdrawn" &&
+              (
+                uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
+                (
+                  uniqueIds.get(req.humanity.id).status.id === "resolved" && 
+                  (
+                    uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired
+                  )
+                )
+              )
+            )
+          )
+        )
       ) {
         uniqueIds.set(req.humanity.id, req);
       }
@@ -191,17 +212,19 @@ function RequestsGrid() {
               ...(search ? { claimer_: { name_contains: search } } : {}),
             };
 
+            const promises = sdk[chain.id].Requests({
+              where,
+              first: REQUESTS_BATCH_SIZE * 4,
+              skip: loadContinued
+                ? normalize(chainStacks$.get()).filter(
+                    (request) => request.chainId === chain.id
+                  ).length
+                : 0,
+            });
+            
             fetchChains.push(chain);
             fetchPromises.push(
-              sdk[chain.id].Requests({
-                where,
-                first: REQUESTS_BATCH_SIZE * 4,
-                skip: loadContinued
-                  ? normalize(chainStacks$.get()).filter(
-                      (request) => request.chainId === chain.id
-                    ).length
-                  : 0,
-              })
+              promises
             );
           }
         }
@@ -211,7 +234,8 @@ function RequestsGrid() {
         } else {
           const res = await Promise.all(fetchPromises);
           chainStacks$.set(
-            fetchChains.reduce(
+            await checkDataIntegrity(
+              fetchChains.reduce(
               (acc, chain, i) => ({
                 ...acc,
                 [chain.id]: [
@@ -220,7 +244,7 @@ function RequestsGrid() {
                 ],
               }),
               chainStacks
-            )
+            ))
           );
         }
 
