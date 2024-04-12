@@ -3,7 +3,7 @@ import { ipfs, ipfsFetch } from "utils/ipfs";
 import { SupportedChain, getChainRpc, paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
-import { getOffChainVouches, getRequestData } from "data/request";
+import { getOffChainVouches, isPosteriorRequestResolving, getRequestData } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
@@ -65,9 +65,14 @@ export default async function Request({ params }: PageProps) {
     !request.revocation &&
     request.humanity.winnerClaim.length>0 && 
     !!contractData.humanityLifespan && 
-    ((request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
-    Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
-    request.humanity.winnerClaim[0].index !== request.index);
+    (
+      (
+        request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
+        Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000
+      ) || 
+      await isPosteriorRequestResolving(chain.id, pohId, request.index) || 
+      request.humanity.winnerClaim[0].index !== request.index
+    );
   
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")

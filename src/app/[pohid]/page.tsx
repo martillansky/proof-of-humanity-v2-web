@@ -367,8 +367,13 @@ async function Profile({ params: { pohid } }: PageProps) {
                 index={req.index}
                 requester={req.requester}
                 revocation={req.revocation}
-                status={req.status.id=="transferred"? "resolved": req.status.id}
-                expired={((req.status.id=="resolved" || req.status.id=="transferred") && !(req.revocation))}
+                status={req.status.id}
+                //status={req.status.id=="transferred"? "resolved": req.status.id}
+                expired={(
+                  (req.status.id === "resolved" && !(req.revocation)) 
+                  /* || 
+                  (req.status.id === "transferred" && humanity![req.chainId]!. &&  req. req.index + 1) */
+                )}
               />
             ))}
           </div>

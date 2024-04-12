@@ -14,7 +14,6 @@ export const getHumanityData = cache(async (pohId: Hash) => {
     {} as Record<SupportedChainId, HumanityQuery>
   );
 
-  
   supportedChains.forEach(chain => {
     const incompleteRequests = out[chain.id].humanity?.requests.filter(req => !req.claimer.name);
     if (incompleteRequests) {
@@ -29,14 +28,12 @@ export const getHumanityData = cache(async (pohId: Hash) => {
       })
     }
   
-    const transferred = out[chain.id].humanity?.requests.filter(req => 
-      req.status.id === 'resolved' && 
-      out[chain.id].humanity?.winnerClaim.at(0)?.index === req.index
-    );
-  
-    if (transferred) {
-      transferred.map(req => req.status.id = "transferred");
-    }
+    out[chain.id].humanity?.requests.filter(req => {
+      return (req.status.id === 'resolved' && 
+      out[chain.id].humanity?.winnerClaim.at(0)?.index === req.index && 
+      !(out[chain.id].humanity?.requests.find(reqG => reqG.index > req.index))
+      )
+    }).forEach(req => req.status.id = "transferred");
   })
   return out;
 });

@@ -7,7 +7,7 @@ import { Address, Hash, concat, keccak256, toHex } from "viem";
 import axios from "axios";
 import { getContractDataAllChains } from "./contract";
 
-export const getRequestsInitData = async () => {
+const _getAllRequests = async () => {
   const res = await Promise.all(
     supportedChains.map((chain) =>
       sdk[chain.id].Requests({ first: REQUESTS_DISPLAY_BATCH * 4 })
@@ -18,7 +18,17 @@ export const getRequestsInitData = async () => {
     (acc, chain, i) => ({ ...acc, [chain.id]: res[i].requests }),
     {} as Record<SupportedChainId, RequestsQuery["requests"]>
   );
+  return out;
+}
 
+export const getRequestsInitData = async () => {
+  return await checkDataIntegrity(undefined);
+};
+
+export const checkDataIntegrity = async (filtered: Record<SupportedChainId, RequestsQuery["requests"]> | undefined) => {
+  var all: Record<SupportedChainId, RequestsQuery["requests"]> = await _getAllRequests(); 
+  var out: Record<SupportedChainId, RequestsQuery["requests"]> = filtered? filtered : all; 
+  
   var humanityLifespanAllChains: Partial<Record<SupportedChainId, string>> = {};
   const [contractData] = await Promise.all([getContractDataAllChains()]);
   Object.keys(contractData).map(
@@ -26,11 +36,12 @@ export const getRequestsInitData = async () => {
   );
   
   supportedChains.forEach(chain => {
-    const incompleteRequests = out[chain.id].filter(req => !req.claimer.name);
-    if (incompleteRequests) {
+    const incompleteRequests = out[chain.id].length>0 && out[chain.id].filter(req => !req.claimer.name);
+    const foreignChainId = incompleteRequests && incompleteRequests.length>0 && getForeignChain(chain.id);
+    if (incompleteRequests && foreignChainId && all[foreignChainId].length>0) {
       incompleteRequests.map(req => {
         const pohId = req.humanity.id;
-        const transferringRequest = out[getForeignChain(chain.id)]
+        const transferringRequest = all[foreignChainId]
           .find(req => req.humanity.id === pohId && req.index === req.humanity.winnerClaim.at(0)?.index
         );
         req.claimer.name = transferringRequest?.claimer.name;
@@ -48,14 +59,14 @@ export const getRequestsInitData = async () => {
     if (transferred) {
       transferred.map(req => {
         if ((Number(req.humanity.winnerClaim.at(0)?.resolutionTime) + Number(humanityLifespan) < Date.now() / 1000)) return req.status.id = "resolved" // expired
-        if (out[chain.id].find(reqN => req.humanity.id === reqN.humanity.id && req.creationTime < reqN.creationTime)) return req.status.id = "resolved"
+        if (Number(req.humanity.nbRequests)>Number(req.index)+1) return req.status.id = "resolved"
         return req.status.id = "transferred"
       });
     }
   })
   
   return out;
-};
+}
 
 const genRequestId = (pohId: Hash, index: number) => {
   return keccak256(
@@ -83,6 +94,7 @@ const getTrasferringRequest = cache(
 export const getRequestData = cache(
   async (chainId: SupportedChainId, pohId: Hash, index: number) => {
     const out = (await sdk[chainId]["Request"]({ id: genRequestId(pohId, index) })).request;
+    if (!(!!out)) return undefined;
     if (!out?.claimer.name) {
       const transferringRequest = await getTrasferringRequest(chainId, pohId);
       out!.claimer.name = transferringRequest?.claimer.name;
@@ -91,10 +103,17 @@ export const getRequestData = cache(
     } else if (!out.humanity.registration && out.status.id === 'resolved' &&
       out!.humanity!.winnerClaim.at(0)!.index === out.index // If resolved in a non-registrered chain and winning claim then it is the transferring request
     ) {
-      out.status.id = "transferred" 
-      // TRANSFERRED!!!
+      out.status.id = "transferred";
     }
     return out;
+  }
+);
+
+export const isPosteriorRequestResolving = cache(
+  async (chainId: SupportedChainId, pohId: Hash, index: number) => {
+    const nextIndex = (index + 1) > 0? index + 1 : 0;
+    const nextRequest = await getRequestData(chainId, pohId, nextIndex);
+    return nextRequest?.status.id === 'resolved';
   }
 );
 
