@@ -36,7 +36,9 @@ export const checkDataIntegrity = async (filtered: Record<SupportedChainId, Requ
   );
   
   supportedChains.forEach(chain => {
-    const incompleteRequests = out[chain.id].length>0 && out[chain.id].filter(req => !req.claimer.name);
+    const incompleteRequests = out[chain.id].length>0 && out[chain.id].filter(req => 
+      (!req.evidenceGroup || !req.evidenceGroup.evidence || req.evidenceGroup.evidence.length === 0 || !req.claimer.name)
+    );
     const foreignChainId = incompleteRequests && incompleteRequests.length>0 && getForeignChain(chain.id);
     if (incompleteRequests && foreignChainId && all[foreignChainId].length>0) {
       incompleteRequests.map(req => {
@@ -45,8 +47,10 @@ export const checkDataIntegrity = async (filtered: Record<SupportedChainId, Requ
           .find(req => req.humanity.id === pohId && req.index === req.humanity.winnerClaim.at(0)?.index
         );
         req.claimer.name = transferringRequest?.claimer.name;
-        req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
-        req.humanity.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+        if (!!transferringRequest?.evidenceGroup.evidence) {
+          req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+          req.humanity.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+        }
       })
     }
   
@@ -95,11 +99,13 @@ export const getRequestData = cache(
   async (chainId: SupportedChainId, pohId: Hash, index: number) => {
     const out = (await sdk[chainId]["Request"]({ id: genRequestId(pohId, index) })).request;
     if (!(!!out)) return undefined;
-    if (!out?.claimer.name) {
+    if (!out.evidenceGroup || !out.evidenceGroup.evidence || out.evidenceGroup.evidence.length === 0 || !out.claimer.name) {
       const transferringRequest = await getTrasferringRequest(chainId, pohId);
       out!.claimer.name = transferringRequest?.claimer.name;
-      out!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
-      out!.humanity!.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+      if (!!transferringRequest?.evidenceGroup.evidence) {
+        out!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+        out!.humanity!.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+      }
     } else if (!out.humanity.registration && out.status.id === 'resolved' &&
       out!.humanity!.winnerClaim.at(0)!.index === out.index // If resolved in a non-registrered chain and winning claim then it is the transferring request
     ) {

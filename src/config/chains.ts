@@ -67,6 +67,8 @@ export function getForeignChain(chainId: number) {
       return 11155111;
     case 11155111:
       return 10200;
+    case 100:
+      return 100; // For launching this will map to mainnet's id
     default:
       throw new Error("chain not supported");
   }

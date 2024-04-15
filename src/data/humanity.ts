@@ -15,7 +15,9 @@ export const getHumanityData = cache(async (pohId: Hash) => {
   );
 
   supportedChains.forEach(chain => {
-    const incompleteRequests = out[chain.id].humanity?.requests.filter(req => !req.claimer.name);
+    const incompleteRequests = out[chain.id].humanity?.requests.filter(req => 
+      (!req.evidenceGroup || !req.evidenceGroup.evidence || req.evidenceGroup.evidence.length === 0 || !req.claimer.name)
+    );
     if (incompleteRequests) {
       incompleteRequests.map(req => {
         const pohId = req.claimer.id;
@@ -23,8 +25,10 @@ export const getHumanityData = cache(async (pohId: Hash) => {
           .find(req => req.claimer.id === pohId && req.index === out[getForeignChain(chain.id)].humanity?.winnerClaim.at(0)?.index
         );
         req.claimer.name = transferringRequest?.claimer.name;
-        req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
-        out[chain.id].humanity!.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+        if (!!transferringRequest?.evidenceGroup.evidence) {
+          req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+          out[chain.id].humanity!.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
+        }
       })
     }
   
