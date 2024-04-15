@@ -35,7 +35,9 @@ export const getHumanityData = cache(async (pohId: Hash) => {
     out[chain.id].humanity?.requests.filter(req => {
       return (req.status.id === 'resolved' && 
       out[chain.id].humanity?.winnerClaim.at(0)?.index === req.index && 
-      !(out[chain.id].humanity?.requests.find(reqG => reqG.index > req.index))
+      !(out[chain.id].humanity?.requests.find(reqG => reqG.index > req.index)) && 
+      out[chain.id].crossChainRegistration &&
+      out[chain.id].outTransfer
       )
     }).forEach(req => req.status.id = "transferred");
   })

@@ -59,7 +59,7 @@ const normalize = (
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
           expired:
-            (request.status.id === "resolved" || request.status.id === "transferred") && 
+            (request.status.id === "resolved") && 
             request.humanity.winnerClaim.length>0 && 
             !!humanityLifespan && 
             request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
