@@ -210,6 +210,7 @@ export default async function Request({ params }: PageProps) {
               ?.evidenceGroup.evidence.at(0)?.uri,
             chain: voucherEvidenceChain,
             voucherId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
+            voucher: voucher[voucherEvidenceChain.id].claimer?.id as Address,
           }
         };
         return {
@@ -227,6 +228,7 @@ export default async function Request({ params }: PageProps) {
           const evFile = await ipfsFetch<EvidenceFile>(uri);
           if (!evFile?.fileURI) return { pohId };
           return {
+            voucher,
             name,
             pohId,
             photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,

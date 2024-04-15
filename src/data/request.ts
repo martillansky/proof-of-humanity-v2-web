@@ -86,7 +86,7 @@ const genRequestId = (pohId: Hash, index: number) => {
   );
 };
 
-const getTrasferringRequest = cache(
+export const getTrasferringRequest = cache(
   async (chainId: SupportedChainId, pohId: Hash) => {
     const out = (await sdk[getForeignChain(chainId)].Humanity({ id: pohId }));
     return out.humanity?.requests
