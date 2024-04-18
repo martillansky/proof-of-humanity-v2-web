@@ -5,6 +5,7 @@ import { sdk } from "config/subgraph";
 import { RequestsQuery } from "generated/graphql";
 import { Address, Hash, concat, keccak256, toHex } from "viem";
 import axios from "axios";
+//import { getContractDataAllChains } from "./contract";
 
 const _getAllRequests = async () => {
   const res = await Promise.all(
@@ -27,7 +28,13 @@ export const getRequestsInitData = async () => {
 export const checkDataIntegrity = async (filtered: Record<SupportedChainId, RequestsQuery["requests"]> | undefined) => {
   var all: Record<SupportedChainId, RequestsQuery["requests"]> = await _getAllRequests(); 
   var out: Record<SupportedChainId, RequestsQuery["requests"]> = filtered? filtered : all; 
-    
+  
+  /* var humanityLifespanAllChains: Partial<Record<SupportedChainId, string>> = {};
+  const [contractData] = await Promise.all([getContractDataAllChains()]);
+  Object.keys(contractData).map(
+    (chainId) => humanityLifespanAllChains[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan
+  ); */
+  
   supportedChains.forEach(chain => {
     const incompleteRequests = out[chain.id].length>0 && out[chain.id].filter(req => 
       (!req.evidenceGroup || !req.evidenceGroup.evidence || req.evidenceGroup.evidence.length === 0 || !req.claimer.name)
@@ -47,6 +54,7 @@ export const checkDataIntegrity = async (filtered: Record<SupportedChainId, Requ
       })
     }
   
+    //const humanityLifespan = humanityLifespanAllChains[chain.id];
     const transferred = out[chain.id].filter(req => 
       !req.humanity.registration && 
       req.status.id === 'resolved' && 
@@ -54,6 +62,7 @@ export const checkDataIntegrity = async (filtered: Record<SupportedChainId, Requ
     );
     if (transferred) {
       transferred.map(req => {
+        //if ((Number(req.humanity.winnerClaim.at(0)?.resolutionTime) + Number(humanityLifespan) < Date.now() / 1000)) return req.status.id = "transferred expired" // expired
         if (Number(req.humanity.nbRequests)>Number(req.index)+1) return req.status.id = "resolved"
         return req.status.id = "transferred"
       });

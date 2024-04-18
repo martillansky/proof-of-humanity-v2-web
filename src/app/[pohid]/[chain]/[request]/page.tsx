@@ -1,6 +1,6 @@
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
-import { SupportedChain, getChainRpc, paramToChain, supportedChains } from "config/chains";
+import { SupportedChain, SupportedChainId, getChainRpc, paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
 import { getOffChainVouches, isPosteriorRequestResolving, getRequestData } from "data/request";
@@ -22,7 +22,7 @@ import Info from "./Info";
 import { Address, createPublicClient, getContract, http } from "viem";
 import { Hash } from "@wagmi/core";
 import { getClaimerData } from "data/claimer";
-import { Request } from "generated/graphql";
+import { ClaimerQuery, Request } from "generated/graphql";
 import abis from "contracts/abis";
 import { Contract } from "contracts";
 import Vouch from "components/Vouch";
@@ -51,10 +51,15 @@ export default async function Request({ params }: PageProps) {
     contractData.arbitrationInfo.extraData
   );
 
-  const onChainVouches = request.claimer.vouchesReceived
+  const onChainVouches = 
+    request.claimer.vouchesReceived
     .filter((v) => v.from.registration)
     .map((v) => v.from.id as Address);
-  const offChainVouches: {
+  
+  
+  // This are vouches to be read directly from supabase, ie, vouches still not processed 
+  // (only necessary before advance state in vouching status)
+  const offChainVouches: { 
     voucher: Address;
     expiration: number;
     signature: Hash;
@@ -188,56 +193,65 @@ export default async function Request({ params }: PageProps) {
     return {isValid: true, reason: undefined};
   }
 
-  const vouchersData = await Promise.all(
-    (
-      await Promise.all([
-        ...offChainVouches.map((vouch) => getClaimerData(vouch.voucher)),
-        ...onChainVouches.map((voucher) => getClaimerData(voucher)),
-      ])
-    )
-      .map((voucher) => {
+  interface VouchData {
+    voucher: `0x${string}` | undefined,
+    name: string | null | undefined,
+    pohId: Address | undefined,
+    photo: string | undefined,
+    vouchStatus: VouchStatus | undefined
+  }
+
+  const cleanVouchData = (rawVouches: Record<SupportedChainId,ClaimerQuery>[]): Promise<VouchData>[] => {
+    return rawVouches
+    .map(async (rawVoucher) => {
+      const out: VouchData = {
+        'voucher': undefined,
+        'name': undefined,
+        'pohId': undefined,
+        'photo': undefined,
+        'vouchStatus': undefined
+      };
+      try {
         const voucherEvidenceChain = supportedChains.find(
           (chain) =>
-            voucher[chain.id].claimer?.registration?.humanity.winnerClaim
+          rawVoucher[chain.id].claimer && rawVoucher[chain.id].claimer?.registration?.humanity.winnerClaim
         );
+        const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain;
         
-        if (voucherEvidenceChain) {
-          return {
-            pohId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
-            name: voucher[voucherEvidenceChain.id].claimer!.name,
-            uri: voucher[voucherEvidenceChain.id]
-              .claimer!.registration!.humanity.winnerClaim.at(0)
-              ?.evidenceGroup.evidence.at(0)?.uri,
-            chain: voucherEvidenceChain,
-            voucherId: voucher[voucherEvidenceChain.id].claimer!.registration!.humanity.id,
-            voucher: voucher[voucherEvidenceChain.id].claimer?.id as Address,
-          }
-        };
-        return {
-          voucher: voucher[chain.id].claimer?.id as Address,
-          name: voucher[chain.id].claimer?.name,
-          pohId: undefined,
-          uri: undefined,
-          chain: chain,
-          voucherId: voucher[chain.id].claimer!.registration!.humanity.id,
-        };
-      })
-      .map(async ({ voucher, name, pohId, uri, voucherId, chain }) => {
-        if (!uri || !pohId) return { voucher };
-        try {
-          const evFile = await ipfsFetch<EvidenceFile>(uri);
-          if (!evFile?.fileURI) return { pohId };
-          return {
-            voucher,
-            name,
-            pohId,
-            photo: (await ipfsFetch<RegistrationFile>(evFile.fileURI)).photo,
-            vouchStatus: await getVouchStatus(voucherId, chain),
-          };
-        } catch {
-          return { pohId };
-        }
-      })
+        out.name = rawVoucher[relevantChain.id].claimer?.name;
+        out.voucher = rawVoucher[relevantChain.id].claimer?.id;
+        out.pohId = rawVoucher[relevantChain.id].claimer?.registration?.humanity.id;
+        if (!out.pohId) out.pohId = out.voucher;
+        const uri = rawVoucher[relevantChain.id]
+          .claimer?.registration?.humanity.winnerClaim.at(0)
+          ?.evidenceGroup.evidence.at(0)?.uri;
+          
+        out.vouchStatus = await Promise.resolve(getVouchStatus(out.voucher!, chain!));
+        
+        if (!uri) return out;
+
+        const evFile = await Promise.resolve(ipfsFetch<EvidenceFile>(uri));
+        if (!evFile?.fileURI) return out;
+
+        out.photo = (await Promise.resolve(ipfsFetch<RegistrationFile>(evFile.fileURI))).photo;
+        return out;
+      } catch {
+        return out;
+      }
+    })
+  }
+
+  const vourchesForData = cleanVouchData(
+    await Promise.all([
+      ...request.claimer.vouches.map(vouch => getClaimerData(vouch.for.id))
+    ])
+  );
+  
+  const vouchersData = cleanVouchData(
+    await Promise.all([
+      ...offChainVouches.map((vouch) => getClaimerData(vouch.voucher)),
+      ...onChainVouches.map((voucher) => getClaimerData(voucher)),
+    ])
   );
 
   const policyLink = contractData.arbitrationInfo!.policy;
@@ -395,27 +409,6 @@ export default async function Request({ params }: PageProps) {
             )}
 
             <div className="w-full md:flex-row md:items-center justify-between">
-              {vouchersData.find((v) => v) && (
-                <div className="mt-8 flex flex-col">
-                  Vouched by
-                  <div className="flex gap-2">
-                    {vouchersData.map(({ photo, pohId, voucher, name, vouchStatus }, idx) => {
-                      return (
-                        <Vouch 
-                          isActive = {vouchStatus?.isValid} 
-                          reason = {vouchStatus?.reason}
-                          name = {name}
-                          photo = {photo}
-                          key = {idx} 
-                          href = {`/${prettifyId(pohId)}`}
-                          pohId = {pohId}
-                          address = {voucher}
-                        />
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
               {policyLink && (
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
                   <Link 
@@ -426,8 +419,53 @@ export default async function Request({ params }: PageProps) {
                   </Link>
                 </div>
               )}
+              {vouchersData.find((v) => v) && (
+                <div className="mt-8 flex flex-col">
+                  Vouched by
+                  <div className="flex gap-2">
+                    {vouchersData.map(async (vouch, idx) => {
+                      const vouchLocal = await Promise.resolve(vouch);
+                      return (
+                        <Vouch 
+                          isActive = {vouchLocal.vouchStatus?.isValid} 
+                          reason = {vouchLocal.vouchStatus?.reason}
+                          name = {vouchLocal.name}
+                          photo = {vouchLocal.photo}
+                          key = {idx} 
+                          href = {`/${prettifyId(vouchLocal.pohId!)}`}
+                          pohId = {vouchLocal.pohId}
+                          address = {vouchLocal.voucher}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
-
+            <div className="w-full md:flex-row md:items-center justify-between">
+              {vourchesForData.find((v) => v) && (
+                <div className="mt-8 flex flex-col">
+                  Vouched for
+                  <div className="flex gap-2">
+                  {vourchesForData.map(async (vouch, idx) => { 
+                    const vouchLocal = await Promise.resolve(vouch);
+                    return (
+                      <Vouch 
+                        isActive = {vouchLocal.vouchStatus?.isValid} 
+                        reason = {vouchLocal.vouchStatus?.reason}
+                        name = {vouchLocal.name}
+                        photo = {vouchLocal.photo}
+                        key = {idx} 
+                        href = {`/${prettifyId(vouchLocal.pohId!)}`}
+                        pohId = {vouchLocal.pohId}
+                        address = {vouchLocal.pohId}
+                      />
+                    )
+                  })}
+                  </div>
+                </div>
+              )}
+            </div>
             <Label className="md:hidden mb-8">
               Last update: <TimeAgo time={request.lastStatusChange} />
             </Label>

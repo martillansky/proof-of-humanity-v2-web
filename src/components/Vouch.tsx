@@ -16,16 +16,20 @@ interface VouchingTooltipProps {
 
 const Vouch: React.FC<VouchingTooltipProps> = ({isActive, reason, name, photo, key, href, pohId, address}) => {
     const className = `w-8 h-8 rounded-full cursor-pointer ${!isActive? 'opacity-25' : ''}`;
-    return photo? (
-        <Link key={key} href={href}>
+    return (
+        <Link key={key} href={pohId && href}>
         <div className="group flex relative">
-            <Image
-                className={className}
-                alt="image"
-                src={ipfs(photo)}
-                width={64}
-                height={64}
-            />
+            {photo?
+                <Image
+                    className={className}
+                    alt="image"
+                    src={ipfs(photo)}
+                    width={64}
+                    height={64}
+                /> 
+            : 
+                <Identicon key={key} address={address} diameter={32} />
+            }
             <div className="\
                 group-hover:visible invisible \
                 group-hover:translate-y-6 ease-in-out transition transform absolute \
@@ -56,10 +60,6 @@ const Vouch: React.FC<VouchingTooltipProps> = ({isActive, reason, name, photo, k
                 </span>
             </div>
         </div>
-        </Link>
-    ) : (
-        <Link key={key} href={pohId && href}>
-          <Identicon key={key} address={address} diameter={32} />
         </Link>
     )
 };
