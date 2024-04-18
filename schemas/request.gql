@@ -41,6 +41,12 @@ query Request($id: ID!) {
           id
         }
       }
+      vouches {
+        for {
+          id
+          name
+        }
+      }
     }
     evidenceGroup {
       evidence(orderBy: creationTime, orderDirection: desc) {
