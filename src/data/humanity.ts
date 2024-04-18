@@ -21,9 +21,13 @@ export const getHumanityData = cache(async (pohId: Hash) => {
     if (incompleteRequests) {
       incompleteRequests.map(req => {
         const pohId = req.claimer.id;
-        const transferringRequest = out[getForeignChain(chain.id)].humanity?.requests
+        var transferringRequest = out[getForeignChain(chain.id)].humanity?.requests
           .find(req => req.claimer.id === pohId && req.index === out[getForeignChain(chain.id)].humanity?.winnerClaim.at(0)?.index
         );
+        if (!(!!transferringRequest?.evidenceGroup.evidence.at(0))) {
+          transferringRequest = out[chain.id].humanity?.requests
+          .find(req => req.claimer.id === pohId && req.evidenceGroup.evidence.length > 0);
+        }
         req.claimer.name = transferringRequest?.claimer.name;
         if (!!transferringRequest?.evidenceGroup.evidence) {
           req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
