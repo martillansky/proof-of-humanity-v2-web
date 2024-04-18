@@ -43,9 +43,13 @@ export const checkDataIntegrity = async (filtered: Record<SupportedChainId, Requ
     if (incompleteRequests && foreignChainId && all[foreignChainId].length>0) {
       incompleteRequests.map(req => {
         const pohId = req.humanity.id;
-        const transferringRequest = all[foreignChainId]
+        var transferringRequest = all[foreignChainId]
           .find(req => req.humanity.id === pohId && req.index === req.humanity.winnerClaim.at(0)?.index
         );
+        if (!(!!transferringRequest?.evidenceGroup.evidence.at(0))) {
+          transferringRequest = all[chain.id]
+          .find(req => (req.humanity.id === pohId && req.evidenceGroup.evidence.length > 0));
+        }
         req.claimer.name = transferringRequest?.claimer.name;
         if (!!transferringRequest?.evidenceGroup.evidence) {
           req.evidenceGroup.evidence = JSON.parse(JSON.stringify(transferringRequest?.evidenceGroup.evidence));
@@ -89,9 +93,17 @@ const genRequestId = (pohId: Hash, index: number) => {
 export const getTrasferringRequest = cache(
   async (chainId: SupportedChainId, pohId: Hash) => {
     const out = (await sdk[getForeignChain(chainId)].Humanity({ id: pohId }));
-    return out.humanity?.requests
+    const reqOut = out.humanity?.requests
       .find(req => req.claimer.id === pohId && req.index === out.humanity?.winnerClaim.at(0)?.index
     );
+    if (reqOut?.evidenceGroup.evidence.length === 0) {
+      // This holds when the profile was transferred to the foreign chain and then bridged back
+      const out = (await sdk[chainId].Humanity({ id: pohId }));
+      const reqOut = out.humanity?.requests
+        .filter(req => req.claimer.id === pohId && req.evidenceGroup.evidence.length > 0).at(-1);
+      return reqOut;
+    }
+    return reqOut;
   }
 );
 
@@ -119,7 +131,8 @@ export const isPosteriorRequestResolving = cache(
   async (chainId: SupportedChainId, pohId: Hash, index: number) => {
     const nextIndex = (index + 1) > 0? index + 1 : 0;
     const nextRequest = await getRequestData(chainId, pohId, nextIndex);
-    return nextRequest?.status.id === 'resolved';
+    const currentRequest = await getRequestData(chainId, pohId, index);
+    return nextRequest?.status.id === 'resolved' && nextRequest.creationTime > currentRequest?.creationTime;
   }
 );
 
