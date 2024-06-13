@@ -17,6 +17,7 @@ query Humanity($id: ID!) {
         name
       }
       creationTime
+      lastStatusChange
       index
       revocation
       requester

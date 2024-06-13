@@ -14,6 +14,7 @@ export const sdk = {
   [sepolia.id]: getSdk(
     new GraphQLClient(
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
+      //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/v0.0.12"
     )
   ),
   [gnosis.id]: getSdk(

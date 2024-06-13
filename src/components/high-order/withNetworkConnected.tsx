@@ -19,7 +19,7 @@ export default function withNetworkConnected<T extends JSX.IntrinsicAttributes>(
   const chain = useChainParam();
 
   return (props: T) => (
-    <WagmiConfig config={config(chain)}>
+    <WagmiConfig config={config(chain as Chain)}>
       <Component {...props} />
     </WagmiConfig>
   );

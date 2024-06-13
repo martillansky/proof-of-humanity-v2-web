@@ -8,13 +8,13 @@ interface VouchingTooltipProps {
     reason: string | undefined;
     name: string | null | undefined;
     photo: string | undefined;
-    key: number;
+    idx: number;
     href: string;
     pohId: any;
     address: `0x${string}` | undefined;
 }
 
-const Vouch: React.FC<VouchingTooltipProps> = ({isActive, reason, name, photo, key, href, pohId, address}) => {
+const Vouch: React.FC<VouchingTooltipProps> = ({isActive, reason, name, photo, idx: key, href, pohId, address}) => {
     const className = `w-8 h-8 rounded-full cursor-pointer ${!isActive? 'opacity-25' : ''}`;
     return (
         <Link key={key} href={pohId && href}>

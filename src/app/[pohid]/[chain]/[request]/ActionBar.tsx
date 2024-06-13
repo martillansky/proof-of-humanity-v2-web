@@ -238,9 +238,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         <span
           className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}
         >
-          {expired && !revocation?
+          {/* status === "resolved" && expired && !revocation?
             'Expired'
-          :
+          : */
             camelToTitle(status, revocation, expired)
           }
         </span>

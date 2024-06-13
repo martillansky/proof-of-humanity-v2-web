@@ -94,7 +94,7 @@ function Card({
   humanity: { id: pohId, winnerClaim },
   expired,
 }: CardInterface) {
-  const statusTitle = queryToStatus(status, revocation);
+  const statusTitle = queryToStatus(status, revocation, expired);
   const statusColor = colorForStatus(status, revocation, expired);
 
   const chain = idToChain(chainId)!;
@@ -108,7 +108,7 @@ function Card({
         <div className={`w-full h-1 bg-status-${statusColor}`} />
         <div className="p-2 centered font-medium">
           <span className={`text-status-${statusColor}`}>
-            {expired && !revocation?
+            {status === "resolved" && expired && !revocation?
               'Expired'
             :
               camelToTitle(statusTitle, revocation, expired)

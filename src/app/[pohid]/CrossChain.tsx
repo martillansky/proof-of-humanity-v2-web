@@ -29,6 +29,7 @@ interface CrossChainProps extends JSX.IntrinsicAttributes {
   pohId: Hash;
   lastTransfer: HumanityQuery["outTransfer"];
   lastTransferChain?: SupportedChain;
+  winningStatus?: string;
 }
 
 type TransferType = {
@@ -48,7 +49,9 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   homeChain,
   lastTransfer,
   lastTransferChain,
+  winningStatus
 }) {
+
   const { address } = useAccount();
   const loading = useLoading();
   const web3Loaded = useWeb3Loaded();
@@ -113,7 +116,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
 
       {web3Loaded &&
         address?.toLowerCase() === claimer &&
-        homeChain.id === chainId && (
+        homeChain.id === chainId && winningStatus !== "transferring" && (
           <Modal
             formal
             header="Transfer"
@@ -138,6 +141,8 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
           </Modal>
         )}
 
+      {web3Loaded &&
+        homeChain.id === chainId && winningStatus === "transferring"?
       <Modal
         formal
         header="Update"
@@ -205,7 +210,13 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
           </div>
         </div>
       </Modal>
-
+      : web3Loaded &&
+        transferState.senderChain?.id === chainId && winningStatus === "transferring"?
+        // TODO !!!!!!!!!!!!!!!!
+        // User will cancel this transfer if updates from sending chain
+        null
+      : null
+      }
       {transferState.receivingChain && !(transferState.received) && (
         <Modal
           trigger={
