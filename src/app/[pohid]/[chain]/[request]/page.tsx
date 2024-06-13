@@ -90,7 +90,7 @@ export default async function Request({ params }: PageProps) {
   let action = ActionType.NONE;
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
     action = ActionType.NONE;
-  else if (request.index < 0) action = ActionType.OLD_ACTIVE;
+  else if (request.index < 0 && request.index > -100) action = ActionType.OLD_ACTIVE;
   else if (request.status.id === "disputed") action = ActionType.DISPUTED;
   else if (request.status.id === "vouching") {
     offChainVouches.push(

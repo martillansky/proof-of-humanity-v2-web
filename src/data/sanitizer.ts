@@ -15,7 +15,7 @@ import { getHumanityData } from "./humanity";
 
 export const sanitizeRequest = async (request: RequestQuery['request'], chainId: SupportedChainId, pohId: Hash) => {
   if (
-    (request?.revocation && request?.humanity.winnerClaim && request?.humanity.winnerClaim[0].index < 0) || 
+    (request?.revocation && request?.humanity.winnerClaim && request?.humanity.winnerClaim[0].index <= -100) || 
     (request && 
       (!request.evidenceGroup || !request.evidenceGroup.evidence || request.evidenceGroup.evidence.length === 0 || 
       !request.claimer.name ||
@@ -34,12 +34,12 @@ export const sanitizeRequest = async (request: RequestQuery['request'], chainId:
     let homeChainId = tROut!.homeChainId;
     let transferringRequest = tROut?.transferringRequest;
 
-    if ((request?.revocation && request?.humanity.winnerClaim && request?.humanity.winnerClaim[0].index < 0)) {
+    if ((request?.revocation && request?.humanity.winnerClaim && request?.humanity.winnerClaim[0].index <= -100)) {
       request.humanity.winnerClaim[0].evidenceGroup.evidence = transferringRequest?.evidenceGroup.evidence as any;
       return request;
     }
 
-    if (request.index < 0) {
+    if (request.index <= -100) {
       let transferringRequestComplete = (await sdk[homeChainId]["Request"]({ id: genRequestId(pohId, Number(transferringRequest!.index)) })).request;
       if (!transferringRequestComplete) {
         request.evidenceGroup = transferringRequest?.evidenceGroup as any;
@@ -108,7 +108,7 @@ export const getTransferringRequest = (
     transferredNumber = -100-request.index;
   } else {
     var orderedBridgedRequests = out[chainId].humanity?.requests
-    .filter(req => (req.index < 0 && req.creationTime < request.creationTime))
+    .filter(req => (req.index <= -100 && req.creationTime < request.creationTime))
     .sort((req1, req2) => (request.creationTime-req1.creationTime) - (request.creationTime-req2.creationTime));
     var bridgedRequest = orderedBridgedRequests?.at(0);
     transferredNumber = -100-bridgedRequest?.index;

@@ -35,7 +35,7 @@ import { getContractDataAllChains } from "data/contract";
 
 enableReactUse();
 
-var humanityLifespanAllChains: Partial<Record<SupportedChainId, string>> = {};
+var humanityLifespanAllChains: Record<SupportedChainId, string>;
 
 export type RequestsQueryItem = ArrayElement<RequestsQuery["requests"]>;
 
@@ -79,6 +79,7 @@ const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
   let requestsOut: RequestInterface[] = new Array<RequestInterface>;
   pohIdGrouped.forEach((val, key) => {
     // We keep only the head request of each pohIdGrouped array which is the one representing the current status of the personhood
+    
     requestsOut.push(val[0]); 
   });
   
@@ -157,11 +158,12 @@ function RequestsGrid() {
   
   useEffect(() => {
     const getLifespanData = async () => {
-      const [contractData] = await Promise.all([getContractDataAllChains()]);
-      Object.keys(contractData).map(
-        (chainId) => humanityLifespanAllChains[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan
-      );
-    }
+      const contractData = await Promise.resolve(getContractDataAllChains());
+      humanityLifespanAllChains = Object.keys(contractData).reduce((acc, chainId) => {
+        acc[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan;
+        return acc;
+      }, {} as Record<SupportedChainId, string>);  
+    };
     getLifespanData();
   }, []);
 
