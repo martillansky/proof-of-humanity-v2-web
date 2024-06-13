@@ -37,7 +37,7 @@ export const genRequestId = (pohId: Hash, index: number) => {
       pohId,
       index >= 0
         ? toHex(index, { size: 32 })
-        : index <= 100
+        : index <= -100
         ? concat([
           toHex(Math.abs(index + 1), { size: 32 }),
           toHex("bridged", { size: 7 }),
