@@ -7,6 +7,12 @@ export const camelToTitle = (strIn: string, revocation?: boolean, expired?: bool
     case "withdrawn":
       str = strIn;
       break;
+    case "transferred":
+      str = strIn;
+      break;
+    case "transferring":
+      str = expired? "incomplete" : "update";
+      break;
     case "resolving":
       str = strIn;
       str = revocation ? "revocation" : "claim";

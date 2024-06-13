@@ -29,7 +29,7 @@ import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
-import { checkDataIntegrity, getRequestsInitData } from "data/request";
+import { getFilteredRequestsInitData, getRequestsInitData } from "data/request";
 import Image from "next/image";
 import { getContractDataAllChains } from "data/contract";
 
@@ -44,11 +44,64 @@ interface RequestInterface extends RequestsQueryItem {
   expired: boolean;
 }
 
-const normalize = (
-  requestsData: Record<SupportedChainId, RequestsQueryItem[]>,
-) => {  
-  const requests = 
-  Object.keys(requestsData)
+const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
+  const pohIdGrouped: Map<string, RequestInterface[]> = new Map();
+  request.map(req => {
+    let pohIdArray = pohIdGrouped.get(req.humanity.id as string); 
+    if (!pohIdArray) pohIdArray = new Array<RequestInterface>;
+    pohIdArray.push(req);
+    pohIdGrouped.set(req.humanity.id, pohIdArray);
+  });
+  pohIdGrouped.forEach((val, key) => {
+    type CompareFunction = (req: RequestsQueryItem) => boolean;
+    
+    function findAllIndex<T>(arr: RequestInterface[], conditionFn: CompareFunction): number[] {
+      const indexes: number[] = [];
+      for(let i = 0; i < arr.length; i++) {
+        if(conditionFn(arr[i])) {
+          indexes.push(i);
+        }
+      }
+      return indexes;
+    }
+    val.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange)
+    
+    let iTransfArr = findAllIndex(val, (req) => req!.status.id === "transferred");
+    for(let i = 0; i < iTransfArr.length; i++) {
+      if (iTransfArr[i] >= 0) {
+        let iReceived = iTransfArr[i]+1;
+        // A transferred request is set to transferred after the receiving request is created, so we need to swap their order 
+        if (val[iReceived]) [val[iTransfArr[i]], val[iReceived]] = [val[iReceived], val[iTransfArr[i]]];
+      }
+    }
+    
+  });
+  let requestsOut: RequestInterface[] = new Array<RequestInterface>;
+  pohIdGrouped.forEach((val, key) => {
+    // We keep only the head request of each pohIdGrouped array which is the one representing the current status of the personhood
+    requestsOut.push(val[0]); 
+  });
+  
+  requestsOut.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange);
+  return requestsOut;
+}
+
+const isRequestExpired = (request: RequestsQueryItem, humanityLifespan: string | undefined): boolean => {
+  if (request.status.id === "resolved") {
+    if (request.humanity.winnerClaim.length>0 && 
+      !!humanityLifespan && 
+      request.humanity.winnerClaim[0].index === request.index) { // Is this the winner request
+        return (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000)
+    } else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
+  } else if (request.status.id === "transferring") {
+    return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
+  }
+  return false
+}
+
+const normalize = (requestsData: Record<SupportedChainId, RequestsQueryItem[]>) => {
+  const requests = sortRequests(
+    Object.keys(requestsData)
     .reduce<RequestInterface[]>(
       (acc, chainId) => {
         const humanityLifespan = !!humanityLifespanAllChains && humanityLifespanAllChains[Number(chainId) as SupportedChainId];
@@ -58,59 +111,13 @@ const normalize = (
           ...request,
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
-          expired:
-            (request.status.id === "resolved") && 
-            request.humanity.winnerClaim.length>0 && 
-            !!humanityLifespan && 
-            request.humanity.winnerClaim[0].index === request.index && // Is this the winner request
-            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000
+          expired: isRequestExpired(request, humanityLifespan)
         }))
       ]},
       []
     )
-    .sort((req1, req2) => req2.creationTime - req1.creationTime);
-    const uniqueIds = new Map();
-    // requests are ordered by creation time, 
-    // we keep only the last active (pending) request from which the status of the profile is determined. 
-    // Thus a withdrawn status can be more recent but shouldn't be the actual status if a pending status still prevails.
-    // Previous requests from different chains are not considered
-    requests.forEach(req => {
-      if (
-        // if this pohId has still not being included, then it is kept
-        !uniqueIds.has(req.humanity.id) || 
-        // some previous requests can be considered 
-        (
-          // any previous request should be in the same chain in order for it to be considered 
-          (req.chainId === uniqueIds.get(req.humanity.id).chainId) && 
-          (
-            // a previous resolved request will not override the one selected before if it was revoked  
-            (
-              req.status.id === "resolved" && req.humanity.winnerClaim.length>0 && req.humanity.winnerClaim[0].index === req.index && 
-              (!req.expired && !(uniqueIds.get(req.humanity.id).status.id === "resolved" && uniqueIds.get(req.humanity.id).revocation))
-            ) || 
-            (
-              req.status.id !== "resolved" && 
-              req.status.id !== "withdrawn" &&
-              (
-                uniqueIds.get(req.humanity.id).status.id === "withdrawn" ||
-                (
-                  uniqueIds.get(req.humanity.id).status.id === "resolved" && 
-                  (
-                    uniqueIds.get(req.humanity.id).revocation || uniqueIds.get(req.humanity.id).expired
-                  )
-                )
-              )
-            )
-          )
-        )
-      ) {
-        uniqueIds.set(req.humanity.id, req);
-      }
-    });
-    const requestsOut = [...uniqueIds.values()]
-      .sort((req1, req2) => req2.creationTime - req1.creationTime);
-
-    return requestsOut
+  );
+  return requests;
 }
 
 const filterChainStacksForChain = (
@@ -234,7 +241,7 @@ function RequestsGrid() {
         } else {
           const res = await Promise.all(fetchPromises);
           chainStacks$.set(
-            await checkDataIntegrity(
+            await getFilteredRequestsInitData(
               fetchChains.reduce(
               (acc, chain, i) => ({
                 ...acc,

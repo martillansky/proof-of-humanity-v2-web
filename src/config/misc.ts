@@ -15,6 +15,8 @@ export const colorForStatus = (status: string, revocation: boolean, expired: boo
   switch (status) {
     case "vouching":
     case "withdrawn":
+    case "transferred":
+    case "transferring":
       return status;
     case "resolving":
       return revocation ? "revocation" : "claim";
@@ -22,8 +24,6 @@ export const colorForStatus = (status: string, revocation: boolean, expired: boo
       return "challenged";
     case "resolved":
       return revocation ? "removed" : expired? "expired" : "registered";
-    case "transferred":
-      return status;
     default:
       throw new Error("status error");
   }

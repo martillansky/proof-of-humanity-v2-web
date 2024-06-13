@@ -1,6 +1,19 @@
 fragment winnerClaim on Humanity {
   winnerClaim: requests(
-    where: { revocation: false, status: "resolved", winnerParty: "requester" }
+    where: { 
+      or: [
+        {
+          revocation: false, 
+          status: "resolved", 
+          winnerParty: "requester" 
+        },
+        {
+          revocation: false, 
+          status: "transferring", 
+          winnerParty: "requester" 
+        }
+      ]
+    }
     orderBy: resolutionTime
     orderDirection: desc
     first: 1

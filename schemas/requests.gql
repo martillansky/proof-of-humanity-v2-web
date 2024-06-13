@@ -13,6 +13,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
     }
     revocation
     creationTime
+    lastStatusChange
     requester
     claimer {
       id
