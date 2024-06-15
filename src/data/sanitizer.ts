@@ -35,6 +35,7 @@ export const sanitizeRequest = async (request: RequestQuery['request'], chainId:
     let transferringRequest = tROut?.transferringRequest;
 
     if ((request?.revocation && request?.humanity.winnerClaim && request?.humanity.winnerClaim[0].index <= -100)) {
+      request.claimer.name = transferringRequest?.claimer.name;
       request.humanity.winnerClaim[0].evidenceGroup.evidence = transferringRequest?.evidenceGroup.evidence as any;
       return request;
     }
@@ -42,6 +43,7 @@ export const sanitizeRequest = async (request: RequestQuery['request'], chainId:
     if (request.index <= -100) {
       let transferringRequestComplete = (await sdk[homeChainId]["Request"]({ id: genRequestId(pohId, Number(transferringRequest!.index)) })).request;
       if (!transferringRequestComplete) {
+        request.claimer.name = transferringRequest?.claimer.name;
         request.evidenceGroup = transferringRequest?.evidenceGroup as any;
         request.humanity.winnerClaim[0].evidenceGroup.evidence = transferringRequest?.evidenceGroup.evidence as any;
       } else {

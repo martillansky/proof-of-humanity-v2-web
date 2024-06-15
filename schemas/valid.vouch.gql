@@ -1,0 +1,8 @@
+query HumanityVouch($id: ID!) {
+  humanity(id: $id) {
+    vouching
+    registration {
+      expirationTime
+    }
+  }
+}

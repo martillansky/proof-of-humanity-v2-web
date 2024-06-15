@@ -1097,6 +1097,8 @@ export type Humanity = {
   __typename?: 'Humanity';
   claimerName?: Maybe<Scalars['String']>;
   id: Scalars['Bytes'];
+  inTransfer: Scalars['Boolean'];
+  nbBridgedRequests: Scalars['BigInt'];
   nbLegacyRequests: Scalars['BigInt'];
   nbPendingRequests: Scalars['BigInt'];
   nbRequests: Scalars['BigInt'];
@@ -1150,6 +1152,18 @@ export type Humanity_Filter = {
   id_not?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  inTransfer?: InputMaybe<Scalars['Boolean']>;
+  inTransfer_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  inTransfer_not?: InputMaybe<Scalars['Boolean']>;
+  inTransfer_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  nbBridgedRequests?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_gt?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_gte?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  nbBridgedRequests_lt?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_lte?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_not?: InputMaybe<Scalars['BigInt']>;
+  nbBridgedRequests_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   nbLegacyRequests?: InputMaybe<Scalars['BigInt']>;
   nbLegacyRequests_gt?: InputMaybe<Scalars['BigInt']>;
   nbLegacyRequests_gte?: InputMaybe<Scalars['BigInt']>;
@@ -1191,6 +1205,8 @@ export type Humanity_Filter = {
 export enum Humanity_OrderBy {
   ClaimerName = 'claimerName',
   Id = 'id',
+  InTransfer = 'inTransfer',
+  NbBridgedRequests = 'nbBridgedRequests',
   NbLegacyRequests = 'nbLegacyRequests',
   NbPendingRequests = 'nbPendingRequests',
   NbRequests = 'nbRequests',
@@ -1987,6 +2003,8 @@ export enum Registration_OrderBy {
   Humanity = 'humanity',
   HumanityClaimerName = 'humanity__claimerName',
   HumanityId = 'humanity__id',
+  HumanityInTransfer = 'humanity__inTransfer',
+  HumanityNbBridgedRequests = 'humanity__nbBridgedRequests',
   HumanityNbLegacyRequests = 'humanity__nbLegacyRequests',
   HumanityNbPendingRequests = 'humanity__nbPendingRequests',
   HumanityNbRequests = 'humanity__nbRequests',
@@ -2292,6 +2310,8 @@ export enum Request_OrderBy {
   Humanity = 'humanity',
   HumanityClaimerName = 'humanity__claimerName',
   HumanityId = 'humanity__id',
+  HumanityInTransfer = 'humanity__inTransfer',
+  HumanityNbBridgedRequests = 'humanity__nbBridgedRequests',
   HumanityNbLegacyRequests = 'humanity__nbLegacyRequests',
   HumanityNbPendingRequests = 'humanity__nbPendingRequests',
   HumanityNbRequests = 'humanity__nbRequests',
@@ -3161,6 +3181,8 @@ export enum VouchInProcess_OrderBy {
   Voucher = 'voucher',
   VoucherClaimerName = 'voucher__claimerName',
   VoucherId = 'voucher__id',
+  VoucherInTransfer = 'voucher__inTransfer',
+  VoucherNbBridgedRequests = 'voucher__nbBridgedRequests',
   VoucherNbLegacyRequests = 'voucher__nbLegacyRequests',
   VoucherNbPendingRequests = 'voucher__nbPendingRequests',
   VoucherNbRequests = 'voucher__nbRequests',
@@ -3260,6 +3282,8 @@ export enum Vouch_OrderBy {
   Humanity = 'humanity',
   HumanityClaimerName = 'humanity__claimerName',
   HumanityId = 'humanity__id',
+  HumanityInTransfer = 'humanity__inTransfer',
+  HumanityNbBridgedRequests = 'humanity__nbBridgedRequests',
   HumanityNbLegacyRequests = 'humanity__nbLegacyRequests',
   HumanityNbPendingRequests = 'humanity__nbPendingRequests',
   HumanityNbRequests = 'humanity__nbRequests',
@@ -3371,6 +3395,13 @@ export type TransferQueryVariables = Exact<{
 
 
 export type TransferQuery = { __typename?: 'Query', inTransfer?: { __typename?: 'InTransfer', id: any, humanityId: any } | null };
+
+export type HumanityVouchQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type HumanityVouchQuery = { __typename?: 'Query', humanity?: { __typename?: 'Humanity', vouching: boolean, registration?: { __typename?: 'Registration', expirationTime: any } | null } | null };
 
 export type WinnerClaimFragment = { __typename?: 'Humanity', winnerClaim: Array<{ __typename?: 'Request', index: any, resolutionTime: any, evidenceGroup: { __typename?: 'EvidenceGroup', evidence: Array<{ __typename?: 'Evidence', uri: string }> } }> };
 
@@ -3671,6 +3702,16 @@ export const TransferDocument = gql`
   }
 }
     `;
+export const HumanityVouchDocument = gql`
+    query HumanityVouch($id: ID!) {
+  humanity(id: $id) {
+    vouching
+    registration {
+      expirationTime
+    }
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -3708,6 +3749,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     Transfer(variables: TransferQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TransferQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<TransferQuery>(TransferDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Transfer', 'query');
+    },
+    HumanityVouch(variables: HumanityVouchQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<HumanityVouchQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<HumanityVouchQuery>(HumanityVouchDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'HumanityVouch', 'query');
     }
   };
 }
