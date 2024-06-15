@@ -1,13 +1,12 @@
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
-import { SupportedChain, SupportedChainId, getChainRpc, paramToChain, supportedChains } from "config/chains";
+import { SupportedChainId, paramToChain } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
 import { getOffChainVouches, getRequestData } from "data/request";
 import { getContractData } from "data/contract";
 import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
-import { ActionType } from "utils/enums";
 import ExternalLink from "components/ExternalLink";
 import Identicon from "components/Identicon";
 import { explorerLink } from "utils/address";
@@ -19,13 +18,12 @@ import Link from "next/link";
 import Attachment from "components/Attachment";
 import ChainLogo from "components/ChainLogo";
 import Info from "./Info";
-import { Address, createPublicClient, getContract, http } from "viem";
+import { Address } from "viem";
 import { Hash } from "@wagmi/core";
 import { getClaimerData } from "data/claimer";
-import { ClaimerQuery, Request } from "generated/graphql";
-import abis from "contracts/abis";
-import { Contract } from "contracts";
+import { ClaimerQuery, Request, Vouch as VouchQuery } from "generated/graphql";
 import Vouch from "components/Vouch";
+import { ValidVouch, isValidOnChainVouch, isValidVouch } from "data/vouch";
 
 interface PageProps {
   params: { pohid: string; chain: string; request: string };
@@ -33,7 +31,7 @@ interface PageProps {
 
 export default async function Request({ params }: PageProps) {
   const chain = paramToChain(params.chain);
-
+  
   if (!chain) throw new Error("unsupported chain");
 
   const pohId = machinifyId(params.pohid)!;
@@ -53,7 +51,6 @@ export default async function Request({ params }: PageProps) {
 
   const onChainVouches = 
     request.claimer.vouchesReceived
-    .filter((v) => v.from.registration)
     .map((v) => v.from.id as Address);
   
   
@@ -65,6 +62,13 @@ export default async function Request({ params }: PageProps) {
     signature: Hash;
   }[] = [];
   
+  if (request.status.id === "vouching") {
+    offChainVouches.push(
+      ...(await getOffChainVouches(chain.id, request.claimer.id, pohId))
+    );
+  }
+
+
   const hasExpired = () => {
     if (request.status.id === "resolved") {
       if (
@@ -87,11 +91,17 @@ export default async function Request({ params }: PageProps) {
 
   const expired = hasExpired();
 
-  let action = ActionType.NONE;
+  /* let action = ActionType.NONE;
+  const setAction = (actionIn: ActionType) => {
+    action = actionIn;
+  } */
+  /* //const [action, setAction] = useState(ActionType.NONE);
+
+
   if (request.status.id === "resolved" || request.status.id === "withdrawn")
-    action = ActionType.NONE;
-  else if (request.index < 0 && request.index > -100) action = ActionType.OLD_ACTIVE;
-  else if (request.status.id === "disputed") action = ActionType.DISPUTED;
+    setAction(ActionType.NONE);
+  else if (request.index < 0 && request.index > -100) setAction(ActionType.OLD_ACTIVE);
+  else if (request.status.id === "disputed") setAction(ActionType.DISPUTED);
   else if (request.status.id === "vouching") {
     offChainVouches.push(
       ...(await getOffChainVouches(chain.id, request.claimer.id, pohId))
@@ -100,22 +110,23 @@ export default async function Request({ params }: PageProps) {
       BigInt(request.challenges[0].rounds[0].requesterFund.amount) <
       arbitrationCost + BigInt(contractData.baseDeposit)
     )
-      action = ActionType.FUND;
+      setAction(ActionType.FUND);
     else if (
       onChainVouches.length + offChainVouches.length >=
       contractData.requiredNumberOfVouches
     )
-      action = ActionType.ADVANCE;
+      setAction(ActionType.ADVANCE);
     else if (onChainVouches.length + offChainVouches.length >= 0)
-      action = ActionType.REMOVE_VOUCH;
-    else action = ActionType.VOUCH;
+      setAction(ActionType.REMOVE_VOUCH);
+    else setAction(ActionType.VOUCH);
   } else if (request.status.id == "resolving")
-    action =
+    setAction(
       +request.lastStatusChange + +contractData.challengePeriodDuration <
       Date.now() / 1000
         ? ActionType.EXECUTE
-        : ActionType.CHALLENGE;
-
+        : ActionType.CHALLENGE
+    );
+ */
   let registrationFile: RegistrationFile | null;
   let revocationFile: EvidenceFile | null = null;
 
@@ -173,43 +184,21 @@ export default async function Request({ params }: PageProps) {
   // advanceRequests.offChain =
   // }
 
-  const getProofOfHumanity = (chain: SupportedChain) =>
-  getContract({
-    abi: abis.ProofOfHumanity,
-    address: Contract.ProofOfHumanity[chain.id],
-    publicClient: createPublicClient({
-      chain,
-      transport: http(getChainRpc(chain.id)),
-    }),
-  });
-
-  interface VouchStatus {
+  /* interface VouchStatus {
     isValid: boolean; 
     reason: string | undefined;
-  }
-  
-  const getVouchStatus = async (voucher: `0x${string}`, chain: SupportedChain): Promise<VouchStatus> => {
-    const poh = getProofOfHumanity(chain);
-    const isHuman = await poh.read.isHuman([voucher]);
-    if (!isHuman) return {isValid: false, reason: "No personhood"};
-
-    const infoArray = await poh.read.getHumanityInfo([voucher]);
-    const isVouching = infoArray[0];
-    if (isVouching) return {isValid: false, reason: "Vouching"};
-    const isExpired = Number(infoArray[3]) <= Date.now() / 1000;
-    if (isExpired) return {isValid: false, reason: "Expired Vouch"};
-    return {isValid: true, reason: undefined};
-  }
+  } */
 
   interface VouchData {
-    voucher: `0x${string}` | undefined,
+    voucher: Address | undefined,
     name: string | null | undefined,
     pohId: Address | undefined,
     photo: string | undefined,
-    vouchStatus: VouchStatus | undefined
+    vouchStatus: ValidVouch | undefined,//VouchStatus | undefined,
+    isOnChain: boolean,
   }
 
-  const cleanVouchData = (rawVouches: Record<SupportedChainId,ClaimerQuery>[]): Promise<VouchData>[] => {
+  const prepareVouchData = (rawVouches: Record<SupportedChainId,ClaimerQuery>[], isOnChain: boolean, skipStatusCheck: boolean): Promise<VouchData>[] => {
     return rawVouches
     .map(async (rawVoucher) => {
       const out: VouchData = {
@@ -217,14 +206,16 @@ export default async function Request({ params }: PageProps) {
         'name': undefined,
         'pohId': undefined,
         'photo': undefined,
-        'vouchStatus': undefined
+        'vouchStatus': undefined,
+        'isOnChain': isOnChain,
       };
       try {
-        const voucherEvidenceChain = supportedChains.find(
+        /* const voucherEvidenceChain = supportedChains.find(
           (chain) =>
           rawVoucher[chain.id].claimer && rawVoucher[chain.id].claimer?.registration?.humanity.winnerClaim
         );
-        const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain;
+        const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain; */
+        const relevantChain = chain;
         
         out.name = rawVoucher[relevantChain.id].claimer?.name;
         out.voucher = rawVoucher[relevantChain.id].claimer?.id;
@@ -233,9 +224,19 @@ export default async function Request({ params }: PageProps) {
         const uri = rawVoucher[relevantChain.id]
           .claimer?.registration?.humanity.winnerClaim.at(0)
           ?.evidenceGroup.evidence.at(0)?.uri;
-          
-        out.vouchStatus = await Promise.resolve(getVouchStatus(out.voucher!, chain!));
-        
+
+        if (!skipStatusCheck && !isOnChain) {
+          out.vouchStatus = await isValidVouch(
+            chain.id, 
+            out.voucher!, 
+            offChainVouches.find(vouch => vouch.voucher === rawVoucher[chain.id].claimer?.id)?.expiration
+          );
+        } else if (!skipStatusCheck && isOnChain) {
+          out.vouchStatus = isValidOnChainVouch(
+            request.claimer.vouchesReceived.find(v => v.from.id === out.voucher!)! as VouchQuery
+          );
+        }
+
         if (!uri) return out;
 
         const evFile = await Promise.resolve(ipfsFetch<EvidenceFile>(uri));
@@ -249,18 +250,23 @@ export default async function Request({ params }: PageProps) {
     })
   }
 
-  const vourchesForData = cleanVouchData(
+  const vourchesForData = prepareVouchData(
     await Promise.all([
       ...request.claimer.vouches.map(vouch => getClaimerData(vouch.for.id))
-    ])
+    ]), true, true
   );
   
-  const vouchersData = cleanVouchData(
+  const vouchersData = prepareVouchData(
     await Promise.all([
-      ...offChainVouches.map((vouch) => getClaimerData(vouch.voucher)),
+      ...offChainVouches
+      .map((vouch) => getClaimerData(vouch.voucher))
+    ]), false, false
+  ).concat(prepareVouchData(
+    await Promise.all([
       ...onChainVouches.map((voucher) => getClaimerData(voucher)),
-    ])
-  );
+    ]), true, false
+  ));
+
 
   const policyLink = contractData.arbitrationInfo!.policy;
   const policyUpdate = contractData.arbitrationInfo!.updateTime;
@@ -268,7 +274,6 @@ export default async function Request({ params }: PageProps) {
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
       <ActionBar
-        action={action}
         arbitrationCost={arbitrationCost}
         index={request.index}
         status={request.status.id}
@@ -427,7 +432,33 @@ export default async function Request({ params }: PageProps) {
                   </Link>
                 </div>
               )}
-              {vouchersData.find((v) => v) && (
+              {vourchesForData.find((v) => v) && (
+                <div className="mt-8 flex flex-col">
+                  Vouched for
+                  <div className="flex gap-2">
+                  {vourchesForData.map(async (vouch, idx) => { 
+                    const vouchLocal = await Promise.resolve(vouch);
+                    return (
+                      <Vouch 
+                        isActive = {true} 
+                        reason = {undefined}
+                        name = {vouchLocal.name}
+                        photo = {vouchLocal.photo}
+                        idx = {idx} 
+                        href = {`/${prettifyId(vouchLocal.pohId!)}`}
+                        pohId = {vouchLocal.pohId}
+                        address = {vouchLocal.pohId}
+                        isOnChain = {vouchLocal.isOnChain}
+                        reducedTooltip = {true}
+                      />
+                    )
+                  })}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="w-full md:flex-row md:items-center justify-between">
+            {vouchersData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched by
                   <div className="flex gap-2">
@@ -443,33 +474,11 @@ export default async function Request({ params }: PageProps) {
                           href = {`/${prettifyId(vouchLocal.pohId!)}`}
                           pohId = {vouchLocal.pohId}
                           address = {vouchLocal.voucher}
+                          isOnChain = {vouchLocal.isOnChain}
+                          reducedTooltip = {false}
                         />
                       )
                     })}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="w-full md:flex-row md:items-center justify-between">
-              {vourchesForData.find((v) => v) && (
-                <div className="mt-8 flex flex-col">
-                  Vouched for
-                  <div className="flex gap-2">
-                  {vourchesForData.map(async (vouch, idx) => { 
-                    const vouchLocal = await Promise.resolve(vouch);
-                    return (
-                      <Vouch 
-                        isActive = {vouchLocal.vouchStatus?.isValid} 
-                        reason = {vouchLocal.vouchStatus?.reason}
-                        name = {vouchLocal.name}
-                        photo = {vouchLocal.photo}
-                        idx = {idx} 
-                        href = {`/${prettifyId(vouchLocal.pohId!)}`}
-                        pohId = {vouchLocal.pohId}
-                        address = {vouchLocal.pohId}
-                      />
-                    )
-                  })}
                   </div>
                 </div>
               )}

@@ -38,7 +38,6 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   requester: Address;
   revocation: boolean;
   status: string;
-  action: ActionType;
   funded: bigint;
   index: number;
   lastStatusChange: number;
@@ -53,7 +52,6 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
 }
 
 export default withClientConnected<ActionBarProps>(function ActionBar({
-  action,
   pohId,
   requester,
   index,
@@ -87,6 +85,38 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   //     [loading]
   //   )
   // );
+
+  const [action, setAction] = useState(ActionType.NONE);
+
+  useEffectOnce(() => {
+    const checkVouchStatus = async () => {
+      if (status === "resolved" || status === "withdrawn")
+        setAction(ActionType.NONE);
+      else if (index < 0 && index > -100) setAction(ActionType.OLD_ACTIVE);
+      else if (status === "disputed") setAction(ActionType.DISPUTED);
+      else if (status === "vouching") {
+        if (funded < arbitrationCost + BigInt(contractData.baseDeposit))
+          setAction(ActionType.FUND);
+        else if (
+          onChainVouches.length + offChainVouches.length >=
+          contractData.requiredNumberOfVouches
+        )
+          setAction(ActionType.ADVANCE);
+        else if (onChainVouches.length + offChainVouches.length >= 0)
+          setAction(ActionType.REMOVE_VOUCH);
+        else setAction(ActionType.VOUCH);
+      } else if (status == "resolving")
+        setAction(
+          +lastStatusChange + +contractData.challengePeriodDuration <
+          Date.now() / 1000
+            ? ActionType.EXECUTE
+            : ActionType.CHALLENGE
+        );
+    }
+    checkVouchStatus();
+  });
+  
+
   const [prepareExecute, execute] = usePoHWrite(
     "executeRequest",
     useMemo(
@@ -118,6 +148,10 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
         },
         onSuccess() {
           toast.success("Request advanced to resolving state");
+        },
+        onFail() {
+          toast.error("No vouch is valid. Advance is not possible");
+          setAction(ActionType.VOUCH);
         },
       }),
       [loading]
@@ -174,7 +208,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       setIsVouchGranted(prevState => ({...prevState, didIVouchFor: true}));
   }, [address, action, requester, revocation, chain, userChainId]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
+  //useEffectOnce(() => {
     if (action === ActionType.ADVANCE && !revocation) {
       // if (advanceRequestsOnChainVouches) {
       //   prepareMulticallAdvance({
@@ -214,7 +249,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     }
 
     if (action === ActionType.EXECUTE) prepareExecute({ args: [pohId, BigInt(index)] });
-  });
+  }, [action]);
 
   useEffect(() => {
     if (
@@ -235,14 +270,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     <div className="paper p-6 flex flex-col md:flex-row justify-between items-center gap-2 border-b">
       <div className="flex items-center">
         <span className="mr-4">Status</span>
-        <span
-          className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}
-        >
-          {/* status === "resolved" && expired && !revocation?
-            'Expired'
-          : */
-            camelToTitle(status, revocation, expired)
-          }
+        <span className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}>
+          {camelToTitle(status, revocation, expired)}
         </span>
       </div>
       <div className="w-full ml-8 flex flex-col md:flex-row md:items-center justify-between gap-2 font-normal">
