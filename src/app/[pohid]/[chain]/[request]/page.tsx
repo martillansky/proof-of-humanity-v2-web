@@ -339,7 +339,8 @@ export default async function Request({ params }: PageProps) {
               )}
 
               <span className="mt-4 mb-12 text-2xl">
-                {request.claimer.name}
+                {/* {request.claimer.name} */}
+                {registrationFile? registrationFile.name: ''}
               </span>
             </div>
 

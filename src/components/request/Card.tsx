@@ -68,13 +68,22 @@ const Content = ({
     suspense: true,
   });
 
+  let name = 
+    data && claimer.name && data.name !== claimer.name
+    ? `${data?.name} (aka ${claimer.name})`
+    : claimer.name
+      ? claimer.name
+      : data && data.name
+        ? data.name 
+        : '';
+
   return (
     <div className="p-3 h-full flex flex-col items-center bg-white">
       <div
         className={"w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full"}
         style={{ backgroundImage: `url('${ipfs(data?.photo!)}')` }}
       />
-      <span className="my-2 font-semibold truncate">{claimer.name}</span>
+      <span className="my-2 font-semibold truncate">{name}</span>
       <div className="grid grid-cols-3 items-center">
         <ChainLogo chainId={chainId} className="w-4 h-4 fill-slate-400" />
         <span className="text-slate-400">{shortenAddress(requester)}</span>

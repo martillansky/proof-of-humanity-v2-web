@@ -5,6 +5,7 @@ export interface EvidenceFile {
 }
 
 export interface RegistrationFile {
+  name: string;
   photo: string;
   video: string;
 }
