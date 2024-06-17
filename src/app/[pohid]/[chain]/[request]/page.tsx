@@ -1,6 +1,6 @@
 import { EvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
-import { SupportedChainId, paramToChain } from "config/chains";
+import { SupportedChainId, paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
 import Evidence from "./Evidence";
 import { getOffChainVouches, getRequestData } from "data/request";
@@ -210,12 +210,12 @@ export default async function Request({ params }: PageProps) {
         'isOnChain': isOnChain,
       };
       try {
-        /* const voucherEvidenceChain = supportedChains.find(
+        const voucherEvidenceChain = supportedChains.find(
           (chain) =>
           rawVoucher[chain.id].claimer && rawVoucher[chain.id].claimer?.registration?.humanity.winnerClaim
         );
-        const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain; */
-        const relevantChain = chain;
+        const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain;
+        //const relevantChain = chain;
         
         out.name = rawVoucher[relevantChain.id].claimer?.name;
         out.voucher = rawVoucher[relevantChain.id].claimer?.id;
@@ -229,7 +229,7 @@ export default async function Request({ params }: PageProps) {
           out.vouchStatus = await isValidVouch(
             chain.id, 
             out.voucher!, 
-            offChainVouches.find(vouch => vouch.voucher === rawVoucher[chain.id].claimer?.id)?.expiration
+            offChainVouches.find(vouch => vouch.voucher === rawVoucher[relevantChain.id].claimer?.id)?.expiration
           );
         } else if (!skipStatusCheck && isOnChain) {
           out.vouchStatus = isValidOnChainVouch(
