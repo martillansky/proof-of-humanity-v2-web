@@ -5,6 +5,8 @@ import { cache } from "react";
 import { Address, Hash } from "viem";
 import { genRequestId } from "./request";
 import { getHumanityData } from "./humanity";
+import { EvidenceFile, RegistrationFile } from "types/docs";
+import { ipfsFetch } from "utils/ipfs";
 
 /* 
   Sanitizer module 
@@ -231,7 +233,22 @@ export const sanitizeClaimerData = async (out: Record<SupportedChainId, ClaimerQ
     const isClaimerIncomplete = out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.length===0;
     if (isClaimerIncomplete) {
       const lastTransf = await getProfileLastTransferringRequest(voucherEvidenceChain.id, id);
-      out[voucherEvidenceChain.id].claimer!.name = lastTransf?.transferringRequest?.claimer.name;
+      const registrationEvidence = 
+      lastTransf?.transferringRequest?.evidenceGroup.evidence && lastTransf?.transferringRequest?.evidenceGroup.evidence.length>0?
+      await ipfsFetch<EvidenceFile>(
+        lastTransf?.transferringRequest?.evidenceGroup.evidence.at(-1)!.uri
+      ) : null;
+
+      let registrationFile = registrationEvidence && registrationEvidence.fileURI
+      ? await ipfsFetch<RegistrationFile>(registrationEvidence.fileURI)
+      : null;
+      out[voucherEvidenceChain.id].claimer!.name = 
+        lastTransf?.transferringRequest?.claimer.name
+        ? lastTransf?.transferringRequest?.claimer.name 
+          : registrationFile
+          ? registrationFile.name 
+            : '';
+      
       if (!!lastTransf?.transferringRequest?.evidenceGroup.evidence) {
         out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(lastTransf?.transferringRequest?.evidenceGroup.evidence));
       }
