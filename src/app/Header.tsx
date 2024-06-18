@@ -5,8 +5,7 @@ import ChainLogo from "components/ChainLogo";
 import ExternalLink from "components/ExternalLink";
 import Popover from "components/Popover";
 import withClientConnected from "components/high-order/withClientConnected";
-import { supportedChains } from "config/chains";
-import { sdk } from "config/subgraph";
+import { getMyData } from "data/user";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,30 +15,6 @@ import { shortenAddress } from "utils/address";
 import { prettifyId } from "utils/identifier";
 import { sepolia } from "viem/chains";
 import { useAccount, usePublicClient } from "wagmi";
-
-export const getMyData = async (account: string) => {
-  const res = await Promise.all(
-    supportedChains.map((chain) => sdk[chain.id].Me({ id: account }))
-  );
-
-  const homeChain = supportedChains.find(
-    (_, i) => res[i].claimer?.registration
-  );
-  const requestChain = supportedChains.find(
-    (_, i) => res[i].claimer?.currentRequest
-  );
-
-  return {
-    homeChain,
-    pohId:
-      homeChain &&
-      res[supportedChains.indexOf(homeChain)].claimer!.registration!.id,
-    currentRequest: requestChain && {
-      chain: requestChain,
-      ...res[supportedChains.indexOf(requestChain)].claimer!.currentRequest!,
-    },
-  };
-};
 
 interface HeaderProps extends JSX.IntrinsicAttributes {
   policy: string;

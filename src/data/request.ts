@@ -21,6 +21,14 @@ const _getAllRequests = async () => {
   return out;
 }
 
+export const getRequestsLoadingPromises = async (chainId: SupportedChainId, where: any, skipNumber: number): Promise<RequestsQuery> => {
+  return sdk[chainId].Requests({
+    where, 
+    first: REQUESTS_DISPLAY_BATCH * 4,
+    skip: skipNumber,
+  });
+}
+
 export const getRequestsInitData = async () => {
   return await getFilteredRequestsInitData(undefined);
 };
