@@ -92,12 +92,15 @@ const isRequestExpired = (request: RequestsQueryItem, humanityLifespan: string |
     if (request.humanity.winnerClaim.length>0 && 
       !!humanityLifespan && 
       request.humanity.winnerClaim[0].index === request.index) { // Is this the winner request
-        return (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000)
-    } else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
+        return (
+          (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
+          !request.humanity.registration
+        )
+    }// else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
   } else if (request.status.id === "transferring") {
     return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
   }
-  return false
+  return true
 }
 
 const normalize = (requestsData: Record<SupportedChainId, RequestsQueryItem[]>) => {
