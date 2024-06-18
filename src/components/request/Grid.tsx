@@ -20,7 +20,6 @@ import { requestStatus, RequestStatus, statusFilters } from "config/requests";
 import { useEffect, useState } from "react";
 import { camelToTitle } from "utils/case";
 import Card from "./Card";
-import { sdk, sdkReturnType } from "config/subgraph";
 import DropdownItem from "components/dropdown/Item";
 import Dropdown from "components/dropdown/Menu";
 import { useLoading } from "hooks/useLoading";
@@ -29,7 +28,7 @@ import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
-import { getFilteredRequestsInitData, getRequestsInitData } from "data/request";
+import { getFilteredRequestsInitData, getRequestsInitData, getRequestsLoadingPromises } from "data/request";
 import Image from "next/image";
 import { getContractDataAllChains } from "data/contract";
 
@@ -107,17 +106,15 @@ const normalize = (requestsData: Record<SupportedChainId, RequestsQueryItem[]>) 
   const requests = sortRequests(
     Object.keys(requestsData)
     .reduce<RequestInterface[]>(
-      (acc, chainId) => {
-        const humanityLifespan = !!humanityLifespanAllChains && humanityLifespanAllChains[Number(chainId) as SupportedChainId];
-        return [
+      (acc, chainId) => [
         ...acc,
         ...requestsData[Number(chainId) as SupportedChainId].map((request) => ({
           ...request,
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
-          expired: isRequestExpired(request, humanityLifespan)
+          expired: isRequestExpired(request, humanityLifespanAllChains[Number(chainId) as SupportedChainId])
         }))
-      ]},
+      ],
       []
     )
   );
@@ -200,7 +197,7 @@ function RequestsGrid() {
         loading.start();
         const loadContinued = cursor > getPrevious().cursor;
         const fetchChains: SupportedChain[] = [];
-        const fetchPromises: ReturnType<sdkReturnType["Requests"]>[] = [];
+        const fetchPromises: Promise<RequestsQuery>[] = [];
 
         const chainStacks = filterChainStacksForChain(
           chainStacks$.get(),
@@ -224,15 +221,13 @@ function RequestsGrid() {
               ...(search ? { claimer_: { name_contains: search } } : {}),
             };
 
-            const promises = sdk[chain.id].Requests({
-              where,
-              first: REQUESTS_BATCH_SIZE * 4,
-              skip: loadContinued
-                ? normalize(chainStacks$.get()).filter(
-                    (request) => request.chainId === chain.id
-                  ).length
-                : 0,
-            });
+            const skipNumber = loadContinued
+            ? normalize(chainStacks$.get()).filter(
+                (request) => request.chainId === chain.id
+              ).length
+            : 0;
+
+            const promises = getRequestsLoadingPromises(chain.id, where, skipNumber);
             
             fetchChains.push(chain);
             fetchPromises.push(

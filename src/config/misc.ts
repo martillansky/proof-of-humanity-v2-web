@@ -9,6 +9,8 @@ export const statusToColor = {
   disputedClaim: "challenged",
   resolvedRevocation: "removed",
   resolvedClaim: "registered",
+  transferring: "transferring",
+  transferred: "transferred"
 };
 
 export const colorForStatus = (status: string, revocation: boolean, expired: boolean) => {

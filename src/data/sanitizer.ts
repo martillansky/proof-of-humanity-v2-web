@@ -234,14 +234,15 @@ export const sanitizeClaimerData = async (out: Record<SupportedChainId, ClaimerQ
     if (isClaimerIncomplete) {
       const lastTransf = await getProfileLastTransferringRequest(voucherEvidenceChain.id, id);
       const registrationEvidence = 
-      lastTransf?.transferringRequest?.evidenceGroup.evidence && lastTransf?.transferringRequest?.evidenceGroup.evidence.length>0?
-      await ipfsFetch<EvidenceFile>(
-        lastTransf?.transferringRequest?.evidenceGroup.evidence.at(-1)!.uri
-      ) : null;
+        lastTransf?.transferringRequest?.evidenceGroup.evidence && lastTransf?.transferringRequest?.evidenceGroup.evidence.length>0?
+        await ipfsFetch<EvidenceFile>(
+          lastTransf?.transferringRequest?.evidenceGroup.evidence.at(-1)!.uri
+        ) : null;
 
       let registrationFile = registrationEvidence && registrationEvidence.fileURI
-      ? await ipfsFetch<RegistrationFile>(registrationEvidence.fileURI)
-      : null;
+        ? await ipfsFetch<RegistrationFile>(registrationEvidence.fileURI)
+        : null;
+      
       out[voucherEvidenceChain.id].claimer!.name = 
         lastTransf?.transferringRequest?.claimer.name
         ? lastTransf?.transferringRequest?.claimer.name 
