@@ -156,17 +156,6 @@ function RequestsGrid() {
     )
   );
   
-  useEffect(() => {
-    const getLifespanData = async () => {
-      const contractData = await Promise.resolve(getContractDataAllChains());
-      humanityLifespanAllChains = Object.keys(contractData).reduce((acc, chainId) => {
-        acc[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan;
-        return acc;
-      }, {} as Record<SupportedChainId, string>);  
-    };
-    getLifespanData();
-  }, []);
-
   const requests = useSelector(() =>
     normalize(chainStacks$.get()).slice(0, REQUESTS_BATCH_SIZE * filter.cursor)
   );
@@ -183,7 +172,16 @@ function RequestsGrid() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+
   useMountOnce(() => {
+    (async () => {
+      const contractData = await Promise.resolve(getContractDataAllChains());
+      humanityLifespanAllChains = Object.keys(contractData).reduce((acc, chainId) => {
+        acc[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan;
+        return acc;
+      }, {} as Record<SupportedChainId, string>);  
+    })();
+
     (async () => {
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
@@ -207,9 +205,7 @@ function RequestsGrid() {
         for (const chain of supportedChains) {
           if (chainFilter && chainFilter !== chain.id) continue;
 
-          const displayedForChain = requests.filter(
-            (request) => request.chainId === chain.id
-          ).length;
+          const displayedForChain = chainStacks[chain.id].length;
 
           if (
             !loadContinued ||
@@ -222,9 +218,7 @@ function RequestsGrid() {
             };
 
             const skipNumber = loadContinued
-            ? normalize(chainStacks$.get()).filter(
-                (request) => request.chainId === chain.id
-              ).length
+            ? chainStacks[chain.id].length
             : 0;
 
             const promises = getRequestsLoadingPromises(chain.id, where, skipNumber);
@@ -246,7 +240,7 @@ function RequestsGrid() {
               (acc, chain, i) => ({
                 ...acc,
                 [chain.id]: [
-                  ...(loadContinued ? acc[chain.id] : []),
+                  ...(loadContinued ? chainStacks[chain.id] : []),
                   ...res[i].requests,
                 ],
               }),
