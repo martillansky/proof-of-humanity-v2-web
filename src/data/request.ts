@@ -7,10 +7,12 @@ import { Address, Hash, concat, keccak256, toHex } from "viem";
 import axios from "axios";
 import { sanitizeHeadRequests, sanitizeRequest } from "./sanitizer";
 
-const _getAllRequests = async () => {
+const PROFILES_DISPLAY_REQUIRED_REQS = REQUESTS_DISPLAY_BATCH * 4;
+
+const _getPagedRequests = async () => {
   const res = await Promise.all(
     supportedChains.map((chain) =>
-      sdk[chain.id].Requests({ first: REQUESTS_DISPLAY_BATCH * 4 })
+      sdk[chain.id].Requests({ first: PROFILES_DISPLAY_REQUIRED_REQS })
     )
   );
   
@@ -24,7 +26,7 @@ const _getAllRequests = async () => {
 export const getRequestsLoadingPromises = async (chainId: SupportedChainId, where: any, skipNumber: number): Promise<RequestsQuery> => {
   return sdk[chainId].Requests({
     where, 
-    first: REQUESTS_DISPLAY_BATCH * 4,
+    first: PROFILES_DISPLAY_REQUIRED_REQS,
     skip: skipNumber,
   });
 }
@@ -34,7 +36,7 @@ export const getRequestsInitData = async () => {
 };
 
 export const getFilteredRequestsInitData = async (filtered: Record<SupportedChainId, RequestsQuery["requests"]> | undefined) => {
-  var all: Record<SupportedChainId, RequestsQuery["requests"]> = await _getAllRequests(); 
+  var all: Record<SupportedChainId, RequestsQuery["requests"]> = await _getPagedRequests(); 
   var out: Record<SupportedChainId, RequestsQuery["requests"]> = filtered? filtered : all; 
   return sanitizeHeadRequests(all, out);
 }
