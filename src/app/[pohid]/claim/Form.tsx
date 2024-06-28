@@ -218,6 +218,7 @@ export default withClientConnected<FormProps & JSX.IntrinsicAttributes>(
               <VideoStep
                 advance={() => step$.set(Step.review)}
                 video$={media$.video}
+                isRenewal={!!renewal}
               />
             ),
             [Step.review]: () => (

@@ -108,7 +108,7 @@ export const getTransferringRequest = (
 ): {homeChainId: SupportedChainId, transferringRequest: RequestQuery['request']} | undefined => {
   if (!request) return ;
   let transferredNumber: number;
-  if (request.index<0) { 
+  if (request.index <= -100) { 
     transferredNumber = -100-request.index;
   } else {
     var orderedBridgedRequests = out[chainId].humanity?.requests
@@ -121,7 +121,7 @@ export const getTransferringRequest = (
   var transferringRequest: any | undefined;
   let homeChainId: SupportedChainId = getForeignChain(chainId);
   var orderedTransferringRequests: any | undefined = out[homeChainId].humanity?.requests
-    .filter(req => (req.status.id == "transferred"))
+    .filter(req => (req.status.id == "transferred" || req.status.id == "transferring"))
     .sort((req1, req2) => req1.creationTime - req2.creationTime);
 
   if (orderedTransferringRequests && orderedTransferringRequests.length > 0) {
@@ -141,7 +141,7 @@ export const getTransferringRequest = (
 
   }
   if (!transferringRequest) return getTransferringRequest(out, homeChainId, request as RequestQuery['request']);
-  if (transferringRequest!.index<0) return getTransferringRequest(out, homeChainId, transferringRequest as RequestQuery['request']);
+  if (transferringRequest!.index<=-100) return getTransferringRequest(out, homeChainId, transferringRequest as RequestQuery['request']);
   
   return {homeChainId, transferringRequest};
 };

@@ -92,8 +92,11 @@ const isRequestExpired = (request: RequestsQueryItem, humanityLifespan: string |
       !!humanityLifespan && 
       request.humanity.winnerClaim[0].index === request.index) { // Is this the winner request
         return (
-          (Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
-          !request.humanity.registration
+          /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
+            Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
+          (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000) ||  */
+          !request.humanity.registration || 
+          (Number(request.humanity.registration?.expirationTime) < Date.now() / 1000)
         )
     }// else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
   } else if (request.status.id === "transferring") {
@@ -179,13 +182,16 @@ function RequestsGrid() {
       humanityLifespanAllChains = Object.keys(contractData).reduce((acc, chainId) => {
         acc[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan;
         return acc;
-      }, {} as Record<SupportedChainId, string>);  
-    })();
+      }, {} as Record<SupportedChainId, string>);
 
-    (async () => {
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
     })();
+
+    /* (async () => {
+      chainStacks$.set(await getRequestsInitData());
+      loading.stop();
+    })(); */
 
     filter$.onChange(
       async ({

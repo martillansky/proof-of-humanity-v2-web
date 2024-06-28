@@ -18,6 +18,7 @@ query Request($id: ID!) {
       nbRequests
       nbLegacyRequests
       registration {
+        expirationTime
         claimer {
           id
         }

@@ -77,8 +77,11 @@ export default async function Request({ params }: PageProps) {
           if (request.humanity.winnerClaim[0].index === request.index) {
             if (!!contractData.humanityLifespan) {
               return (
-                Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000 || 
-                !request.humanity.registration
+                /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
+                Number(request.humanity.winnerClaim[0].resolutionTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) || 
+                (Number(request.creationTime) + Number(contractData.humanityLifespan) < Date.now() / 1000) ||  */
+                !request.humanity.registration ||
+                (Number(request.humanity.registration?.expirationTime) < Date.now() / 1000)
               )
             }
           } else return true;
@@ -91,42 +94,6 @@ export default async function Request({ params }: PageProps) {
 
   const expired = hasExpired();
 
-  /* let action = ActionType.NONE;
-  const setAction = (actionIn: ActionType) => {
-    action = actionIn;
-  } */
-  /* //const [action, setAction] = useState(ActionType.NONE);
-
-
-  if (request.status.id === "resolved" || request.status.id === "withdrawn")
-    setAction(ActionType.NONE);
-  else if (request.index < 0 && request.index > -100) setAction(ActionType.OLD_ACTIVE);
-  else if (request.status.id === "disputed") setAction(ActionType.DISPUTED);
-  else if (request.status.id === "vouching") {
-    offChainVouches.push(
-      ...(await getOffChainVouches(chain.id, request.claimer.id, pohId))
-    );
-    if (
-      BigInt(request.challenges[0].rounds[0].requesterFund.amount) <
-      arbitrationCost + BigInt(contractData.baseDeposit)
-    )
-      setAction(ActionType.FUND);
-    else if (
-      onChainVouches.length + offChainVouches.length >=
-      contractData.requiredNumberOfVouches
-    )
-      setAction(ActionType.ADVANCE);
-    else if (onChainVouches.length + offChainVouches.length >= 0)
-      setAction(ActionType.REMOVE_VOUCH);
-    else setAction(ActionType.VOUCH);
-  } else if (request.status.id == "resolving")
-    setAction(
-      +request.lastStatusChange + +contractData.challengePeriodDuration <
-      Date.now() / 1000
-        ? ActionType.EXECUTE
-        : ActionType.CHALLENGE
-    );
- */
   let registrationFile: RegistrationFile | null;
   let revocationFile: EvidenceFile | null = null;
 
@@ -155,46 +122,12 @@ export default async function Request({ params }: PageProps) {
       : null;
   }
 
-  // let advanceRequests: {
-  //   offChain: { claimer: Address; vouchers: Address[] }[];
-  //   onChain: { claimer: Address; vouchers: Address[] }[];
-  // } = { onChain: [], offChain: [] };
-  // if (action === ActionType.ADVANCE) {
-  //   advanceRequests.onChain = (await getRequestsToAdvance(chain.id))
-  //     .map((req) => {
-  //       if (
-  //         BigInt(req.challenges[0].rounds[0].requesterFund.amount) !==
-  //         BigInt(contractData.baseDeposit) + arbitrationCost
-  //       )
-  //         return null;
-
-  //       const onChainVouches = req.claimer.vouchesReceived
-  //         .filter(
-  //           (vouch) =>
-  //             vouch.humanity.id === req.humanity.id && !vouch.humanity.usedVouch
-  //         )
-  //         .map((vouch) => vouch.from.id);
-
-  //       return onChainVouches.length
-  //         ? { claimer: req.claimer.id, vouchers: onChainVouches }
-  //         : null;
-  //     })
-  //     .filter((vouch) => vouch) as { claimer: Address; vouchers: Address[] }[];
-
-  // advanceRequests.offChain =
-  // }
-
-  /* interface VouchStatus {
-    isValid: boolean; 
-    reason: string | undefined;
-  } */
-
   interface VouchData {
     voucher: Address | undefined,
     name: string | null | undefined,
     pohId: Address | undefined,
     photo: string | undefined,
-    vouchStatus: ValidVouch | undefined,//VouchStatus | undefined,
+    vouchStatus: ValidVouch | undefined,
     isOnChain: boolean,
   }
 
@@ -215,7 +148,6 @@ export default async function Request({ params }: PageProps) {
           rawVoucher[chain.id].claimer && rawVoucher[chain.id].claimer?.registration?.humanity.winnerClaim
         );
         const relevantChain = !!voucherEvidenceChain? voucherEvidenceChain : chain;
-        //const relevantChain = chain;
         
         out.name = rawVoucher[relevantChain.id].claimer?.name;
         out.voucher = rawVoucher[relevantChain.id].claimer?.id;
@@ -429,8 +361,32 @@ export default async function Request({ params }: PageProps) {
                     className="ml-2 underline underline-offset-2" 
                     href={ipfs(policyLink)}
                   >
-                    Policy in force (Updated on {new Date(policyUpdate * 1000).toDateString()})
+                    <div className="group flex relative">
+                    Policy in force at submission 
+                    <div className="\
+                    group-hover:visible invisible \
+                    group-hover:translate-y-6 ease-in-out transition transform absolute \
+                    content-between place-content-center \
+                    flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
+                    bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
+                    text-justify text-[14px] \
+                    left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto \
+                    not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
+                    w-[480px] h-[160px]"
+                  >
+                    <span>
+                    (Policy in force since {new Date(policyUpdate * 1000).toDateString()})
+
+                    This is the policy that was in effect when this submission was made. Why is this important?
+                    Policies may change over time, and it's crucial to know the policy that was in force at the 
+                    time of a submission before challenging or removing a profile. If you challenge this submission, 
+                    this version of the policy will be enforced by Kleros jurors if the case goes to arbitration. Also, 
+                    if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
+                    your revocation request may be rejected, and you may lose your deposit.
+                    </span>
+                  </div></div>
                   </Link>
+                  
                 </div>
               )}
               {vourchesForData.find((v) => v) && (
