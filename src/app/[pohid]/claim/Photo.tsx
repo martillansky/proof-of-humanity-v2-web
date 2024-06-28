@@ -158,7 +158,15 @@ function Photo({ advance, photo$ }: PhotoProps) {
               <ExamplePic src="/images/glasses.jpg" />
               <ExamplePic src="/images/sunglasses.jpg" wrong={true} />
             </div>
+
+            <div className="w-fit flex flex-col items-center">
+              <br/>
+              <span className="font-semibold pb-2">
+                Upload only in accepted formats (jpg, jpeg, png and webp) to avoid losing your deposit
+              </span>
+            </div>
           </div>
+          
           <div className="relative w-full mt-12 bordered grid grid-cols-2">
             <Uploader
               className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"

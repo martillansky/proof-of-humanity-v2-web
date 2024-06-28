@@ -64,17 +64,22 @@ function Review({
       </div>
 
       <span className="txt pb-8">
-        Check the uploaded files and make sure they are according to the rules:
+        Before proceeding, check that your submission complies with the above 
+        Registration Policy. If not, you might lose your deposit. 
+        Specifically, make sure:
         <ul className="list-disc ml-8">
           <li>
-            Photo must be facing forward, without any covering that might hide
-            facial features
+            Non-mirrored photo and video (if you display any text in the 
+            camera and it appears backwards, your image is mirrored).
           </li>
           <li>
-            No filters, heavy makeup or adornments that might obscure the face,
-            hats are okay
+            Photo is facing forward, without any covering that might hide 
+            internal facial features (no filters, heavy makeup, or masks).
           </li>
-          <li>Make sure the video follows the rules</li>
+          <li>
+            Video has good lighting and sound, your internal facial 
+            features are visible, and the displayed address is correct.
+          </li>
         </ul>
       </span>
 
