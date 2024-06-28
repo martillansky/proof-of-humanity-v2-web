@@ -199,9 +199,8 @@ export default async function Request({ params }: PageProps) {
     ]), true, false
   ));
 
-
-  const policyLink = contractData.arbitrationInfo!.policy;
-  const policyUpdate = contractData.arbitrationInfo!.updateTime;
+  const policyLink = request.arbitratorHistory.registrationMeta;
+  const policyUpdate = request.arbitratorHistory.updateTime;
 
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
