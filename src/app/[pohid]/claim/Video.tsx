@@ -107,6 +107,14 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
         </span>
       </span>
 
+      <span className="flex flex-col text-center my-8 mx-12">
+        <span>
+          <strong>
+            Upload only in accepted formats (webm, mp4, avi, and mov) to avoid losing your deposit
+          </strong>
+        </span>
+      </span>
+
       {showCamera && (
         <span className="text-center mb-4">
           {secondaryPhrase}
