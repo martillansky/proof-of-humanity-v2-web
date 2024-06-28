@@ -85,7 +85,12 @@ async function Profile({ params: { pohid } }: PageProps) {
       if (request) {
         requestQuery = humanity[lastEvidenceChain.id]!.humanity!.requests
           .find(req => req.index === request!.index);
-        expired = (Number(requestQuery?.creationTime) + Number(contractData[lastEvidenceChain.id].humanityLifespan) < Date.now() / 1000);
+        expired = (humanity[homeChain.id]!.humanity!.registration!.expirationTime < Date.now() / 1000);
+        /* expired = (
+          (Number(request.resolutionTime) > 0 && 
+          Number(request.resolutionTime) + Number(contractData[lastEvidenceChain.id].humanityLifespan) < Date.now() / 1000) || 
+          (Number(requestQuery?.creationTime) + Number(contractData[lastEvidenceChain.id].humanityLifespan) < Date.now() / 1000)
+        ); */
         if (expired) {
           request = undefined;
         } else {

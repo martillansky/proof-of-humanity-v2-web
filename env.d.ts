@@ -1,6 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
+      MAINNET_RPC: string;
       GNOSIS_RPC: string;
       CHIADO_RPC: string;
       SEPOLIA_RPC: string;

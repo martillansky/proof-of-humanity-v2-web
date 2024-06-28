@@ -23,6 +23,7 @@ query Requests($skip: Int, $first: Int, $where: Request_filter) {
       id
       nbRequests
       registration {
+        expirationTime
         claimer {
           id
         }
