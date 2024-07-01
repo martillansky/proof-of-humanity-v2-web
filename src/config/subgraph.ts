@@ -12,12 +12,14 @@ export type queryReturnType<Q extends queryType> = Record<
 >;
 
 export const sdk = {
-  /* [mainnet.id]: getSdk(
+  [mainnet.id]: getSdk(
     new GraphQLClient(
-      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
+      //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
       //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
+      "https://api.studio.thegraph.com/query/64099/poh/v0.0.20" // ONLY PoHv1 (Last version)
+      //"https://api.studio.thegraph.com/query/64099/poh/v0.0.19" // ONLY PoHv1 (OLD)
     )
-  ), */
+  ),
   [gnosis.id]: getSdk(
     new GraphQLClient(
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"

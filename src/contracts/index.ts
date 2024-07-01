@@ -12,7 +12,6 @@ export const Contract = {
     [mainnet.id]: "0x29defF3DbEf6f79ef20d3fe4f9CFa0547acCeC0D", // OLD
     [sepolia.id]: "0x29defF3DbEf6f79ef20d3fe4f9CFa0547acCeC0D", // OLD
     [gnosisChiado.id]: "0x2505C87AA36d9ed18514Ea7473Ac58aeDeb50849", // OLD
-    //[gnosis.id]: "0xB6412c84eC958cafcC80B688d6F473e399be488f",
     [gnosis.id]: "0x4a594f0e73223c9a1CE0EfC16da92fFaA193a612",
   } : (configSet === "testNew")? {
     [gnosis.id]: "0x4a594f0e73223c9a1CE0EfC16da92fFaA193a612",
