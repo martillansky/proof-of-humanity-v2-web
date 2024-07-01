@@ -1,4 +1,4 @@
-import { EvidenceFile, RegistrationFile } from "types/docs";
+import { EvidenceFile, MetaEvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
 import { SupportedChainId, paramToChain, supportedChains } from "config/chains";
 import ActionBar from "./ActionBar";
@@ -199,8 +199,15 @@ export default async function Request({ params }: PageProps) {
     ]), true, false
   ));
 
-  const policyLink = request.arbitratorHistory.registrationMeta;
-  const policyUpdate = request.arbitratorHistory.updateTime;
+  const policyLink = await (async () => {
+    try {
+      return (await Promise.resolve(ipfsFetch<MetaEvidenceFile>(request.arbitratorHistory.registrationMeta))).fileURI;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  //const policyUpdate = request.arbitratorHistory.updateTime;
 
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
@@ -356,7 +363,7 @@ export default async function Request({ params }: PageProps) {
             <div className="w-full md:flex-row md:items-center justify-between">
               {policyLink && (
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
-                  <Link 
+                  <ExternalLink 
                     className="ml-2 underline underline-offset-2" 
                     href={ipfs(policyLink)}
                   >
@@ -374,8 +381,7 @@ export default async function Request({ params }: PageProps) {
                     w-[480px] h-[160px]"
                   >
                     <span>
-                    (Policy in force since {new Date(policyUpdate * 1000).toDateString()})
-
+                    {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
                     This is the policy that was in effect when this submission was made. Why is this important?
                     Policies may change over time, and it's crucial to know the policy that was in force at the 
                     time of a submission before challenging or removing a profile. If you challenge this submission, 
@@ -384,7 +390,7 @@ export default async function Request({ params }: PageProps) {
                     your revocation request may be rejected, and you may lose your deposit.
                     </span>
                   </div></div>
-                  </Link>
+                  </ExternalLink>
                   
                 </div>
               )}
