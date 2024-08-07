@@ -440,7 +440,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           </>
         )}
 
-        {index === -1 && (
+        {(index < 0 && index > -100) && (
           <span>
             Check submission on
             <ExternalLink

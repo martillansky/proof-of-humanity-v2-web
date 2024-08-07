@@ -143,7 +143,7 @@ async function Profile({ params: { pohid } }: PageProps) {
     
     let iTransfArr = findAllIndex(requests, (req) => req!.status.id === "transferred");
     for(let i = 0; i < iTransfArr.length; i++) {
-      if (iTransfArr[i] >= 1) { // We leave the first as it is, since in that case, the bridged profile is winner claim
+      if (iTransfArr[i] >= 0) {
         let iReceived = iTransfArr[i]+1;
         // A transferred request is set to transferred after the receiving request is created, so we need to swap their order 
         if (requests[iReceived]) [requests[iTransfArr[i]], requests[iReceived]] = [requests[iReceived], requests[iTransfArr[i]]];
@@ -328,6 +328,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                     humanity[homeChain.id]!.humanity!.registration!.claimer.id
                   }
                   revocation={false}
+                  registrationEvidenceRevokedReq={""}
                   status={winnerClaimData.status as string}
                   expired={false}
                 />
@@ -364,6 +365,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                   index={req.index}
                   requester={req.requester}
                   revocation={req.revocation}
+                  registrationEvidenceRevokedReq={req.registrationEvidenceRevokedReq}
                   status={req.status.id}
                   expired={req.expired}
                 />
@@ -392,6 +394,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 index={req.index}
                 requester={req.requester}
                 revocation={req.revocation}
+                registrationEvidenceRevokedReq={req.registrationEvidenceRevokedReq}
                 status={req.status.id}
                 expired={req.expired}
               />

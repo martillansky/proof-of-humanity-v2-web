@@ -31,7 +31,12 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
 
   return (
     // <header className="px-8 pb-2 sm:pt-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm">
-    <header className="px-6 md:px-8 pb-2 sm:pt-2 w-full grid grid-cols-2 md:grid-cols-[200px_minmax(100px,_1fr)_minmax(100px,300px)] text-white text-lg gradient shadow-sm">
+    <header 
+      className="
+        px-6 md:px-8 pb-2 sm:pt-2 w-full
+        grid grid-cols-2 md:grid-cols-[200px_minmax(100px,_1fr)_minmax(100px,300px)]
+        text-white text-lg gradient shadow-sm"
+    >
       <Link href="/" className="flex items-center w-[156px]">
         <Image
           alt="proof of humanity logo"
@@ -40,7 +45,6 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
           width={156}
         />
       </Link>
-
       <div className="my-2 sm:place-self-end grid grid-cols-2 sm:flex gap-x-8 sm:gap-x-12 whitespace-nowrap">
         {web3Loaded && chain.id === sepolia.id && (
           <ExternalLink href="https://docs.scroll.io/en/user-guide/faucet/">
@@ -124,14 +128,14 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
             <ExternalLink href="https://gov.proofofhumanity.id/">
               Forums
             </ExternalLink>
+            <ExternalLink href="https://t.me/pohDebug">
+              Report Bugs (Telegram)
+            </ExternalLink>
             <ExternalLink href="https://github.com/Proof-Of-Humanity/proof-of-humanity-web/issues">
-              Report a bug
+              Report Bugs (Github)
             </ExternalLink>
             <ExternalLink href="https://kleros.gitbook.io/docs/products/proof-of-humanity/proof-of-humanity-tutorial">
               Tutorial
-            </ExternalLink>
-            <ExternalLink href="https://t.me/pohDebug">
-              Report a bug
             </ExternalLink>
             <ExternalLink href="https://ethereum.org/en/wallets">
               Crypto Beginner's Guide

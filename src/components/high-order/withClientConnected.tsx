@@ -9,7 +9,7 @@ import { supportedChains } from "config/chains";
 
 const projectId = "9185f693b1bc3d1d3440300c1559a202";
 
-const { publicClient } = configureChains(supportedChains, [
+const { publicClient } = configureChains(supportedChains as any, [
   w3mProvider({ projectId }),
 ]);
 

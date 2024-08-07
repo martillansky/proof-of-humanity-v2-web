@@ -38,7 +38,7 @@ export const getRequestsInitData = async () => {
 export const getFilteredRequestsInitData = async (filtered: Record<SupportedChainId, RequestsQuery["requests"]> | undefined) => {
   var all: Record<SupportedChainId, RequestsQuery["requests"]> = await _getPagedRequests(); 
   var out: Record<SupportedChainId, RequestsQuery["requests"]> = filtered? filtered : all; 
-  return sanitizeHeadRequests(all, out);
+  return await sanitizeHeadRequests(all, out);
 }
 
 export const genRequestId = (pohId: Hash, index: number) => {
@@ -49,7 +49,7 @@ export const genRequestId = (pohId: Hash, index: number) => {
         ? toHex(index, { size: 32 })
         : index <= -100
         ? concat([
-          toHex(Math.abs(index + 1), { size: 32 }),
+          toHex(Math.abs(index), { size: 32 }),
           toHex("bridged", { size: 7 }),
         ])
         : concat([
@@ -63,7 +63,7 @@ export const genRequestId = (pohId: Hash, index: number) => {
 export const getRequestData = cache(
   async (chainId: SupportedChainId, pohId: Hash, index: number) => {
     const out = (await sdk[chainId]["Request"]({ id: genRequestId(pohId, index) })).request;
-    return sanitizeRequest(out, chainId, pohId);
+    return await sanitizeRequest(out, chainId, pohId);
   }
 )
 

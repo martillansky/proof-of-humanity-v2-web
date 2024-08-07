@@ -20,10 +20,14 @@ query Humanity($id: ID!) {
       lastStatusChange
       index
       revocation
+      registrationEvidenceRevokedReq
       requester
       evidenceGroup {
         evidence(orderBy: creationTime, first: 1) {
+          id
           uri
+          creationTime
+          submitter
         }
       }
     }

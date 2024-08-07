@@ -17,10 +17,10 @@ export const getMyData = async (account: string) => {
       homeChain,
       pohId:
         homeChain &&
-        res[supportedChains.indexOf(homeChain)].claimer!.registration!.id,
+        res[supportedChains.indexOf(homeChain as any)].claimer!.registration!.id,
       currentRequest: requestChain && {
         chain: requestChain,
-        ...res[supportedChains.indexOf(requestChain)].claimer!.currentRequest!,
+        ...res[supportedChains.indexOf(requestChain as any)].claimer!.currentRequest!,
       },
     };
   };

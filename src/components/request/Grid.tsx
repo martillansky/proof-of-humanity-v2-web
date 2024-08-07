@@ -345,6 +345,7 @@ function RequestsGrid() {
             claimer={request.claimer}
             status={request.status.id}
             revocation={request.revocation}
+            registrationEvidenceRevokedReq={request.registrationEvidenceRevokedReq}
             evidence={request.evidenceGroup.evidence}
             expired={request.expired}
           />

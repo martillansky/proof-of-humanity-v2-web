@@ -68,7 +68,7 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
       domain: {
         name: "Proof of Humanity",
         chainId: chain.id,
-        verifyingContract: Contract.ProofOfHumanity[chain.id],
+        verifyingContract: Contract.ProofOfHumanity[chain.id] as any,
       },
       types: {
         IsHumanVoucher: [
