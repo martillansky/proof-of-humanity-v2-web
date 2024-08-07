@@ -99,10 +99,14 @@ export default async function Request({ params }: PageProps) {
 
   if (request.revocation) {
     const [registrationEvidence, revocationEvidence] = await Promise.all([
+      !!request.registrationEvidenceRevokedReq?
+        ipfsFetch<EvidenceFile>(request.registrationEvidenceRevokedReq)
+      : 
       (request.humanity.winnerClaim.length>0 && request.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.length>0)?
-      ipfsFetch<EvidenceFile>(
-        request.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.at(-1)!.uri
-      ): null,
+        ipfsFetch<EvidenceFile>(
+          request.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.at(-1)!.uri
+        )
+      : null,
       ipfsFetch<EvidenceFile>(request.evidenceGroup.evidence.at(-1)!.uri),
     ]);
 
@@ -240,7 +244,7 @@ export default async function Request({ params }: PageProps) {
               <div className="flex justify-between">
                 Revocation requested - {revocationFile.name}
                 {revocationFile.fileURI && (
-                  <Attachment uri="revocationFile.fileURI" />
+                  <Attachment uri={revocationFile.fileURI} />
                 )}
               </div>
               <p className="text-slate-600">{revocationFile.description}</p>

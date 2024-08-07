@@ -11,7 +11,7 @@ export default function useWagmiRead<
 >(contract: C, functionName: F, args?: ReadArgs<C, F>) {
   const chainId = useChainId() as SupportedChainId;
   const { data, isLoading, isError, isSuccess } = useContractRead({
-    address: Contract[contract][chainId],
+    address: Contract[contract][chainId] as `0x${string}`,
     abi: abis[contract] as Abi,
     functionName: functionName as string,
     args: args as unknown[],

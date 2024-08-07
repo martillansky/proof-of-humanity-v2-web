@@ -5,6 +5,7 @@ query Request($id: ID!) {
     }
     index
     revocation
+    registrationEvidenceRevokedReq
     requester
     creationTime
     lastStatusChange

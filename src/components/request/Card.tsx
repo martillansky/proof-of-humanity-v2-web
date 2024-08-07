@@ -20,6 +20,7 @@ import ChainLogo from "components/ChainLogo";
 interface ContentProps {
   chainId: SupportedChainId;
   revocation: boolean;
+  registrationEvidenceRevokedReq: string;
   evidence: RequestsQueryItem["evidenceGroup"]["evidence"];
   claimer: RequestsQueryItem["claimer"];
   requester: Address;
@@ -52,6 +53,7 @@ const ErrorFallback: React.FC<{ claimer?: { name?: string | null } }> = ({
 const Content = ({
   chainId,
   revocation,
+  registrationEvidenceRevokedReq,
   humanity,
   evidence,
   requester,
@@ -59,8 +61,11 @@ const Content = ({
   expired,
 }: ContentProps) => {
   const [evidenceURI] = useIPFS<EvidenceFile>(
-    revocation
-      ? humanity.winnerClaim.at(0)?.evidenceGroup.evidence.at(-1)?.uri
+    revocation?
+      !!registrationEvidenceRevokedReq? 
+        registrationEvidenceRevokedReq
+      : 
+        humanity.winnerClaim.at(0)?.evidenceGroup.evidence.at(-1)?.uri
       : evidence.at(-1)?.uri,
     { suspense: true }
   );
@@ -95,6 +100,7 @@ const Content = ({
 function Card({
   status,
   revocation,
+  registrationEvidenceRevokedReq,
   index,
   requester,
   chainId,
@@ -139,6 +145,7 @@ function Card({
             humanity={{ id: pohId, winnerClaim }}
             requester={requester}
             revocation={revocation}
+            registrationEvidenceRevokedReq={registrationEvidenceRevokedReq}
             expired={expired}
           />
         </Suspense>

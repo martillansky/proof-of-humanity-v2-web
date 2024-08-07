@@ -16,7 +16,7 @@ import {
 const getProofOfHumanity = (chain: SupportedChain) =>
   getContract({
     abi: abis.ProofOfHumanity,
-    address: Contract.ProofOfHumanity[chain.id],
+    address: Contract.ProofOfHumanity[chain.id] as `0x${string}`,
     publicClient: createPublicClient({
       chain,
       transport: http(getChainRpc(chain.id)),
@@ -66,7 +66,7 @@ export async function POST(
       domain: {
         name: "Proof of Humanity",
         chainId: chain.id,
-        verifyingContract: Contract.ProofOfHumanity[chain.id],
+        verifyingContract: Contract.ProofOfHumanity[chain.id] as `0x${string}`,
       },
       types: {
         IsHumanVoucher: [

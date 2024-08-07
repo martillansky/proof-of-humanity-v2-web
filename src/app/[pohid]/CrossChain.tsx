@@ -93,12 +93,12 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
     senderChain: lastTransferChain,
     receivingChain: supportedChains.find(
       (chain) =>
-        Contract.CrossChainProofOfHumanity[chain.id].toLowerCase() ===
+        Contract.CrossChainProofOfHumanity[chain.id]?.toLowerCase() ===
         lastTransfer?.foreignProxy
     )!,
     received: !!supportedChains.find(
       (c) => 
-        Contract.CrossChainProofOfHumanity[c.id].toLowerCase() === 
+        Contract.CrossChainProofOfHumanity[c.id]?.toLowerCase() === 
         lastTransfer?.foreignProxy
     ),
   });
@@ -193,7 +193,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                             gateway.foreignProxy ===
                             Contract.CrossChainProofOfHumanity[
                               chain.id
-                            ].toLowerCase()
+                            ]?.toLowerCase()
                         );
 
                         if (!gatewayForChain) return;

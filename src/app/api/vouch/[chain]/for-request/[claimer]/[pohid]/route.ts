@@ -10,6 +10,7 @@ interface RequestParams {
   pohid: Hash;
 }
 
+export const dynamic = "force-dynamic";
 export async function GET(
   _request: NextRequest,
   { params }: { params: RequestParams }
