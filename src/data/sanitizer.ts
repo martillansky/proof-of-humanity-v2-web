@@ -162,6 +162,14 @@ export const getTransferringRequest = (
     .at(0);
 
   }
+  if (!transferringRequest) {
+    // Cases of failed transferring (being double-transferred before)
+    var transferringRequest: any | undefined = out[homeChainId].humanity?.requests
+    .filter(req => (req.status.id == "transferring"))
+    .sort((req1, req2) => req2.creationTime - req1.creationTime)
+    .at(0);
+
+  }
   if (!transferringRequest) return getTransferringRequest(out, homeChainId, request as RequestQuery['request']);
   if (transferringRequest!.index<=-100) return getTransferringRequest(out, homeChainId, transferringRequest as RequestQuery['request']);
   
@@ -239,7 +247,7 @@ export const sanitizeHeadRequests = async (
             .at(0);
           }
           if (!transferringRequest) {
-            // Cases of failed transferring
+            // Cases of failed transferring (being double-transferred before)
             transferringRequest = all[chain.id]
             .filter(req => (req.humanity.id === pohId && (req.status.id == "transferring")))
             .sort((req1, req2) => req2.creationTime - req1.creationTime)
