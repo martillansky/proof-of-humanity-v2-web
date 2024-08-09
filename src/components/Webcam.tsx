@@ -113,6 +113,7 @@ const Webcam: React.FC<WebcamProps> = ({
         mirrored={mirrored}
         screenshotFormat={"image/jpeg"}
         audio={isVideo}
+        muted={true}
         screenshotQuality={1}
         forceScreenshotSourceSize
         videoConstraints={{
@@ -130,6 +131,10 @@ const Webcam: React.FC<WebcamProps> = ({
         onClick={(e) => e.preventDefault()}
         onUserMedia={onUserMedia}
         onUserMediaError={onUserMediaError}
+        audioConstraints={{
+          noiseSuppression: true,
+          echoCancellation: true,
+        }}
       />
 
       {recording && overlay && (
