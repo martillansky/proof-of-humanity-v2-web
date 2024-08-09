@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import ReactWebcam from "react-webcam";
 import Uploader from "components/Uploader";
 import Webcam from "components/Webcam";
-import { IS_IOS, OS } from "utils/media";
+import { IS_IOS } from "utils/media";
 import useFullscreen from "hooks/useFullscreen";
 import { useAccount } from "wagmi";
 import { ObservableObject } from "@legendapp/state";
@@ -72,18 +72,11 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
     video$.delete();
   };
 
-  const isMac = OS.name?.includes("Mac");
   const phrase = 
     isRenewal
     ? "I certify I am a real human and I reapply to keep being part of this registry"
     : "I certify that I am a real human and that I am not already registered in this registry";
 
-  const secondaryPhrase = 
-    isMac
-    ? "For MAC computers, momentarily, we recommend recording on a different media and upload afterwards." 
-    : "The phrase will also appear on screen when you start recording."
-  ;
-  
 
   return (
     <>
@@ -114,12 +107,6 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
           </strong>
         </span>
       </span>
-
-      {showCamera && (
-        <span className="text-center mb-4">
-          {secondaryPhrase}
-        </span>
-      )}
 
       {!showCamera && !video && (
         <div className="relative w-full mt-12 bordered grid grid-cols-2">
@@ -174,7 +161,7 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
         </div>
       )}
 
-      {showCamera && !isMac && (
+      {showCamera && (
         <div tabIndex={0} ref={fullscreenRef}>
           <Webcam
             isVideo
