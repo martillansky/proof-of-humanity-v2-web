@@ -14,12 +14,20 @@ export type queryReturnType<Q extends queryType> = Record<
 export const sdk = {
   [mainnet.id]: getSdk(
     new GraphQLClient(
+      (configSetSelection.id === configSets.main.id) ? 
+      "https://api.studio.thegraph.com/query/64099/pohv2-prod-mainnet/version/latest"
+      : (configSetSelection.id === configSets.mainOld.id) ? 
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
+      : ""
     )
   ),
   [gnosis.id]: getSdk(
     new GraphQLClient(
+      (configSetSelection.id === configSets.main.id) ? 
+      "https://api.studio.thegraph.com/query/64099/pohv2-prod-gnosis/version/latest"
+      : (configSetSelection.id === configSets.mainOld.id) ? 
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
+      : ""
     )
   ),
   [sepolia.id]: getSdk(
