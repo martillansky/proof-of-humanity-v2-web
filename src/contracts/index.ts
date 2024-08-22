@@ -12,7 +12,7 @@ export const configSets = {
   'mainOld': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainOld', id: '4'},
 };
 
-export const configSetSelection = configSets.testOld;
+export const configSetSelection = configSets.main;
 
 export const Contract = {
   ProofOfHumanity: 
