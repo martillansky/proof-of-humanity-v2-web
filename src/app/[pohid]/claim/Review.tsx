@@ -13,6 +13,7 @@ import Image from "next/image";
 import Previewed from "components/Previewed";
 import DocumentIcon from "icons/NoteMajor.svg";
 import { ContractData } from "data/contract";
+import { prettifyId } from "utils/identifier";
 
 interface ReviewProps {
   arbitrationInfo: ContractData["arbitrationInfo"];
@@ -109,7 +110,7 @@ function Review({
       </div>
 
       <div className="w-full flex flex-col">
-        <Field label="Proof of Humanity ID" value={pohId} disabled />
+        <Field label="Proof of Humanity ID" value={prettifyId(pohId)} disabled />
         <Field label="Name" value={name} disabled />
         <Field label="Account" value={address} disabled />
 
