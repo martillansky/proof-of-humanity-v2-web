@@ -10,6 +10,7 @@ export const configSets = {
   'testOld': {chainSet: ChainSet.TESTNETS, chainSetId: 'testOld', id: '2'},
   'testNew': {chainSet: ChainSet.TESTNETS, chainSetId: 'testNew', id: '3'},
   'mainOld': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainOld', id: '4'},
+  'mainPreAudit': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainPreAudit', id: '5'},
 };
 
 export const configSetSelection = configSets.main;
@@ -28,6 +29,9 @@ export const Contract = {
     [sepolia.id]: "0x0D4674De96459e00A101656b799ba016fBc45dC1",
     [gnosisChiado.id]: "0x2F0f39c3CF5cffc0DeACEb69d3fD883734D67687",
   } : (configSetSelection.id === configSets.main.id)? {
+    [gnosis.id]: "0xa4AC94C4fa65Bb352eFa30e3408e64F72aC857bc",
+    [mainnet.id]: "0xbE9834097A4E97689d9B667441acafb456D0480A",
+  } : (configSetSelection.id === configSets.mainPreAudit.id)? {
     [gnosis.id]: "0xECd1823b3087acEE3C77928b1959c08d31A8F20e",
     [mainnet.id]: "0x87c5c294C9d0ACa6b9b2835A99FE0c9A444Aacc1",
   } : (configSetSelection.id === configSets.mainOld.id)? {
@@ -47,6 +51,9 @@ export const Contract = {
     [sepolia.id]: "0xDb7070C1AE12f83E709FF22c4c51993a570FDF84",
     [gnosisChiado.id]: "0x2f33051DF37Edf2286E3b2B3c7883E1A13D82071",
   } : (configSetSelection.id === configSets.main.id)? {
+    [gnosis.id]: "0x16044E1063C08670f8653055A786b7CC2034d2b0",
+    [mainnet.id]: "0xa478095886659168E8812154fB0DE39F103E74b2",
+  } : (configSetSelection.id === configSets.mainPreAudit.id)? {
     [gnosis.id]: "0xF921b42B541bc53a07067B65207F879c9377bf7F",
     [mainnet.id]: "0xD8D462ac9F3FAD77Af2ae2640fE7F591F1651A2C",
   } : (configSetSelection.id === configSets.mainOld.id)? {

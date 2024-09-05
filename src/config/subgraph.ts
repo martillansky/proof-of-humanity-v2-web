@@ -15,18 +15,22 @@ export const sdk = {
   [mainnet.id]: getSdk(
     new GraphQLClient(
       (configSetSelection.id === configSets.main.id) ? 
-      "https://api.studio.thegraph.com/query/64099/pohv2-prod-mainnet/version/latest"
+      "https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/version/latest"
       : (configSetSelection.id === configSets.mainOld.id) ? 
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
+      : (configSetSelection.id === configSets.mainPreAudit.id) ? 
+      "https://api.studio.thegraph.com/query/64099/pohv2-prod-mainnet/version/latest"
       : ""
     )
   ),
   [gnosis.id]: getSdk(
     new GraphQLClient(
       (configSetSelection.id === configSets.main.id) ? 
-      "https://api.studio.thegraph.com/query/64099/pohv2-prod-gnosis/version/latest"
+      "https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/version/latest"
       : (configSetSelection.id === configSets.mainOld.id) ? 
       "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
+      : (configSetSelection.id === configSets.mainPreAudit.id) ? 
+      "https://api.studio.thegraph.com/query/64099/pohv2-prod-gnosis/version/latest"
       : ""
     )
   ),
