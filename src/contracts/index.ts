@@ -1,3 +1,4 @@
+import { handleUpdateChains } from "config/chains";
 import { gnosis, sepolia, gnosisChiado, mainnet } from "viem/chains";
 
 export enum ChainSet {
@@ -5,6 +6,7 @@ export enum ChainSet {
   TESTNETS
 }
 
+export type ConfigTypes = 'main'| 'testOld'| 'testNew'| 'mainOld'; 
 export const configSets = {
   'main': {chainSet: ChainSet.MAINNETS, chainSetId: 'main', id: '1'},
   'testOld': {chainSet: ChainSet.TESTNETS, chainSetId: 'testOld', id: '2'},
@@ -12,7 +14,32 @@ export const configSets = {
   'mainOld': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainOld', id: '4'},
 };
 
-export const configSetSelection = configSets.testOld;
+
+export var configSetSelection = configSets.main;
+//export var configSetSelection = configSets['main'];
+
+//export var configSetSelection = configSets[process.env.CHAIN_SET];
+
+//export var configSetSelection = !!getWindowChainSet()? configSets[getWindowChainSet() as ConfigTypes]: configSets.testOld;
+/* export var configSetSelection = 
+  (process.env.CHAIN_SET == configSets.main.chainSetId)? configSets.main : configSets.testOld; */
+//console.log("CHAINNNNN>>>>> ", process.env.CHAIN_SET, configSetSelection);
+
+export const setConfigSetSelection = (selection: typeof configSetSelection) => {
+  configSetSelection = selection;
+  handleUpdateChains(selection);
+}
+
+export async function getServerSideProps(context:any) {
+  // Update configuration here
+  //process.env.CHAIN_SET = configSetSelection.chainSetId;
+  console.log("SERVER SIDE PROPS> ", context);
+  
+  return {
+    props: {}, // Will be passed to the page component as props
+  };
+}
+
 
 export const Contract = {
   ProofOfHumanity: 

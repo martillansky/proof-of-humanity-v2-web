@@ -9,6 +9,7 @@ import { Metadata } from "next";
 import Toastify from "./Toastify";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import PreHeader from "./PreHeader";
 
 export const metadata: Metadata = {
   title: "Proof of Humanity V2",
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const policy = (await getContractData(defaultChain.id)).arbitrationInfo
     .policy;
 
+    console.log("ENTRA>>>> ", defaultChain.id);
   return (
     <html lang="en">
       <body
@@ -32,7 +34,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           inter.className
         )}
       >
-        <Header policy={ipfs(policy)} />
+        <PreHeader policy={ipfs(policy)}/>
+        {/* <Header policy={ipfs(policy)}/> */}
         <main>{children}</main>
         <Footer />
         <Toastify />

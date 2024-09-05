@@ -9,26 +9,61 @@ import { getMyData } from "data/user";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { shortenAddress } from "utils/address";
 import { prettifyId } from "utils/identifier";
 import { sepolia } from "viem/chains";
 import { useAccount, usePublicClient } from "wagmi";
+import { configSetSelection, configSets, getServerSideProps } from "contracts";
+import { supportedChains } from "config/chains";
+import { useEffect } from "react";
+//import { useSwitchNetwork } from 'wagmi';
 
 interface HeaderProps extends JSX.IntrinsicAttributes {
   policy: string;
+  updateChains: ()=> Promise<boolean>;
+  configSet: any;
 }
 
-export default withClientConnected<HeaderProps>(function Header({ policy }) {
+export default withClientConnected<HeaderProps>(function Header({ policy, updateChains, configSet }) {
   const pathname = usePathname();
   const modal = useWeb3Modal();
   const { isConnected, address } = useAccount();
   const { chain } = usePublicClient();
   const web3Loaded = useWeb3Loaded();
-
   const { data: me } = useSWR(address, getMyData);
 
+  //const { switchNetwork } = useSwitchNetwork();
+
+  /* const switchToChain = async (chainId: number) => {
+    try {
+      await switchNetwork(chainId);
+    } catch (error) {
+      console.error('Failed to switch network:', error);
+    }
+  }; */
+
+  const handleUpdateChains = () => {
+    const updateChainsAsync = async () => {
+      await updateChains();
+      //await switchNetwork(chainId);
+      //router.replace("");
+      console.log(">>>>>>>>>> INNNNN >>>> ", policy, configSet)
+      console.log(">>>>>>>>>> supportedChains PRE>> ", configSetSelection, supportedChains, process.env.CHAIN_SET)
+      //window.location.reload();
+      //router.refresh();
+      //router.push('/');
+      //console.log(">>>>>>>>>> supportedChains POST>> ", configSetSelection, supportedChains)
+      ;
+    }
+    updateChainsAsync();
+  }
+
+/*   useEffect(()=>{
+    handleUpdateChains();
+  },[]);
+ */  
   return (
     // <header className="px-8 pb-2 sm:pt-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm">
     <header 
@@ -45,6 +80,14 @@ export default withClientConnected<HeaderProps>(function Header({ policy }) {
           width={156}
         />
       </Link>
+      <div className="justify-self-center md:w-fit md:justify-self-end col-span-2 md:col-span-1 flex items-center">
+        <button
+          className="mr-2 px-2 h-8 centered border-2 border-white rounded bg-white/10 text-white"
+          onClick={handleUpdateChains}
+        >
+          {configSet == configSets.main? "to TESTNETS" : "to MAINNETS"}
+        </button>
+      </div>
       <div className="my-2 sm:place-self-end grid grid-cols-2 sm:flex gap-x-8 sm:gap-x-12 whitespace-nowrap">
         {web3Loaded && chain.id === sepolia.id && (
           <ExternalLink href="https://docs.scroll.io/en/user-guide/faucet/">

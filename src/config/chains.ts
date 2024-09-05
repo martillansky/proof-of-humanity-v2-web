@@ -14,10 +14,18 @@ import { supportedChains as supportedChainsTest,
   getForeignChain as getForeignChainTest 
 } from "./chains.testnets";
 
-export const supportedChains = (configSetSelection.chainSet === ChainSet.MAINNETS? supportedChainsMain : supportedChainsTest);
-export const defaultChain = supportedChains[0];
+export var supportedChains = (configSetSelection.chainSet === ChainSet.MAINNETS? supportedChainsMain : supportedChainsTest);
+export var defaultChain = supportedChains[0];
 
-export const legacyChain = (configSetSelection.chainSet === ChainSet.MAINNETS? legacyChainMain : legacyChainTest);
+export var legacyChain = (configSetSelection.chainSet === ChainSet.MAINNETS? legacyChainMain : legacyChainTest);
+
+export const handleUpdateChains = (configSetSelection:any) => {
+  supportedChains = (configSetSelection.chainSet === ChainSet.MAINNETS? supportedChainsMain : supportedChainsTest);
+  defaultChain = supportedChains[0];
+  
+  legacyChain = (configSetSelection.chainSet === ChainSet.MAINNETS? legacyChainMain : legacyChainTest);
+  
+}
 
 export type SupportedChain = ArrayElement<typeof supportedChains>;
 export type SupportedChainId = SupportedChain["id"];

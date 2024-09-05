@@ -15,6 +15,7 @@ const nextConfig = {
     DEPLOYED_APP: process.env.DEPLOYED_APP,
   },
   images: {
+    //formats: ['image/webp'], // Check this out for avoiding showing jpeg's as avif
     remotePatterns: [
       {
         protocol: "https",
