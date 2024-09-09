@@ -13,7 +13,7 @@ export const configSets = {
   'mainPreAudit': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainPreAudit', id: '5'},
 };
 
-export const configSetSelection = configSets.main;
+export const configSetSelection = configSets.testOld;
 
 export const Contract = {
   ProofOfHumanity: 
