@@ -44,7 +44,7 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
     mediaRecorder.ondataavailable = async ({ data }) => {
       const newlyRecorded = ([] as BlobPart[]).concat(data);
       const blob = new Blob(newlyRecorded, {
-        type: `${IS_IOS ? "video/mp4" : "video/webm"};codecs=h264`,
+        type: `${IS_IOS ? "video/mp4;codecs=h264" : "video/webm;codecs=vp8"}`,
       });
       video$.set({ content: blob, uri: URL.createObjectURL(blob) });
       setShowCamera(false);
