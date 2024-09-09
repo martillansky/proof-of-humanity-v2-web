@@ -38,13 +38,14 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
   const startRecording = () => {
     if (!camera || !camera.stream) return;
     const mediaRecorder = new MediaRecorder(camera.stream, {
-      mimeType: IS_IOS ? "video/mp4" : "video/webm",
+      mimeType: IS_IOS ? 'video/mp4;codecs="h264"' : 'video/webm; codecs="vp8"',
     });
 
     mediaRecorder.ondataavailable = async ({ data }) => {
       const newlyRecorded = ([] as BlobPart[]).concat(data);
-      const blob = new Blob(newlyRecorded, {
-        type: `${IS_IOS ? "video/mp4;codecs=h264" : "video/webm;codecs=vp8"}`,
+      const blob = new Blob(newlyRecorded, 
+         {
+        type: `${IS_IOS ? 'video/mp4;codecs="h264"' : 'video/webm;codecs="vp8"'}`,
       });
       video$.set({ content: blob, uri: URL.createObjectURL(blob) });
       setShowCamera(false);
