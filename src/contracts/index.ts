@@ -13,7 +13,7 @@ export const configSets = {
   'mainPreAudit': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainPreAudit', id: '5'},
 };
 
-export const configSetSelection = configSets.main;
+export const configSetSelection = process.env.DEPLOYED_APP == 'https://testnets--proof-of-humanity-v2.netlify.app/'? configSets.testOld : configSets.main;
 
 export const Contract = {
   ProofOfHumanity: 
