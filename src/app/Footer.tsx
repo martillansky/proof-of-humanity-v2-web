@@ -2,7 +2,7 @@ import Image from "next/image";
 import ExternalLink from "components/ExternalLink";
 
 const Footer: React.FC = () => (
-  <div className="bottom-0 w-full flex flex-wrap justify-center sm:justify-between items-center gap-y-[20px] gap-x-[32px] text-white text-lg gradient shadow-sm px-8 py-4">
+  <div className="bottom-0 w-full flex flex-wrap justify-center sm:justify-between items-center gap-y-[20px] gap-x-[168px] text-white text-lg gradient shadow-sm px-8 py-4">
     <ExternalLink
       className="flex items-center gap-2 text-sm"
       href="https://kleros.io/"
