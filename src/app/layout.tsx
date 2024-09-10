@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import Header from "./Header";
+import Header from "./Header/index";
 import cn from "classnames";
 import Footer from "./Footer";
 import { getContractData } from "data/contract";

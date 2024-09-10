@@ -1,7 +1,7 @@
 import { SupportedChain } from "config/chains";
 import { isAddress } from "viem";
 
-export function shortenAddress(address: string, chars = 4): string {
+export function shortenAddress(address: `0x${string}`, chars = 4): string {
   if (!isAddress(address))
     throw Error(`Invalid 'address' parameter '${address}'.`);
 

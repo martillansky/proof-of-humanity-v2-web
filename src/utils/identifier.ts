@@ -4,7 +4,7 @@ import { Hash, toBytes, zeroAddress } from "viem";
 // const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 // const base58 = baseX(BASE58);
 
-export const prettifyId = (id: Hash) => id.slice(2).toUpperCase();
+export const prettifyId = (id: Hash) => id?.slice(2).toUpperCase();
 // base58.encode(hexToBytes(id));
 
 export const machinifyId = (s: string) => {
