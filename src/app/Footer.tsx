@@ -1,17 +1,17 @@
-import ExternalLink from "components/ExternalLink";
 import Image from "next/image";
+import ExternalLink from "components/ExternalLink";
 
 const Footer: React.FC = () => (
-  <nav className="absolute bottom-0 w-full grid grid-cols-2 sm:grid-cols-3 text-white text-lg gradient shadow-sm px-8 py-4">
-    <ExternalLink href="https://proofofhumanity.id/">Learn More</ExternalLink>
+  <div className="bottom-0 w-full flex flex-wrap justify-center sm:justify-between items-center gap-y-[20px] gap-x-[32px] text-white text-lg gradient shadow-sm px-8 py-4">
     <ExternalLink
-      className="justify-self-end sm:place-self-center flex items-center gap-2 text-sm"
+      className="flex items-center gap-2 text-sm"
       href="https://kleros.io/"
     >
       SECURED BY{" "}
       <Image alt="kleros" src="/logo/kleros.svg" width={96} height={24} />
     </ExternalLink>
-    <div className="mt-4 sm:mt-0 place-self-center col-span-2 sm:col-span-1 sm:justify-self-end flex items-center gap-4">
+
+    <div className="flex items-center gap-4">
       <ExternalLink href="https://snapshot.org/#/poh.eth/">
         <Image alt="snapshot" src="/logo/snapshot.svg" width={20} height={20} />
       </ExternalLink>
@@ -25,7 +25,7 @@ const Footer: React.FC = () => (
         <Image alt="telegram" src="/logo/telegram.svg" width={20} height={20} />
       </ExternalLink>
     </div>
-  </nav>
+  </div>
 );
 
 export default Footer;
