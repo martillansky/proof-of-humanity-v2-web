@@ -29,8 +29,8 @@ import { RequestsQuery } from "generated/graphql";
 import cn from "classnames";
 import ChainLogo from "components/ChainLogo";
 import { getFilteredRequestsInitData, getRequestsInitData, getRequestsLoadingPromises } from "data/request";
-import Image from "next/image";
 import { getContractDataAllChains } from "data/contract";
+import Loading from "app/[pohid]/loading";
 
 enableReactUse();
 
@@ -262,13 +262,7 @@ function RequestsGrid() {
 
   if (pending && loadingType === "init")
     return (
-      <Image
-        alt="logo loading"
-        className="mx-auto animate-flip my-40"
-        src="/logo/poh-colored.svg"
-        width={256}
-        height={256}
-      />
+      <Loading />
     );
 
   return (
