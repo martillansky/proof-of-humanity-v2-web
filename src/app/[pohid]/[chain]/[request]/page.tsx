@@ -383,26 +383,27 @@ export default async function Request({ params }: PageProps) {
                      <div className="group flex relative">
                     Policy in force at submission 
                     <div className="\
-    group-hover:visible invisible \
-    group-hover:translate-y-6 ease-in-out transition transform absolute \
-    content-between place-content-center \
-    flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
-    bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
-    text-justify text-[14px] p-[8px] \
-    left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto \
-    not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
-    w-[260px] z-10"
->
-                    <span>
-                    {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
-                    This is the policy that was in effect when this submission was made. Why is this important?
-                    Policies may change over time, and it's crucial to know the policy that was in force at the 
-                    time of a submission before challenging or removing a profile. If you challenge this submission, 
-                    this version of the policy will be enforced by Kleros jurors if the case goes to arbitration. Also, 
-                    if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
-                    your revocation request may be rejected, and you may lose your deposit.
-                    </span>
-                    </div></div>
+                      group-hover:visible invisible \
+                      ease-in-out transition-opacity transform absolute \
+                      content-between place-content-center \
+                      flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
+                      bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
+                      text-justify text-[14px] p-[8px] \
+                      left-1/2 -translate-x-1/2 m-4 mx-auto \
+                      not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
+                      w-[260px] z-10"
+                    >
+                      <span>
+                        {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
+                        This is the policy that was in effect when this submission was made. Why is this important?
+                        Policies may change over time, and it's crucial to know the policy that was in force at the 
+                        time of a submission before challenging or removing a profile. If you challenge this submission, 
+                        this version of the policy will be enforced by Kleros jurors if the case goes to arbitration. Also, 
+                        if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
+                        your revocation request may be rejected, and you may lose your deposit.
+                      </span>
+                    </div>
+                  </div>
                   </ExternalLink>
 
                 </div>
