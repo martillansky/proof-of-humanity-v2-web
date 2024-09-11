@@ -249,11 +249,11 @@ export default async function Request({ params }: PageProps) {
               </div>
               <p className="text-slate-600">{revocationFile.description}</p>
             </div>
-            <div className="flex font-normal text-sm">
+            <div className="flex font-normal flex-wrap text-sm">
               <span className="mr-2">Requested by</span>
               <Identicon diameter={16} address={request.requester} />
               <ExternalLink
-                className="ml-1 text-blue-500 underline underline-offset-2"
+                className="ml-1 text-blue-500 flex flex-wrap underline underline-offset-2 break-words break-all"
                 href={explorerLink(request.requester, chain)}
               >
                 {request.requester}
@@ -391,7 +391,7 @@ export default async function Request({ params }: PageProps) {
                       text-justify text-[14px] p-[8px] \
                       left-1/2 -translate-x-1/2 m-4 mx-auto \
                       not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
-                      w-[260px] z-10"
+                      w-[260px] md:w-[400px] z-10"
                     >
                       <span>
                         {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
