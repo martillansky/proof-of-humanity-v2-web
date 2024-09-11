@@ -467,7 +467,7 @@ export default async function Request({ params }: PageProps) {
       </div>
 
       <Evidence
-        list={request.evidenceGroup.evidence}
+        list={request.evidenceGroup.evidence.reverse()}
         pohId={pohId}
         requestIndex={request.index}
         arbitrationInfo={request.arbitratorHistory}

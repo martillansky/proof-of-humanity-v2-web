@@ -53,7 +53,7 @@ function Item({ index, uri, creationTime, sender }: ItemInterface) {
             </ExternalLink>
           )}
         </div>
-        <p>{evidence?.description}</p>
+        <p className="break-words break-word">{evidence?.description}</p>
       </div>
       <div className="px-4 py-2 flex items-center">
         <Identicon diameter={32} address={sender} />
@@ -206,7 +206,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
       {list.map((item, i) => (
         <Item
           key={item.id}
-          index={list.length - i - 1}
+          index={i}
           creationTime={item.creationTime}
           sender={item.submitter}
           uri={item.uri}
