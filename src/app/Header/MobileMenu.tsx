@@ -1,8 +1,8 @@
-import { useWeb3Modal } from "@web3modal/react";
 import Link from "next/link";
 import { Ref, forwardRef } from "react";
 import { prettifyId } from "utils/identifier";
 import WalletSection from "./WalletSection"
+import Options from "./Options"
 
 interface MobileMenuProps {
   policy: string;
@@ -18,12 +18,11 @@ const MobileMenu = forwardRef(
     { policy, me, pathname, address, web3Loaded, isConnected }: MobileMenuProps,
     ref: Ref<HTMLDivElement>
   ) => {
-    const modal = useWeb3Modal();
 
     return (
       <div
         ref={ref}
-        className="md:hidden absolute top-16 right-0 gradient w-64 p-4 rounded shadow-lg z-5"
+        className="md:hidden absolute top-16 right-0 gradient w-64 p-4 rounded shadow-lg z-10"
       >
         <nav className="flex flex-col gap-y-4">
           <Link href="/" className="text-lg font-semibold">
@@ -62,6 +61,7 @@ const MobileMenu = forwardRef(
             }}
           />
         </div>
+        <Options />
       </div>
     );
   }

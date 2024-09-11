@@ -1,7 +1,5 @@
 import { useWeb3Modal } from "@web3modal/react";
-import Image from "next/image";
 import ChainLogo from "components/ChainLogo";
-import ExternalLink from "components/ExternalLink";
 import { shortenAddress } from "utils/address";
 
 interface WalletSectionProps {
@@ -45,14 +43,6 @@ const WalletSection = ({
           Connect
         </button>
       )}
-
-      <ExternalLink href="https://snapshot.org/#/poh.eth/">
-        <Image alt="snapshot" src="/logo/snapshot.svg" height={16} width={16} />
-      </ExternalLink>
-
-      <button className="w-6 h-6 ml-2 border-2 border-white rounded-full font-bold text-sm">
-        ?
-      </button>
     </div>
   );
 };

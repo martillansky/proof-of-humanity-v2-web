@@ -12,6 +12,7 @@ import withClientConnected from "components/high-order/withClientConnected";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import DesktopNavigation from "./DesktopNavigation";
 import MobileMenu from "./MobileMenu";
+import Options from "./Options";
 import WalletSection from "./WalletSection";
 
 interface IHeader extends JSX.IntrinsicAttributes {
@@ -74,8 +75,13 @@ export default withClientConnected(function Header({ policy }: IHeader) {
         />
       )}
 
-      <div className="hidden md:block">
-        <WalletSection {...{ chain, address, isConnected, web3Loaded }} />
+      <div className="flex flex-row items-center">
+        <div className="hidden md:block">
+          <WalletSection {...{ chain, address, isConnected, web3Loaded }} />
+        </div>
+        <div className="hidden md:block">
+          <Options />
+        </div>
       </div>
     </header>
   );
