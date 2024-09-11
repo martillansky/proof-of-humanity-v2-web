@@ -53,7 +53,7 @@ export default async function Request({ params }: PageProps) {
     request.claimer.vouchesReceived
     .map((v) => v.from.id as Address);
   
-  
+
   // This are vouches to be read directly from supabase, ie, vouches still not processed 
   // (only necessary before advance state in vouching status)
   const offChainVouches: { 
@@ -211,7 +211,7 @@ export default async function Request({ params }: PageProps) {
     }
   })();
 
-  //const policyUpdate = request.arbitratorHistory.updateTime;
+    //const policyUpdate = request.arbitratorHistory.updateTime;
 
   return (
     <div className="content mx-auto flex flex-col justify-center font-semibold">
@@ -270,7 +270,7 @@ export default async function Request({ params }: PageProps) {
                   uri={ipfs(registrationFile.photo)}
                   trigger={
                     <Image
-                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
+                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer object-cover"
                       alt="image"
                       src={ipfs(registrationFile.photo)}
                       width={144}
@@ -283,6 +283,10 @@ export default async function Request({ params }: PageProps) {
               <span className="mt-4 mb-12 text-2xl">
                 {/* {request.claimer.name} */}
                 {registrationFile? registrationFile.name: ''}
+              </span>
+
+              <span className="text-sm font-light">
+                {registrationFile ? registrationFile.bio : ''}
               </span>
             </div>
 
@@ -313,19 +317,20 @@ export default async function Request({ params }: PageProps) {
               </span>
             </div>
 
-            <div className="mb-8 flex font-medium text-theme">
-              <Image
+            <div className="mb-8 flex font-medium text-theme flex-wrap gap-x-[8px] gap-y-[8px]" >
+              <div className="flex flex-row gap-x-[8px]">
+                <Image
                 alt="poh id"
                 src="/logo/pohid.svg"
-                className="mr-2"
                 height={24}
                 width={24}
-              />
-              <Link href={`/${prettifyId(pohId)}`}>
+                />
+                <Link href={`/${prettifyId(pohId)}`}>
                 {prettifyId(pohId).slice(0, 20)}
                 <wbr />
                 {prettifyId(pohId).slice(20)}
-              </Link>
+                </Link>
+              </div>
 
               <Info
                 nbRequests={
@@ -341,7 +346,7 @@ export default async function Request({ params }: PageProps) {
                   uri={ipfs(registrationFile.photo)}
                   trigger={
                     <Image
-                      className="w-32 h-32 rounded-full cursor-pointer"
+                      className="w-32 h-32 rounded-full cursor-pointer object-cover"
                       alt="image"
                       src={ipfs(registrationFile.photo)}
                       width={144}
@@ -351,8 +356,12 @@ export default async function Request({ params }: PageProps) {
                 />
               )}
 
-              <span className="mt-4 mb-12 text-2xl">
+              <span className="mt-4 mb-[16px] text-2xl">
                 {request.claimer.name}
+              </span>
+
+              <span className="mb-[32px] text-sm font-light">
+                {registrationFile ? registrationFile.bio : ''}
               </span>
             </div>
 
@@ -364,26 +373,26 @@ export default async function Request({ params }: PageProps) {
               />
             )}
 
-            <div className="w-full md:flex-row md:items-center justify-between">
+            <div className="w-full flex flex-wrap md:flex-row md:items-center justify-between gap-2">
               {policyLink && (
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
                   <ExternalLink 
                     className="ml-2 underline underline-offset-2" 
                     href={ipfs(policyLink)}
                   >
-                    <div className="group flex relative">
+                     <div className="group flex relative">
                     Policy in force at submission 
                     <div className="\
-                    group-hover:visible invisible \
-                    group-hover:translate-y-6 ease-in-out transition transform absolute \
-                    content-between place-content-center \
-                    flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
-                    bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
-                    text-justify text-[14px] \
-                    left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto \
-                    not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
-                    w-[480px] h-[160px]"
-                  >
+    group-hover:visible invisible \
+    group-hover:translate-y-6 ease-in-out transition transform absolute \
+    content-between place-content-center \
+    flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
+    bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
+    text-justify text-[14px] p-[8px] \
+    left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto \
+    not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
+    w-[260px] z-10"
+>
                     <span>
                     {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
                     This is the policy that was in effect when this submission was made. Why is this important?
@@ -393,41 +402,41 @@ export default async function Request({ params }: PageProps) {
                     if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
                     your revocation request may be rejected, and you may lose your deposit.
                     </span>
-                  </div></div>
+                    </div></div>
                   </ExternalLink>
-                  
+
                 </div>
               )}
               {vourchesForData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched for
-                  <div className="flex gap-2">
-                  {vourchesForData.map(async (vouch, idx) => { 
-                    const vouchLocal = await Promise.resolve(vouch);
-                    return (
-                      <Vouch 
-                        isActive = {true} 
-                        reason = {undefined}
-                        name = {vouchLocal.name}
-                        photo = {vouchLocal.photo}
-                        idx = {idx} 
-                        href = {`/${prettifyId(vouchLocal.pohId!)}`}
-                        pohId = {vouchLocal.pohId}
-                        address = {vouchLocal.pohId}
-                        isOnChain = {vouchLocal.isOnChain}
-                        reducedTooltip = {true}
-                      />
-                    )
-                  })}
+                  <div className="flex flex-wrap gap-2">
+                    {vourchesForData.map(async (vouch, idx) => { 
+                      const vouchLocal = await Promise.resolve(vouch);
+                      return (
+                        <Vouch 
+                          isActive = {true} 
+                          reason = {undefined}
+                          name = {vouchLocal.name}
+                          photo = {vouchLocal.photo}
+                          idx = {idx} 
+                          href = {`/${prettifyId(vouchLocal.pohId!)}`}
+                          pohId = {vouchLocal.pohId}
+                          address = {vouchLocal.pohId}
+                          isOnChain = {vouchLocal.isOnChain}
+                          reducedTooltip = {true}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
               )}
             </div>
-            <div className="w-full md:flex-row md:items-center justify-between">
-            {vouchersData.find((v) => v) && (
+            <div className="w-full flex-wrap md:flex-row md:items-center justify-between gap-2">
+              {vouchersData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched by
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {vouchersData.map(async (vouch, idx) => {
                       const vouchLocal = await Promise.resolve(vouch);
                       return (

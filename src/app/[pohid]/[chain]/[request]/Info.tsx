@@ -1,8 +1,8 @@
 "use client";
 
-import Modal from "components/Modal";
-import Image from "next/image";
 import InfoIcon from "icons/info.svg";
+import Image from "next/image";
+import Modal from "components/Modal";
 
 interface InfoProps {
   nbRequests: number;
@@ -14,8 +14,8 @@ export default function Info({ nbRequests }: InfoProps) {
       formal
       className="p-8 flex flex-col"
       trigger={
-        <span className="flex ml-2 text-slate-500 cursor-pointer">
-          default
+        <span className="flex text-slate-500 cursor-pointer gap-x-[4px]">
+          <text>default</text>
           <InfoIcon className="w-6 h-6 stroke-slate-500 stroke-2" />
         </span>
       }
