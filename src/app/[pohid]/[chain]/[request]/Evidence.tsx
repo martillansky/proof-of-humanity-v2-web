@@ -49,7 +49,7 @@ function Item({ index, uri, creationTime, sender }: ItemInterface) {
         <div className="flex justify-between text-xl font-bold">
           {evidence?.name}
           {evidence?.fileURI && (
-            <Link href={`/attachment?url=${ipfs(evidence?.fileURI)}`}>
+            <Link href={`/attachment?url=${encodeURIComponent(ipfs(evidence?.fileURI))}`}>
               <AttachmentIcon className="fill-black w-6 h-6" />
             </Link>
           )}
