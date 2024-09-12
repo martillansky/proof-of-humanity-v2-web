@@ -2,6 +2,7 @@ import Link from "next/link";
 import { sepolia } from "viem/chains";
 import ExternalLink from "components/ExternalLink";
 import { prettifyId } from "utils/identifier";
+import { useSearchParams } from "next/navigation"
 
 interface DesktopNavigationProps {
   web3Loaded: boolean;
@@ -20,6 +21,9 @@ const DesktopNavigation = ({
   me,
   address,
 }: DesktopNavigationProps) => {
+  const searchParams = useSearchParams();
+  const currentUrl = searchParams.get("url");
+
   return (
     <div className="hidden md:flex my-2 gap-x-8 whitespace-nowrap">
       {web3Loaded && chain.id === sepolia.id && (
@@ -54,12 +58,12 @@ const DesktopNavigation = ({
             Register
           </Link>
         ))}
-      <ExternalLink
-        href={policy}
-        className={`${pathname === policy ? "font-bold" : ""}`}
+      <Link
+        href={`/attachment?url=${policy}`}
+        className={`${currentUrl?.includes(policy) ? "font-bold" : ""}`}
       >
         Policy
-      </ExternalLink>
+      </Link>
     </div>
   );
 };

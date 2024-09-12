@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Ref, forwardRef } from "react";
 import { prettifyId } from "utils/identifier";
 import Options from "./Options";
@@ -18,18 +19,16 @@ const MobileMenu = forwardRef(
     { policy, me, pathname, address, web3Loaded, isConnected }: MobileMenuProps,
     ref: Ref<HTMLDivElement>
   ) => {
+    const searchParams = useSearchParams();
+    const currentUrl = searchParams.get("url");
+
     return (
       <div
         ref={ref}
         className="md:hidden absolute top-16 right-0 gradient w-64 p-4 rounded shadow-lg z-10"
       >
         <nav className="flex flex-col gap-y-4">
-          <Link
-            href="/"
-            className={`text-lg font-semibold ${
-              pathname === "/" ? "font-bold" : ""
-            }`}
-          >
+          <Link href="/" className={`${pathname === "/" ? "font-bold" : ""}`}>
             Profiles
           </Link>
           {me &&
@@ -59,8 +58,10 @@ const MobileMenu = forwardRef(
               </Link>
             ))}
           <Link
-            href={policy}
-            className={`text-lg ${pathname === policy ? "font-bold" : ""}`}
+            href={`/attachment?url=${policy}`}
+            className={`text-lg ${
+              currentUrl?.includes(policy) ? "font-bold" : ""
+            }`}
           >
             Policy
           </Link>

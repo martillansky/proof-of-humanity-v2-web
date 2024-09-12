@@ -32,6 +32,8 @@
     "util": "^0.12.4"
   },
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.16.3",
+    "react-markdown": "^8.0.7",
     "@ffmpeg/ffmpeg": "^0.10.1",
     "@legendapp/state": "^1.11.1",
     "@web3modal/ethereum": "^2.7.1",

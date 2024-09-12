@@ -1,3 +1,5 @@
+"use client";
+
 import { EvidenceFile, MetaEvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
 import { SupportedChainId, paramToChain, supportedChains } from "config/chains";
@@ -376,12 +378,12 @@ export default async function Request({ params }: PageProps) {
             <div className="w-full flex flex-wrap md:flex-row md:items-center justify-between gap-2">
               {policyLink && (
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
-                  <ExternalLink 
-                    className="ml-2 underline underline-offset-2" 
-                    href={ipfs(policyLink)}
-                  >
-                     <div className="group flex relative">
-                    Policy in force at submission 
+                <Link 
+                  href={`/attachment?url=${ipfs(policyLink)}`}
+                  className="ml-2 underline underline-offset-2"
+                >
+                  <div className="group flex relative">
+                    Policy in force at submission
                     <div className="\
                       group-hover:visible invisible \
                       ease-in-out transition-opacity transform absolute \
@@ -404,7 +406,7 @@ export default async function Request({ params }: PageProps) {
                       </span>
                     </div>
                   </div>
-                  </ExternalLink>
+                </Link>
 
                 </div>
               )}
