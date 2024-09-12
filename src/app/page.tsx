@@ -1,4 +1,4 @@
-import RequestsGrid from "../components/Request/Grid";
+import RequestsGrid from "../components/request placeholder/Grid";
 
 export default async function Home() {
   return (

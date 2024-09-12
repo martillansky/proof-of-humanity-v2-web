@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getHumanityData } from "data/humanity";
 import { getContractDataAllChains } from "data/contract";
 import ExternalLink from "components/ExternalLink";
-import Card from "components/Request/Card";
+import Card from "components/request placeholder/Card";
 import Image from "next/image";
 import Revoke from "./Revoke";
 import { getArbitrationCost } from "data/costs";
