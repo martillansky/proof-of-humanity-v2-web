@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Ref, forwardRef } from "react";
 import { prettifyId } from "utils/identifier";
-import WalletSection from "./WalletSection"
-import Options from "./Options"
+import Options from "./Options";
+import WalletSection from "./WalletSection";
 
 interface MobileMenuProps {
   policy: string;
@@ -18,35 +18,50 @@ const MobileMenu = forwardRef(
     { policy, me, pathname, address, web3Loaded, isConnected }: MobileMenuProps,
     ref: Ref<HTMLDivElement>
   ) => {
-
     return (
       <div
         ref={ref}
         className="md:hidden absolute top-16 right-0 gradient w-64 p-4 rounded shadow-lg z-10"
       >
         <nav className="flex flex-col gap-y-4">
-          <Link href="/" className="text-lg font-semibold">
+          <Link
+            href="/"
+            className={`text-lg font-semibold ${
+              pathname === "/" ? "font-bold" : ""
+            }`}
+          >
             Profiles
           </Link>
           {me &&
             (me.pohId ? (
-              <Link href={`/${prettifyId(me.pohId)}`}>PoH ID</Link>
+              <Link
+                href={`/${prettifyId(me.pohId)}`}
+                className={`text-lg ${
+                  pathname === `/${prettifyId(me.pohId)}` ? "font-bold" : ""
+                }`}
+              >
+                PoH ID
+              </Link>
             ) : (
-              !pathname.endsWith("/claim") && (
-                <Link
-                  href={
-                    me.currentRequest
-                      ? `/${prettifyId(me.currentRequest.humanity.id)}/${
-                          me.currentRequest.chain.name
-                        }/${me.currentRequest.index}`
-                      : `/${prettifyId(address!)}/claim`
-                  }
-                >
-                  Register
-                </Link>
-              )
+              <Link
+                href={
+                  me.currentRequest
+                    ? `/${prettifyId(me.currentRequest.humanity.id)}/${
+                        me.currentRequest.chain.name
+                      }/${me.currentRequest.index}`
+                    : `/${prettifyId(address!)}/claim`
+                }
+                className={`text-lg ${
+                  pathname.includes("/claim") ? "font-bold" : ""
+                }`}
+              >
+                Register
+              </Link>
             ))}
-          <Link href={policy} className="text-lg">
+          <Link
+            href={policy}
+            className={`text-lg ${pathname === policy ? "font-bold" : ""}`}
+          >
             Policy
           </Link>
         </nav>

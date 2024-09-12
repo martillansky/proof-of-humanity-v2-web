@@ -214,7 +214,7 @@ export default async function Request({ params }: PageProps) {
     //const policyUpdate = request.arbitratorHistory.updateTime;
 
   return (
-    <div className="content mx-auto flex flex-col justify-center font-semibold">
+    <div className="content mx-auto flex flex-col justify-center w-[84vw] md:w-[76vw] max-w-[1500px] font-semibold">
       <ActionBar
         arbitrationCost={arbitrationCost}
         index={request.index}

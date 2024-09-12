@@ -12,7 +12,7 @@ import Challenge from "./Challenge";
 import { RequestQuery } from "generated/graphql";
 import { useEffectOnce } from "@legendapp/state/react";
 import { useEffect, useMemo, useCallback, useState } from "react";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import { camelToTitle } from "utils/case";
 import useChainParam from "hooks/useChainParam";
 import { useLoading } from "hooks/useLoading";

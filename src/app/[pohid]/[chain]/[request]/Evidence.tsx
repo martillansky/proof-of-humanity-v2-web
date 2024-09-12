@@ -18,7 +18,7 @@ import { romanize } from "utils/misc";
 import { explorerLink, shortenAddress } from "utils/address";
 import Identicon from "components/Identicon";
 import { RequestQuery } from "generated/graphql";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import AttachmentIcon from "icons/AttachmentMajor.svg";
 import DocumentIcon from "icons/NoteMajor.svg";
 import { toast } from "react-toastify";

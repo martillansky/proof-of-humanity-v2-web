@@ -11,7 +11,7 @@ import { formatEth } from "utils/misc";
 import { SupportedChain, SupportedChainId } from "config/chains";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Hash } from "viem";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import { useLoading } from "hooks/useLoading";
 import { toast } from "react-toastify";
 import DocumentIcon from "icons/NoteMajor.svg";

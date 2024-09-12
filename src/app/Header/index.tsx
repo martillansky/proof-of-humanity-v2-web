@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useAccount, usePublicClient } from "wagmi";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import DesktopNavigation from "./DesktopNavigation";
 import MobileMenu from "./MobileMenu";
@@ -47,7 +47,7 @@ export default withClientConnected(function Header({ policy }: IHeader) {
   }, [menuOpen]);
 
   return (
-    <header className="h-16 md:h-16 px-6 pt-2 md:px-8 pb-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm">
+    <header className="h-16 md:h-16 px-6 pt-2 md:px-8 pb-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm relative">
       <Link href="/" className="flex items-center w-[156px]">
         <Image
           alt="proof of humanity logo"
@@ -64,9 +64,11 @@ export default withClientConnected(function Header({ policy }: IHeader) {
         <Hamburger />
       </button>
 
-      <DesktopNavigation
-        {...{ address, me, policy, pathname, chain, web3Loaded }}
-      />
+      <div className="absolute left-1/2 transform -translate-x-1/2">
+        <DesktopNavigation
+          {...{ address, me, policy, pathname, chain, web3Loaded }}
+        />
+      </div>
 
       {menuOpen && (
         <MobileMenu

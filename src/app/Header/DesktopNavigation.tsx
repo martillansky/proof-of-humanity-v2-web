@@ -21,32 +21,45 @@ const DesktopNavigation = ({
   address,
 }: DesktopNavigationProps) => {
   return (
-    <div className="hidden md:flex my-2 sm:place-self-end gap-x-8 sm:gap-x-12 whitespace-nowrap">
+    <div className="hidden md:flex my-2 gap-x-8 whitespace-nowrap">
       {web3Loaded && chain.id === sepolia.id && (
         <ExternalLink href="https://docs.scroll.io/en/user-guide/faucet/">
           Faucet
         </ExternalLink>
       )}
-      {pathname !== "/" && <Link href="/">Profiles</Link>}
+      <Link href="/" className={`${pathname === "/" ? "font-bold" : ""}`}>
+        Profiles
+      </Link>
       {me &&
         (me.pohId ? (
-          <Link href={`/${prettifyId(me.pohId)}`}>PoH ID</Link>
+          <Link
+            href={`/${prettifyId(me.pohId)}`}
+            className={`${
+              pathname === `/${prettifyId(me.pohId)}` ? "font-bold" : ""
+            }`}
+          >
+            PoH ID
+          </Link>
         ) : (
-          !pathname.endsWith("/claim") && (
-            <Link
-              href={
-                me.currentRequest
-                  ? `/${prettifyId(me.currentRequest.humanity.id)}/${
-                      me.currentRequest.chain.name
-                    }/${me.currentRequest.index}`
-                  : `/${prettifyId(address!)}/claim`
-              }
-            >
-              Register
-            </Link>
-          )
+          <Link
+            href={
+              me.currentRequest
+                ? `/${prettifyId(me.currentRequest.humanity.id)}/${
+                    me.currentRequest.chain.name
+                  }/${me.currentRequest.index}`
+                : `/${prettifyId(address!)}/claim`
+            }
+            className={`${pathname.includes("/claim") ? "font-bold" : ""}`}
+          >
+            Register
+          </Link>
         ))}
-      <ExternalLink href={policy}>Policy</ExternalLink>
+      <ExternalLink
+        href={policy}
+        className={`${pathname === policy ? "font-bold" : ""}`}
+      >
+        Policy
+      </ExternalLink>
     </div>
   );
 };
