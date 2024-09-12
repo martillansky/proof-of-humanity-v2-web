@@ -64,7 +64,7 @@ export default withClientConnected(function Header({ policy }: IHeader) {
         <Hamburger />
       </button>
 
-      <div className="absolute left-1/2 transform -translate-x-1/2">
+      <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
         <DesktopNavigation
           {...{ address, me, policy, pathname, chain, web3Loaded }}
         />
