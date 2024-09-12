@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { sepolia } from "viem/chains";
 import ExternalLink from "components/ExternalLink";
 import { prettifyId } from "utils/identifier";
-import { useSearchParams } from "next/navigation"
 
 interface DesktopNavigationProps {
   web3Loaded: boolean;
@@ -23,6 +23,11 @@ const DesktopNavigation = ({
 }: DesktopNavigationProps) => {
   const searchParams = useSearchParams();
   const currentUrl = searchParams.get("url");
+  const router = useRouter();
+
+  const handlePolicyClick = () => {
+    router.push(`/attachment?url=${encodeURIComponent(policy)}`);
+  };
 
   return (
     <div className="hidden md:flex my-2 gap-x-8 whitespace-nowrap">
@@ -58,12 +63,12 @@ const DesktopNavigation = ({
             Register
           </Link>
         ))}
-      <Link
-        href={`/attachment?url=${policy}`}
+      <button
+        onClick={handlePolicyClick}
         className={`${currentUrl?.includes(policy) ? "font-bold" : ""}`}
       >
         Policy
-      </Link>
+      </button>
     </div>
   );
 };
