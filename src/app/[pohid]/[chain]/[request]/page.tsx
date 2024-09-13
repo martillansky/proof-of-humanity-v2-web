@@ -1,5 +1,3 @@
-"use client";
-
 import { EvidenceFile, MetaEvidenceFile, RegistrationFile } from "types/docs";
 import { ipfs, ipfsFetch } from "utils/ipfs";
 import { SupportedChainId, paramToChain, supportedChains } from "config/chains";
