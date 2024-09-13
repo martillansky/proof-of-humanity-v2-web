@@ -295,10 +295,10 @@ export default async function Request({ params }: PageProps) {
             </Label>
           </div>
 
-          <div className="w-full p-8 flex flex-col">
+          <div className="w-full p-[24px] lg:p-[32px] flex flex-col">
             <div className="mb-8 flex flex-col-reverse md:flex-row justify-between">
               <div className="flex items-center">
-                <Identicon diameter={28} address={request.claimer.id} />
+                <Identicon diameter={24} address={request.claimer.id} />
                 <ExternalLink
                   className="ml-2 font-semibold underline underline-offset-2"
                   href={explorerLink(request.claimer.id, chain)}
@@ -318,26 +318,25 @@ export default async function Request({ params }: PageProps) {
             </div>
 
             <div className="mb-8 flex font-medium text-theme flex-wrap gap-x-[8px] gap-y-[8px]" >
-              <div className="flex flex-row gap-x-[8px]">
+              <div className="flex flex-row flex-wrap gap-x-[8px]">
                 <Image
                 alt="poh id"
                 src="/logo/pohid.svg"
                 height={24}
                 width={24}
                 />
-                <Link href={`/${prettifyId(pohId)}`}>
+               <Link href={`/${prettifyId(pohId)}`}>
                 {prettifyId(pohId).slice(0, 20)}
                 <wbr />
                 {prettifyId(pohId).slice(20)}
                 </Link>
-              </div>
-
-              <Info
+                <Info
                 nbRequests={
                   +request.humanity.nbRequests +
                   +request.humanity.nbLegacyRequests
                 }
               />
+              </div>
             </div>
 
             <div className="flex md:hidden flex-col items-center">
@@ -380,7 +379,7 @@ export default async function Request({ params }: PageProps) {
                   href={`/attachment?url=${ipfs(policyLink)}`}
                   className="ml-2 underline underline-offset-2"
                 >
-                  <div className="group flex relative">
+                  <div className="group flex py-[8px] relative">
                     Policy in force at submission
                     <div className="\
                       group-hover:visible invisible \

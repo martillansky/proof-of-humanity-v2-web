@@ -15,7 +15,6 @@ export default function Info({ nbRequests }: InfoProps) {
       className="p-8 flex flex-col"
       trigger={
         <span className="flex text-slate-500 cursor-pointer gap-x-[4px]">
-          <text>default</text>
           <InfoIcon className="w-6 h-6 stroke-slate-500 stroke-2" />
         </span>
       }

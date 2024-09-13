@@ -8,6 +8,7 @@ export interface RegistrationFile {
   name: string;
   photo: string;
   video: string;
+  bio: string;
 }
 
 export interface MetaEvidenceFile {

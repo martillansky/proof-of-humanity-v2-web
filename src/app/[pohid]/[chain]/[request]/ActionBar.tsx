@@ -1,27 +1,28 @@
 "use client";
 
-import ExternalLink from "components/ExternalLink";
+import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+import { useEffectOnce } from "@legendapp/state/react";
 import { colorForStatus } from "config/misc";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
+import { ContractData } from "data/contract";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { Address, Hash, formatEther, hexToSignature } from "viem";
-import Vouch from "./Vouch";
-import TimeAgo from "components/TimeAgo";
 import { useAccount, useChainId } from "wagmi";
-import FundButton from "./Funding";
-import Challenge from "./Challenge";
-import { RequestQuery } from "generated/graphql";
-import { useEffectOnce } from "@legendapp/state/react";
-import { useEffect, useMemo, useCallback, useState } from "react";
+import ExternalLink from "components/ExternalLink";
 import withClientConnected from "components/HighOrder/withClientConnected";
-import { camelToTitle } from "utils/case";
+import TimeAgo from "components/TimeAgo";
+import { RequestQuery } from "generated/graphql";
 import useChainParam from "hooks/useChainParam";
 import { useLoading } from "hooks/useLoading";
-import { ActionType } from "utils/enums";
-import { enableReactUse } from "@legendapp/state/config/enableReactUse";
-import { ContractData } from "data/contract";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
-import { toast } from "react-toastify";
+import { camelToTitle } from "utils/case";
+import { ActionType } from "utils/enums";
+import Challenge from "./Challenge";
+import FundButton from "./Funding";
 import RemoveVouch from "./RemoveVouch";
+import Vouch from "./Vouch";
+
 
 enableReactUse();
 
@@ -108,14 +109,13 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       } else if (status == "resolving")
         setAction(
           +lastStatusChange + +contractData.challengePeriodDuration <
-          Date.now() / 1000
+            Date.now() / 1000
             ? ActionType.EXECUTE
             : ActionType.CHALLENGE
         );
-    }
+    };
     checkVouchStatus();
   });
-  
 
   const [prepareExecute, execute] = usePoHWrite(
     "executeRequest",
@@ -184,32 +184,37 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
     ]
   );
 
-  const [isVouchGranted, setIsVouchGranted] = useState({didIVouchFor: false, isVouchOnchain: false});
+  const [isVouchGranted, setIsVouchGranted] = useState({
+    didIVouchFor: false,
+    isVouchOnchain: false,
+  });
 
   useEffect(() => {
     const didIVouchFor = () => {
       return (
-        (onChainVouches.length + offChainVouches.length >= 0) && 
-        (
-          (onChainVouches.some(voucherAddress => {
-            if (voucherAddress === address?.toLocaleLowerCase()) {
-              setIsVouchGranted(prevState => ({...prevState, isVouchOnchain: true}));
-              return true;
-            }
-            return false;
-            })
-          ) || 
-          (offChainVouches.some(voucher => voucher.voucher === address?.toLocaleLowerCase()))
-        )
+        onChainVouches.length + offChainVouches.length >= 0 &&
+        (onChainVouches.some((voucherAddress) => {
+          if (voucherAddress === address?.toLocaleLowerCase()) {
+            setIsVouchGranted((prevState) => ({
+              ...prevState,
+              isVouchOnchain: true,
+            }));
+            return true;
+          }
+          return false;
+        }) ||
+          offChainVouches.some(
+            (voucher) => voucher.voucher === address?.toLocaleLowerCase()
+          ))
       );
-    }
+    };
 
-    if (didIVouchFor()) 
-      setIsVouchGranted(prevState => ({...prevState, didIVouchFor: true}));
+    if (didIVouchFor())
+      setIsVouchGranted((prevState) => ({ ...prevState, didIVouchFor: true }));
   }, [address, action, requester, revocation, chain, userChainId]);
 
   useEffect(() => {
-  //useEffectOnce(() => {
+    //useEffectOnce(() => {
     if (action === ActionType.ADVANCE && !revocation) {
       // if (advanceRequestsOnChainVouches) {
       //   prepareMulticallAdvance({
@@ -248,7 +253,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       });
     }
 
-    if (action === ActionType.EXECUTE) prepareExecute({ args: [pohId, BigInt(index)] });
+    if (action === ActionType.EXECUTE)
+      prepareExecute({ args: [pohId, BigInt(index)] });
   }, [action]);
 
   useEffect(() => {
@@ -267,16 +273,20 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const statusColor = colorForStatus(status, revocation, expired);
 
   return (
-    <div className="paper p-6 flex flex-col md:flex-row justify-between items-center gap-2 border-b">
+    <div className="paper py-[24px] px-[24px] flex flex-col md:flex-row justify-between items-center gap-[12px] lg:gap-[20px] border-b">
       <div className="flex items-center">
         <span className="mr-4">Status</span>
-        <span className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-white bg-status-${statusColor}`}
+        >
           {camelToTitle(status, revocation, expired)}
         </span>
       </div>
-      <div className="w-full ml-8 flex flex-col md:flex-row md:items-center justify-between gap-2 font-normal">
+      <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-[12px] font-normal">
         {web3Loaded &&
-          (action === ActionType.REMOVE_VOUCH || action === ActionType.VOUCH || action === ActionType.FUND) && (
+          (action === ActionType.REMOVE_VOUCH ||
+            action === ActionType.VOUCH ||
+            action === ActionType.FUND) && (
             <>
               <div className="flex gap-6">
                 <span className="text-slate-400">
@@ -314,23 +324,18 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                 )}
 
                 {requester === address?.toLowerCase() ? (
-                    <button
-                      disabled={pending || withdrawState.prepare !== "success"}
-                      className="btn-main mb-2"
-                      onClick={withdraw}
-                    >
-                      Withdraw
-                    </button>
-                ) : (
-                  !isVouchGranted.didIVouchFor ? 
+                  <button
+                    disabled={pending || withdrawState.prepare !== "success"}
+                    className="btn-main mb-2"
+                    onClick={withdraw}
+                  >
+                    Withdraw
+                  </button>
+                ) : !isVouchGranted.didIVouchFor ? (
                   <Vouch pohId={pohId} claimer={requester} />
-                : isVouchGranted.isVouchOnchain ? 
-                  <RemoveVouch 
-                    requester={requester}
-                    pohId={pohId}
-                  />
-                : null
-                )}
+                ) : isVouchGranted.isVouchOnchain ? (
+                  <RemoveVouch requester={requester} pohId={pohId} />
+                ) : null}
               </div>
             </>
           )}
@@ -348,16 +353,11 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                 >
                   Withdraw
                 </button>
-              ) : (
-                !isVouchGranted.didIVouchFor ? 
-                  <Vouch pohId={pohId} claimer={requester} />
-                : isVouchGranted.isVouchOnchain ? 
-                  <RemoveVouch 
-                    requester={requester}
-                    pohId={pohId}
-                  />
-                : null
-              )}
+              ) : !isVouchGranted.didIVouchFor ? (
+                <Vouch pohId={pohId} claimer={requester} />
+              ) : isVouchGranted.isVouchOnchain ? (
+                <RemoveVouch requester={requester} pohId={pohId} />
+              ) : null}
               <button
                 disabled={pending}
                 className="btn-main mb-2"
@@ -411,7 +411,11 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   {" "}
                   for{" "}
                   <strong className="text-status-challenged">
-                    {camelToTitle(currentChallenge.reason.id, revocation, expired)}
+                    {camelToTitle(
+                      currentChallenge.reason.id,
+                      revocation,
+                      expired
+                    )}
                   </strong>
                 </>
               )}
@@ -420,7 +424,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
             <ExternalLink
               href={`https://resolve.kleros.io/cases/${currentChallenge.disputeId}`}
-              className="btn-main px-4"
+              className="btn-main px-[24px]"
             >
               View case #{currentChallenge.disputeId}
             </ExternalLink>
@@ -429,18 +433,18 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
         {status === "resolved" && (
           <>
-          <span>
-            Request was accepted
-            <TimeAgo
-              className={`ml-1 text-status-${statusColor}`}
-              time={lastStatusChange}
-            />
-            .
-          </span>
+            <span>
+              Request was accepted
+              <TimeAgo
+                className={`ml-1 text-status-${statusColor}`}
+                time={lastStatusChange}
+              />
+              .
+            </span>
           </>
         )}
 
-        {(index < 0 && index > -100) && (
+        {index < 0 && index > -100 && (
           <span>
             Check submission on
             <ExternalLink
