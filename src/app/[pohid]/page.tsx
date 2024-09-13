@@ -49,6 +49,7 @@ async function Profile({ params: { pohid } }: PageProps) {
   const homeChain = supportedChains.find(
     (chain) => (
       !!humanity[chain.id]?.humanity?.registration 
+      && !(humanity[chain.id]?.humanity?.registration?.expirationTime < Date.now() / 1000)
     )
   );
   
