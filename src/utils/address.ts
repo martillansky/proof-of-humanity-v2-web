@@ -1,4 +1,3 @@
-import { SupportedChain } from "config/chains";
 import { isAddress } from "viem";
 
 export function shortenAddress(address: `0x${string}`, chars = 4): string {
@@ -7,6 +6,3 @@ export function shortenAddress(address: `0x${string}`, chars = 4): string {
 
   return `${address.substring(0, chars)}..${address.substring(42 - chars)}`;
 }
-
-export const explorerLink = (address: string, chain: SupportedChain) =>
-  `${chain.blockExplorers.default.url}/address/${address}`;

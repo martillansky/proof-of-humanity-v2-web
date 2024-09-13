@@ -11,7 +11,7 @@ import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
 import ExternalLink from "components/ExternalLink";
 import Identicon from "components/Identicon";
-import { explorerLink } from "utils/address";
+import { explorerLink } from "config/chains";
 import Image from "next/image";
 import Previewed from "components/Previewed";
 import Label from "components/Label";
@@ -215,7 +215,7 @@ export default async function Request({ params }: PageProps) {
 
     //const policyUpdate = request.arbitratorHistory.updateTime;
 
-  return (
+    return (
     <div className="content mx-auto flex flex-col justify-center w-[84vw] md:w-[76vw] max-w-[1500px] font-semibold">
       <ActionBar
         arbitrationCost={arbitrationCost}
@@ -469,7 +469,7 @@ export default async function Request({ params }: PageProps) {
       </div>
 
       <Evidence
-        list={request.evidenceGroup.evidence.reverse()}
+        list={request.evidenceGroup.evidence.sort((a, b) => Number(a.creationTime) - Number(b.creationTime))}
         pohId={pohId}
         requestIndex={request.index}
         arbitrationInfo={request.arbitratorHistory}

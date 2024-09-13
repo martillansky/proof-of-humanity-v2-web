@@ -23,7 +23,8 @@ import useChainParam from "hooks/useChainParam";
 import useIPFS from "hooks/useIPFS";
 import { useLoading } from "hooks/useLoading";
 import { EvidenceFile, MetaEvidenceFile } from "types/docs";
-import { explorerLink, shortenAddress } from "utils/address";
+import { shortenAddress } from "utils/address";
+import { explorerLink } from "config/chains";
 import { ipfs, ipfsFetch, uploadToIPFS } from "utils/ipfs";
 import { romanize } from "utils/misc";
 

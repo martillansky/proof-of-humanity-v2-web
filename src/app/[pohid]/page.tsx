@@ -1,6 +1,7 @@
 import cn from "classnames";
 import { HumanityQuery } from "generated/graphql";
-import { explorerLink, shortenAddress } from "utils/address";
+import { shortenAddress } from "utils/address";
+import { explorerLink } from "config/chains";
 import { machinifyId, prettifyId } from "utils/identifier";
 import { SupportedChainId, supportedChains } from "config/chains";
 import Link from "next/link";
