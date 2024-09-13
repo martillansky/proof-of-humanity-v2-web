@@ -114,7 +114,7 @@ const isRequestExpired = (
     ) {
       // Is this the winner request
       return (
-        /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
+                /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
             Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
           (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000) ||  */
         !request.humanity.registration ||
@@ -220,8 +220,8 @@ function RequestsGrid() {
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
     })();
-
-    /* (async () => {
+    
+      /* (async () => {
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
     })(); */
@@ -301,7 +301,7 @@ function RequestsGrid() {
       <SubgraphsStatus />
       <div className="my-4 py-2 flex gap-1 md:gap-2">
         <input
-          className="w-full p-2 md:mr-2 border border-slate-200 rounded"
+          className="w-full p-2 md:mr-2 border border-stroke rounded text-primaryText bg-whiteBackground"
           placeholder="Search (case sensitive)"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -348,7 +348,7 @@ function RequestsGrid() {
               icon={
                 <ChainLogo
                   chainId={chain.id}
-                  className="w-4 h-4 mr-1 fill-black"
+                  className="w-4 h-4 mr-1 fill-primaryText"
                 />
               }
               key={chain.id}
@@ -382,7 +382,7 @@ function RequestsGrid() {
 
       {!pending && (
         <button
-          className="btn-main mx-auto my-8 px-8 py-4"
+          className="btn-main mx-auto my-8 px-8 py-4 gradient"
           onClick={() => filter$.cursor.set((c) => c + 1)}
         >
           Load More
@@ -393,3 +393,4 @@ function RequestsGrid() {
 }
 
 export default RequestsGrid;
+

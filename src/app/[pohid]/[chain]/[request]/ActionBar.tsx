@@ -273,7 +273,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const statusColor = colorForStatus(status, revocation, expired);
 
   return (
-    <div className="paper py-[24px] px-[24px] flex flex-col md:flex-row justify-between items-center gap-[12px] lg:gap-[20px] border-b">
+    <div className="paper py-[24px] px-[24px] flex flex-col md:flex-row justify-between items-center gap-[12px] lg:gap-[20px] border-stroke bg-whiteBackground text-primaryText">
       <div className="flex items-center">
         <span className="mr-4">Status</span>
         <span
@@ -424,7 +424,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
             <ExternalLink
               href={`https://resolve.kleros.io/cases/${currentChallenge.disputeId}`}
-              className="btn-main px-[24px]"
+              className="btn-main gradient px-[24px] h-[48px] rounded"
             >
               View case #{currentChallenge.disputeId}
             </ExternalLink>

@@ -3,7 +3,7 @@
   html {
     @apply text-black;
   }
-
+  
   button {
     @apply cursor-pointer select-none;
   }
@@ -26,23 +26,19 @@
   }
 
   .divider {
-    @apply h-0.5 w-full gradient rounded;
+    @apply h-0.5 w-full bg-shade-400 dark:bg-shade-200 rounded;
   }
 
   .checkbox {
-    @apply w-6 h-6 border border-theme rounded-sm bg-shade-100
-         checked:text-theme
-           focus:ring-2 focus:ring-offset-1 focus:ring-theme/60;
+    @apply w-6 h-6 border border-theme rounded-sm bg-shade-100 dark:bg-shade-300;
   }
 
   .radio {
-    @apply w-6 h-6 border border-theme rounded-full bg-shade-100
-         checked:text-theme
-           focus:ring-2 focus:ring-offset-2 focus:ring-theme/60;
+    @apply w-6 h-6 border border-theme rounded-full bg-shade-100 dark:bg-shade-300;
   }
 
-  .bordered {
-    @apply p-px gradient rounded;
+    .bordered {
+      @apply p-px gradient rounded;
   }
 
   .btn-main {
@@ -69,9 +65,9 @@
 
   .content-wide {
     @apply mb-16 mx-auto w-11/12
-           sm:w-5/6
-           md:mt-12
-           lg:w-4/5;
+             sm:w-5/6
+             md:mt-12
+             lg:w-4/5;
   }
 
   .paper {
@@ -81,6 +77,259 @@
 
 @tailwind utilities;
 @layer utilities {
+  .border-theme {
+    border-color: theme("colors.light.theme");
+  }
+
+  .text-primaryText {
+    color: theme("colors.light.primaryText");
+  }
+
+  .dark .text-primaryText {
+    color: theme("colors.dark.primaryText");
+  }
+
+  .text-secondaryText {
+    color: theme("colors.light.secondaryText");
+  }
+
+  .dark .text-secondaryText {
+    color: theme("colors.dark.secondaryText");
+  }
+
+  .fill-primaryText {
+    fill: theme("colors.light.primaryText");
+  }
+
+  .dark .fill-primaryText {
+    fill: theme("colors.dark.primaryText");
+  }
+
+  .bg-whiteBackground {
+    background-color: theme("colors.light.whiteBackground");
+  }
+
+  .dark .bg-whiteBackground {
+    background-color: theme("colors.dark.whiteBackground");
+  }
+
+  .border-stroke {
+    border-color: theme("colors.light.stroke");
+  }
+
+  .dark .border-stroke {
+    border-color: theme("colors.dark.stroke");
+  }
+
+  .bg-theme {
+    background-color: theme("colors.light.theme");
+  }
+
+  .dark .border-theme {
+    border-color: theme("colors.dark.theme");
+  }
+
+  .dark .bg-theme {
+    background-color: theme("colors.dark.theme");
+  }
+
+  .text-theme {
+    color: theme("colors.light.theme");
+  }
+
+  .dark .text-theme {
+    color: theme("colors.dark.theme");
+  }
+
+  .text-orange {
+    color: theme("colors.light.orange");
+  }
+
+  .dark .text-orange {
+    color: theme("colors.dark.orange");
+  }
+
+  .text-status-vouching {
+    color: theme("colors.light.status.vouching");
+  }
+  .text-status-registered {
+    color: theme("colors.light.status.registered");
+  }
+  .text-status-removed {
+    color: theme("colors.light.status.removed");
+  }
+  .text-status-revocation {
+    color: theme("colors.light.status.revocation");
+  }
+  .text-status-claim {
+    color: theme("colors.light.status.claim");
+  }
+  .text-status-challenged {
+    color: theme("colors.light.status.challenged");
+  }
+  .text-status-withdrawn {
+    color: theme("colors.light.status.withdrawn");
+  }
+  .text-status-expired {
+    color: theme("colors.light.status.expired");
+  }
+  .text-status-transferred {
+    color: theme("colors.light.status.transferred");
+  }
+  .text-status-transferring {
+    color: theme("colors.light.status.transferring");
+  }
+
+  /* Dark Theme Text Status Colors */
+  .dark .text-status-vouching {
+    color: theme("colors.dark.status.vouching");
+  }
+  .dark .text-status-registered {
+    color: theme("colors.dark.status.registered");
+  }
+  .dark .text-status-removed {
+    color: theme("colors.dark.status.removed");
+  }
+  .dark .text-status-revocation {
+    color: theme("colors.dark.status.revocation");
+  }
+  .dark .text-status-claim {
+    color: theme("colors.dark.status.claim");
+  }
+  .dark .text-status-challenged {
+    color: theme("colors.dark.status.challenged");
+  }
+  .dark .text-status-withdrawn {
+    color: theme("colors.dark.status.withdrawn");
+  }
+  .dark .text-status-expired {
+    color: theme("colors.dark.status.expired");
+  }
+  .dark .text-status-transferred {
+    color: theme("colors.dark.status.transferred");
+  }
+  .dark .text-status-transferring {
+    color: theme("colors.dark.status.transferring");
+  }
+
+  .bg-status-vouching {
+    background-color: theme("colors.light.status.vouching");
+  }
+  .bg-status-registered {
+    background-color: theme("colors.light.status.registered");
+  }
+  .bg-status-removed {
+    background-color: theme("colors.light.status.removed");
+  }
+  .bg-status-revocation {
+    background-color: theme("colors.light.status.revocation");
+  }
+  .bg-status-claim {
+    background-color: theme("colors.light.status.claim");
+  }
+  .bg-status-challenged {
+    background-color: theme("colors.light.status.challenged");
+  }
+  .bg-status-withdrawn {
+    background-color: theme("colors.light.status.withdrawn");
+  }
+  .bg-status-expired {
+    background-color: theme("colors.light.status.expired");
+  }
+  .bg-status-transferred {
+    background-color: theme("colors.light.status.transferred");
+  }
+  .bg-status-transferring {
+    background-color: theme("colors.light.status.transferring");
+  }
+
+  .dark .bg-status-vouching {
+    background-color: theme("colors.dark.status.vouching");
+  }
+  .dark .bg-status-registered {
+    background-color: theme("colors.dark.status.registered");
+  }
+  .dark .bg-status-removed {
+    background-color: theme("colors.dark.status.removed");
+  }
+  .dark .bg-status-revocation {
+    background-color: theme("colors.dark.status.revocation");
+  }
+  .dark .bg-status-claim {
+    background-color: theme("colors.dark.status.claim");
+  }
+  .dark .bg-status-challenged {
+    background-color: theme("colors.dark.status.challenged");
+  }
+  .dark .bg-status-withdrawn {
+    background-color: theme("colors.dark.status.withdrawn");
+  }
+  .dark .bg-status-expired {
+    background-color: theme("colors.dark.status.expired");
+  }
+  .dark .bg-status-transferred {
+    background-color: theme("colors.dark.status.transferred");
+  }
+  .dark .bg-status-transferring {
+    background-color: theme("colors.dark.status.transferring");
+  }
+
+  .bg-shade-50 {
+    background-color: theme("colors.light.shade.50");
+  }
+  .bg-shade-100 {
+    background-color: theme("colors.light.shade.100");
+  }
+  .bg-shade-200 {
+    background-color: theme("colors.light.shade.200");
+  }
+  .bg-shade-300 {
+    background-color: theme("colors.light.shade.300");
+  }
+  .bg-shade-400 {
+    background-color: theme("colors.light.shade.400");
+  }
+  .bg-shade-500 {
+    background-color: theme("colors.light.shade.500");
+  }
+  .bg-shade-600 {
+    background-color: theme("colors.light.shade.600");
+  }
+
+  .dark .bg-shade-50 {
+    background-color: theme("colors.dark.shade.50");
+  }
+  .dark .bg-shade-100 {
+    background-color: theme("colors.dark.shade.100");
+  }
+  .dark .bg-shade-200 {
+    background-color: theme("colors.dark.shade.200");
+  }
+  .dark .bg-shade-300 {
+    background-color: theme("colors.dark.shade.300");
+  }
+  .dark .bg-shade-400 {
+    background-color: theme("colors.dark.shade.400");
+  }
+  .dark .bg-shade-500 {
+    background-color: theme("colors.dark.shade.500");
+  }
+  .dark .bg-shade-600 {
+    background-color: theme("colors.dark.shade.600");
+  }
+
+  .btn-main {
+    background-color: #ff9966;
+  }
+
+  .divider {
+    @apply h-0.5 w-full bg-shade-400 dark:bg-shade-200 rounded;
+  }
+
+  .slider-thumb::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 rounded-full bg-theme cursor-pointer;
+  }
+
   .centered {
     display: flex;
     align-items: center;
