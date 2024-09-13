@@ -1,10 +1,13 @@
 "use client";
 
+import { observable } from "@legendapp/state";
+import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import {
   useMountOnce,
   useObservable,
   useSelector,
 } from "@legendapp/state/react";
+import cn from "classnames";
 import {
   SupportedChain,
   SupportedChainId,
@@ -16,21 +19,23 @@ import {
   REQUESTS_DISPLAY_BATCH as REQUESTS_BATCH_SIZE,
   statusToColor,
 } from "config/misc";
-import { requestStatus, RequestStatus, statusFilters } from "config/requests";
+import { RequestStatus, requestStatus, statusFilters } from "config/requests";
+import { getContractDataAllChains } from "data/contract";
+import {
+  getFilteredRequestsInitData,
+  getRequestsInitData,
+  getRequestsLoadingPromises,
+} from "data/request";
 import { useEffect, useState } from "react";
+import ChainLogo from "components/ChainLogo";
+import DropdownItem from "components/Dropdown/Item";
+import Dropdown from "components/Dropdown/Menu";
+import { RequestsQuery } from "generated/graphql";
+import { useLoading } from "hooks/useLoading";
 import { camelToTitle } from "utils/case";
 import Card from "./Card";
-import DropdownItem from "components/dropdown/Item";
-import Dropdown from "components/dropdown/Menu";
-import { useLoading } from "hooks/useLoading";
-import { observable } from "@legendapp/state";
-import { enableReactUse } from "@legendapp/state/config/enableReactUse";
-import { RequestsQuery } from "generated/graphql";
-import cn from "classnames";
-import ChainLogo from "components/ChainLogo";
-import { getFilteredRequestsInitData, getRequestsInitData, getRequestsLoadingPromises } from "data/request";
-import Image from "next/image";
-import { getContractDataAllChains } from "data/contract";
+import SubgraphsStatus from "./SubgraphsStatus";
+import Loading from "app/[pohid]/loading"
 
 enableReactUse();
 
@@ -45,84 +50,109 @@ interface RequestInterface extends RequestsQueryItem {
 
 const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
   const pohIdGrouped: Map<string, RequestInterface[]> = new Map();
-  request.map(req => {
-    let pohIdArray = pohIdGrouped.get(req.humanity.id as string); 
-    if (!pohIdArray) pohIdArray = new Array<RequestInterface>;
+  request.map((req) => {
+    let pohIdArray = pohIdGrouped.get(req.humanity.id as string);
+    if (!pohIdArray) pohIdArray = new Array<RequestInterface>();
     pohIdArray.push(req);
     pohIdGrouped.set(req.humanity.id, pohIdArray);
   });
   pohIdGrouped.forEach((val, key) => {
     type CompareFunction = (req: RequestsQueryItem) => boolean;
-    
-    function findAllIndex<T>(arr: RequestInterface[], conditionFn: CompareFunction): number[] {
+
+    function findAllIndex<T>(
+      arr: RequestInterface[],
+      conditionFn: CompareFunction
+    ): number[] {
       const indexes: number[] = [];
-      for(let i = 0; i < arr.length; i++) {
-        if(conditionFn(arr[i])) {
+      for (let i = 0; i < arr.length; i++) {
+        if (conditionFn(arr[i])) {
           indexes.push(i);
         }
       }
       return indexes;
     }
-    val.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange)
-    
-    let iTransfArr = findAllIndex(val, (req) => req!.status.id === "transferred");
-    for(let i = 0; i < iTransfArr.length; i++) {
+    val.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange);
+
+    let iTransfArr = findAllIndex(
+      val,
+      (req) => req!.status.id === "transferred"
+    );
+    for (let i = 0; i < iTransfArr.length; i++) {
       if (iTransfArr[i] >= 0) {
-        let iReceived = iTransfArr[i]+1;
-        // A transferred request is set to transferred after the receiving request is created, so we need to swap their order 
-        if (val[iReceived]) [val[iTransfArr[i]], val[iReceived]] = [val[iReceived], val[iTransfArr[i]]];
+        let iReceived = iTransfArr[i] + 1;
+        // A transferred request is set to transferred after the receiving request is created, so we need to swap their order
+        if (val[iReceived])
+          [val[iTransfArr[i]], val[iReceived]] = [
+            val[iReceived],
+            val[iTransfArr[i]],
+          ];
       }
     }
-    
   });
-  let requestsOut: RequestInterface[] = new Array<RequestInterface>;
+  let requestsOut: RequestInterface[] = new Array<RequestInterface>();
   pohIdGrouped.forEach((val, key) => {
     // We keep only the head request of each pohIdGrouped array which is the one representing the current status of the personhood
-    
-    requestsOut.push(val[0]); 
-  });
-  
-  requestsOut.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange);
-  return requestsOut;
-}
 
-const isRequestExpired = (request: RequestsQueryItem, humanityLifespan: string | undefined): boolean => {
+    requestsOut.push(val[0]);
+  });
+
+  requestsOut.sort(
+    (req1, req2) => req2.lastStatusChange - req1.lastStatusChange
+  );
+  return requestsOut;
+};
+
+const isRequestExpired = (
+  request: RequestsQueryItem,
+  humanityLifespan: string | undefined
+): boolean => {
   if (request.status.id === "resolved") {
-    if (request.humanity.winnerClaim.length>0 && 
-      !!humanityLifespan && 
-      request.humanity.winnerClaim[0].index === request.index) { // Is this the winner request
-        return (
-          /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
+    if (
+      request.humanity.winnerClaim.length > 0 &&
+      !!humanityLifespan &&
+      request.humanity.winnerClaim[0].index === request.index
+    ) {
+      // Is this the winner request
+      return (
+        /* (Number(request.humanity.winnerClaim[0].resolutionTime) > 0 && 
             Number(request.humanity.winnerClaim[0].resolutionTime) + Number(humanityLifespan) < Date.now() / 1000) || 
           (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000) ||  */
-          !request.humanity.registration || 
-          (Number(request.humanity.registration?.expirationTime) < Date.now() / 1000)
-        )
-    }// else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
+        !request.humanity.registration ||
+        Number(request.humanity.registration?.expirationTime) <
+          Date.now() / 1000
+      );
+    } // else return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
   } else if (request.status.id === "transferring") {
-    return (Number(request.creationTime) + Number(humanityLifespan) < Date.now() / 1000)
+    return (
+      Number(request.creationTime) + Number(humanityLifespan) <
+      Date.now() / 1000
+    );
   }
-  return true
-}
+  return true;
+};
 
-const normalize = (requestsData: Record<SupportedChainId, RequestsQueryItem[]>) => {
+const normalize = (
+  requestsData: Record<SupportedChainId, RequestsQueryItem[]>
+) => {
   const requests = sortRequests(
-    Object.keys(requestsData)
-    .reduce<RequestInterface[]>(
+    Object.keys(requestsData).reduce<RequestInterface[]>(
       (acc, chainId) => [
         ...acc,
         ...requestsData[Number(chainId) as SupportedChainId].map((request) => ({
           ...request,
           old: Number(chainId) === legacyChain.id,
           chainId: Number(chainId) as SupportedChainId,
-          expired: isRequestExpired(request, humanityLifespanAllChains[Number(chainId) as SupportedChainId])
-        }))
+          expired: isRequestExpired(
+            request,
+            humanityLifespanAllChains[Number(chainId) as SupportedChainId]
+          ),
+        })),
       ],
       []
     )
   );
   return requests;
-}
+};
 
 const filterChainStacksForChain = (
   chainStacks: Record<SupportedChainId, RequestsQueryItem[]>,
@@ -158,7 +188,7 @@ function RequestsGrid() {
       {} as Record<SupportedChainId, RequestsQuery["requests"]>
     )
   );
-  
+
   const requests = useSelector(() =>
     normalize(chainStacks$.get()).slice(0, REQUESTS_BATCH_SIZE * filter.cursor)
   );
@@ -175,14 +205,17 @@ function RequestsGrid() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-
   useMountOnce(() => {
     (async () => {
       const contractData = await Promise.resolve(getContractDataAllChains());
-      humanityLifespanAllChains = Object.keys(contractData).reduce((acc, chainId) => {
-        acc[Number(chainId) as SupportedChainId] = contractData[Number(chainId) as SupportedChainId].humanityLifespan;
-        return acc;
-      }, {} as Record<SupportedChainId, string>);
+      humanityLifespanAllChains = Object.keys(contractData).reduce(
+        (acc, chainId) => {
+          acc[Number(chainId) as SupportedChainId] =
+            contractData[Number(chainId) as SupportedChainId].humanityLifespan;
+          return acc;
+        },
+        {} as Record<SupportedChainId, string>
+      );
 
       chainStacks$.set(await getRequestsInitData());
       loading.stop();
@@ -223,16 +256,16 @@ function RequestsGrid() {
               ...(search ? { claimer_: { name_contains: search } } : {}),
             };
 
-            const skipNumber = loadContinued
-            ? chainStacks[chain.id].length
-            : 0;
+            const skipNumber = loadContinued ? chainStacks[chain.id].length : 0;
 
-            const promises = getRequestsLoadingPromises(chain.id, where, skipNumber);
-            
-            fetchChains.push(chain);
-            fetchPromises.push(
-              promises
+            const promises = getRequestsLoadingPromises(
+              chain.id,
+              where,
+              skipNumber
             );
+
+            fetchChains.push(chain);
+            fetchPromises.push(promises);
           }
         }
 
@@ -243,15 +276,16 @@ function RequestsGrid() {
           chainStacks$.set(
             await getFilteredRequestsInitData(
               fetchChains.reduce(
-              (acc, chain, i) => ({
-                ...acc,
-                [chain.id]: [
-                  ...(loadContinued ? chainStacks[chain.id] : []),
-                  ...res[i].requests,
-                ],
-              }),
-              chainStacks
-            ))
+                (acc, chain, i) => ({
+                  ...acc,
+                  [chain.id]: [
+                    ...(loadContinued ? chainStacks[chain.id] : []),
+                    ...res[i].requests,
+                  ],
+                }),
+                chainStacks
+              )
+            )
           );
         }
 
@@ -260,19 +294,11 @@ function RequestsGrid() {
     );
   });
 
-  if (pending && loadingType === "init")
-    return (
-      <Image
-        alt="logo loading"
-        className="mx-auto animate-flip my-40"
-        src="/logo/poh-colored.svg"
-        width={256}
-        height={256}
-      />
-    );
+  if (pending && loadingType === "init") return <Loading />;
 
   return (
     <>
+      <SubgraphsStatus />
       <div className="my-4 py-2 flex gap-1 md:gap-2">
         <input
           className="w-full p-2 md:mr-2 border border-slate-200 rounded"
@@ -345,7 +371,9 @@ function RequestsGrid() {
             claimer={request.claimer}
             status={request.status.id}
             revocation={request.revocation}
-            registrationEvidenceRevokedReq={request.registrationEvidenceRevokedReq}
+            registrationEvidenceRevokedReq={
+              request.registrationEvidenceRevokedReq
+            }
             evidence={request.evidenceGroup.evidence}
             expired={request.expired}
           />

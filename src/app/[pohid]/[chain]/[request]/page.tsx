@@ -9,7 +9,7 @@ import { getArbitrationCost } from "data/costs";
 import { machinifyId, prettifyId } from "utils/identifier";
 import ExternalLink from "components/ExternalLink";
 import Identicon from "components/Identicon";
-import { explorerLink } from "utils/address";
+import { explorerLink } from "config/chains";
 import Image from "next/image";
 import Previewed from "components/Previewed";
 import Label from "components/Label";
@@ -53,7 +53,7 @@ export default async function Request({ params }: PageProps) {
     request.claimer.vouchesReceived
     .map((v) => v.from.id as Address);
   
-  
+
   // This are vouches to be read directly from supabase, ie, vouches still not processed 
   // (only necessary before advance state in vouching status)
   const offChainVouches: { 
@@ -211,10 +211,10 @@ export default async function Request({ params }: PageProps) {
     }
   })();
 
-  //const policyUpdate = request.arbitratorHistory.updateTime;
+    //const policyUpdate = request.arbitratorHistory.updateTime;
 
-  return (
-    <div className="content mx-auto flex flex-col justify-center font-semibold">
+    return (
+    <div className="content mx-auto flex flex-col justify-center w-[84vw] md:w-[76vw] max-w-[1500px] font-semibold">
       <ActionBar
         arbitrationCost={arbitrationCost}
         index={request.index}
@@ -249,11 +249,11 @@ export default async function Request({ params }: PageProps) {
               </div>
               <p className="text-slate-600">{revocationFile.description}</p>
             </div>
-            <div className="flex font-normal text-sm">
+            <div className="flex font-normal flex-wrap text-sm">
               <span className="mr-2">Requested by</span>
               <Identicon diameter={16} address={request.requester} />
               <ExternalLink
-                className="ml-1 text-blue-500 underline underline-offset-2"
+                className="ml-1 text-blue-500 flex flex-wrap underline underline-offset-2 break-words break-all"
                 href={explorerLink(request.requester, chain)}
               >
                 {request.requester}
@@ -270,7 +270,7 @@ export default async function Request({ params }: PageProps) {
                   uri={ipfs(registrationFile.photo)}
                   trigger={
                     <Image
-                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer"
+                      className="w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full cursor-pointer object-cover"
                       alt="image"
                       src={ipfs(registrationFile.photo)}
                       width={144}
@@ -284,6 +284,10 @@ export default async function Request({ params }: PageProps) {
                 {/* {request.claimer.name} */}
                 {registrationFile? registrationFile.name: ''}
               </span>
+
+              <span className="text-sm font-light">
+                {registrationFile ? registrationFile.bio : ''}
+              </span>
             </div>
 
             <Label className="mb-8">
@@ -291,10 +295,10 @@ export default async function Request({ params }: PageProps) {
             </Label>
           </div>
 
-          <div className="w-full p-8 flex flex-col">
+          <div className="w-full p-[24px] lg:p-[32px] flex flex-col">
             <div className="mb-8 flex flex-col-reverse md:flex-row justify-between">
               <div className="flex items-center">
-                <Identicon diameter={28} address={request.claimer.id} />
+                <Identicon diameter={24} address={request.claimer.id} />
                 <ExternalLink
                   className="ml-2 font-semibold underline underline-offset-2"
                   href={explorerLink(request.claimer.id, chain)}
@@ -313,26 +317,26 @@ export default async function Request({ params }: PageProps) {
               </span>
             </div>
 
-            <div className="mb-8 flex font-medium text-theme">
-              <Image
+            <div className="mb-8 flex font-medium text-theme flex-wrap gap-x-[8px] gap-y-[8px]" >
+              <div className="flex flex-row flex-wrap gap-x-[8px]">
+                <Image
                 alt="poh id"
                 src="/logo/pohid.svg"
-                className="mr-2"
                 height={24}
                 width={24}
-              />
-              <Link href={`/${prettifyId(pohId)}`}>
+                />
+               <Link href={`/${prettifyId(pohId)}`}>
                 {prettifyId(pohId).slice(0, 20)}
                 <wbr />
                 {prettifyId(pohId).slice(20)}
-              </Link>
-
-              <Info
+                </Link>
+                <Info
                 nbRequests={
                   +request.humanity.nbRequests +
                   +request.humanity.nbLegacyRequests
                 }
               />
+              </div>
             </div>
 
             <div className="flex md:hidden flex-col items-center">
@@ -341,7 +345,7 @@ export default async function Request({ params }: PageProps) {
                   uri={ipfs(registrationFile.photo)}
                   trigger={
                     <Image
-                      className="w-32 h-32 rounded-full cursor-pointer"
+                      className="w-32 h-32 rounded-full cursor-pointer object-cover"
                       alt="image"
                       src={ipfs(registrationFile.photo)}
                       width={144}
@@ -351,8 +355,12 @@ export default async function Request({ params }: PageProps) {
                 />
               )}
 
-              <span className="mt-4 mb-12 text-2xl">
+              <span className="mt-4 mb-[16px] text-2xl">
                 {request.claimer.name}
+              </span>
+
+              <span className="mb-[32px] text-sm font-light">
+                {registrationFile ? registrationFile.bio : ''}
               </span>
             </div>
 
@@ -364,70 +372,71 @@ export default async function Request({ params }: PageProps) {
               />
             )}
 
-            <div className="w-full md:flex-row md:items-center justify-between">
+            <div className="w-full flex flex-wrap md:flex-row md:items-center justify-between gap-2">
               {policyLink && (
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
-                  <ExternalLink 
-                    className="ml-2 underline underline-offset-2" 
-                    href={ipfs(policyLink)}
-                  >
-                    <div className="group flex relative">
-                    Policy in force at submission 
+                <Link 
+                  href={`/attachment?url=${ipfs(policyLink)}`}
+                  className="ml-2 underline underline-offset-2"
+                >
+                  <div className="group flex py-[8px] relative">
+                    Policy in force at submission
                     <div className="\
-                    group-hover:visible invisible \
-                    group-hover:translate-y-6 ease-in-out transition transform absolute \
-                    content-between place-content-center \
-                    flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
-                    bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
-                    text-justify text-[14px] \
-                    left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto \
-                    not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
-                    w-[480px] h-[160px]"
-                  >
-                    <span>
-                    {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
-                    This is the policy that was in effect when this submission was made. Why is this important?
-                    Policies may change over time, and it's crucial to know the policy that was in force at the 
-                    time of a submission before challenging or removing a profile. If you challenge this submission, 
-                    this version of the policy will be enforced by Kleros jurors if the case goes to arbitration. Also, 
-                    if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
-                    your revocation request may be rejected, and you may lose your deposit.
-                    </span>
-                  </div></div>
-                  </ExternalLink>
-                  
+                      group-hover:visible invisible \
+                      ease-in-out transition-opacity transform absolute \
+                      content-between place-content-center \
+                      flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
+                      bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] \
+                      text-justify text-[14px] p-[8px] \
+                      left-1/2 -translate-x-1/2 m-4 mx-auto \
+                      not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
+                      w-[260px] md:w-[400px] z-10"
+                    >
+                      <span>
+                        {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
+                        This is the policy that was in effect when this submission was made. Why is this important?
+                        Policies may change over time, and it's crucial to know the policy that was in force at the 
+                        time of a submission before challenging or removing a profile. If you challenge this submission, 
+                        this version of the policy will be enforced by Kleros jurors if the case goes to arbitration. Also, 
+                        if you revoke this profile citing “incorrect submission,” but the submission complied with this policy, 
+                        your revocation request may be rejected, and you may lose your deposit.
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+
                 </div>
               )}
               {vourchesForData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched for
-                  <div className="flex gap-2">
-                  {vourchesForData.map(async (vouch, idx) => { 
-                    const vouchLocal = await Promise.resolve(vouch);
-                    return (
-                      <Vouch 
-                        isActive = {true} 
-                        reason = {undefined}
-                        name = {vouchLocal.name}
-                        photo = {vouchLocal.photo}
-                        idx = {idx} 
-                        href = {`/${prettifyId(vouchLocal.pohId!)}`}
-                        pohId = {vouchLocal.pohId}
-                        address = {vouchLocal.pohId}
-                        isOnChain = {vouchLocal.isOnChain}
-                        reducedTooltip = {true}
-                      />
-                    )
-                  })}
+                  <div className="flex flex-wrap gap-2">
+                    {vourchesForData.map(async (vouch, idx) => { 
+                      const vouchLocal = await Promise.resolve(vouch);
+                      return (
+                        <Vouch 
+                          isActive = {true} 
+                          reason = {undefined}
+                          name = {vouchLocal.name}
+                          photo = {vouchLocal.photo}
+                          idx = {idx} 
+                          href = {`/${prettifyId(vouchLocal.pohId!)}`}
+                          pohId = {vouchLocal.pohId}
+                          address = {vouchLocal.pohId}
+                          isOnChain = {vouchLocal.isOnChain}
+                          reducedTooltip = {true}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
               )}
             </div>
-            <div className="w-full md:flex-row md:items-center justify-between">
-            {vouchersData.find((v) => v) && (
+            <div className="w-full flex-wrap md:flex-row md:items-center justify-between gap-2">
+              {vouchersData.find((v) => v) && (
                 <div className="mt-8 flex flex-col">
                   Vouched by
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {vouchersData.map(async (vouch, idx) => {
                       const vouchLocal = await Promise.resolve(vouch);
                       return (
@@ -457,7 +466,7 @@ export default async function Request({ params }: PageProps) {
       </div>
 
       <Evidence
-        list={request.evidenceGroup.evidence}
+        list={request.evidenceGroup.evidence.sort((a, b) => Number(a.creationTime) - Number(b.creationTime))}
         pohId={pohId}
         requestIndex={request.index}
         arbitrationInfo={request.arbitratorHistory}

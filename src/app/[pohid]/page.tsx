@@ -1,13 +1,14 @@
 import cn from "classnames";
 import { HumanityQuery } from "generated/graphql";
-import { explorerLink, shortenAddress } from "utils/address";
+import { shortenAddress } from "utils/address";
+import { explorerLink } from "config/chains";
 import { machinifyId, prettifyId } from "utils/identifier";
 import { SupportedChainId, supportedChains } from "config/chains";
 import Link from "next/link";
 import { getHumanityData } from "data/humanity";
 import { getContractDataAllChains } from "data/contract";
 import ExternalLink from "components/ExternalLink";
-import Card from "components/request/Card";
+import Card from "components/Request/Card";
 import Image from "next/image";
 import Revoke from "./Revoke";
 import { getArbitrationCost } from "data/costs";
@@ -49,6 +50,7 @@ async function Profile({ params: { pohid } }: PageProps) {
   const homeChain = supportedChains.find(
     (chain) => (
       !!humanity[chain.id]?.humanity?.registration 
+      && !(humanity[chain.id]?.humanity?.registration?.expirationTime < Date.now() / 1000)
     )
   );
   

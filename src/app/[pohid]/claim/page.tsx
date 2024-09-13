@@ -3,22 +3,16 @@ import { Hash } from "viem";
 import { supportedChains } from "config/chains";
 import { redirect } from "next/navigation";
 import { RedirectType } from "next/dist/client/components/redirect";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { getContractDataAllChains } from "data/contract";
 import { getRegistrationData } from "data/registration";
 import { getTotalCosts } from "data/costs";
+import Loading from "../loading";
 
 const Form = dynamic(() => import("./Form"), {
   ssr: false,
   loading: () => (
-    <Image
-      alt="logo loading"
-      className="mx-auto animate-flip my-40"
-      src="/logo/poh-colored.svg"
-      width={256}
-      height={256}
-    />
+    <Loading />
   ),
 });
 

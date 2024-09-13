@@ -8,7 +8,7 @@ import ReviewStep from "./Review";
 import VideoStep from "./Video";
 import { Show, Switch, useObservable } from "@legendapp/state/react";
 import { useAccount, useChainId } from "wagmi";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import { useParams } from "next/navigation";
 import { Hash, parseEther } from "viem";
 import cn from "classnames";

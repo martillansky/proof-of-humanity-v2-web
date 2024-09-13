@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import Header from "./Header";
+import Header from "./Header/index";
 import cn from "classnames";
 import Footer from "./Footer";
 import { getContractData } from "data/contract";
@@ -28,12 +28,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body
         className={cn(
-          "relative min-h-screen pb-16 flex-col bg-shade-50 scrollbar",
+          "relative min-h-screen flex flex-col bg-shade-50 scrollbar",
           inter.className
         )}
       >
         <Header policy={ipfs(policy)} />
-        <main>{children}</main>
+        <main className="flex-grow">{children}</main>
         <Footer />
         <Toastify />
       </body>

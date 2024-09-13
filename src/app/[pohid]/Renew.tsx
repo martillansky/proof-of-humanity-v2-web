@@ -1,6 +1,6 @@
 "use client";
 
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import useWeb3Loaded from "hooks/useWeb3Loaded";
 import Link from "next/link";
 import { prettifyId } from "utils/identifier";

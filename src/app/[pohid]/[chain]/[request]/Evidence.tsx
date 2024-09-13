@@ -1,30 +1,32 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import ExternalLink from "components/ExternalLink";
+import { enableReactUse } from "@legendapp/state/config/enableReactUse";
+import usePoHWrite from "contracts/hooks/usePoHWrite";
+import AttachmentIcon from "icons/AttachmentMajor.svg";
+import DocumentIcon from "icons/NoteMajor.svg";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import useSWR from "swr";
+import { Address, Hash } from "viem";
 import Accordion from "components/Accordion";
+import ExternalLink from "components/ExternalLink";
 import Field from "components/Field";
+import withClientConnected from "components/HighOrder/withClientConnected";
+import Identicon from "components/Identicon";
 import Label from "components/Label";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
 import Uploader from "components/Uploader";
-import { ipfs, ipfsFetch, uploadToIPFS } from "utils/ipfs";
-import usePoHWrite from "contracts/hooks/usePoHWrite";
-import { Address, Hash } from "viem";
+import { RequestQuery } from "generated/graphql";
 import useChainParam from "hooks/useChainParam";
 import useIPFS from "hooks/useIPFS";
-import { EvidenceFile, MetaEvidenceFile } from "types/docs";
-import { romanize } from "utils/misc";
-import { explorerLink, shortenAddress } from "utils/address";
-import Identicon from "components/Identicon";
-import { RequestQuery } from "generated/graphql";
-import withClientConnected from "components/high-order/withClientConnected";
-import AttachmentIcon from "icons/AttachmentMajor.svg";
-import DocumentIcon from "icons/NoteMajor.svg";
-import { toast } from "react-toastify";
 import { useLoading } from "hooks/useLoading";
-import { enableReactUse } from "@legendapp/state/config/enableReactUse";
-import useSWR from "swr";
+import { EvidenceFile, MetaEvidenceFile } from "types/docs";
+import { shortenAddress } from "utils/address";
+import { explorerLink } from "config/chains";
+import { ipfs, ipfsFetch, uploadToIPFS } from "utils/ipfs";
+import { romanize } from "utils/misc";
 
 enableReactUse();
 
@@ -48,12 +50,12 @@ function Item({ index, uri, creationTime, sender }: ItemInterface) {
         <div className="flex justify-between text-xl font-bold">
           {evidence?.name}
           {evidence?.fileURI && (
-            <ExternalLink href={ipfs(evidence?.fileURI)}>
+            <Link href={`/attachment?url=${encodeURIComponent(ipfs(evidence?.fileURI))}`}>
               <AttachmentIcon className="fill-black w-6 h-6" />
-            </ExternalLink>
+            </Link>
           )}
         </div>
-        <p>{evidence?.description}</p>
+        <p className="break-words break-word">{evidence?.description}</p>
       </div>
       <div className="px-4 py-2 flex items-center">
         <Identicon diameter={32} address={sender} />
@@ -206,7 +208,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
       {list.map((item, i) => (
         <Item
           key={item.id}
-          index={list.length - i - 1}
+          index={i}
           creationTime={item.creationTime}
           sender={item.submitter}
           uri={item.uri}

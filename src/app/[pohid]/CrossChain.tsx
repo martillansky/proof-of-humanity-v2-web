@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Modal from "components/Modal";
 import TimeAgo from "components/TimeAgo";
-import withClientConnected from "components/high-order/withClientConnected";
+import withClientConnected from "components/HighOrder/withClientConnected";
 import {
   SupportedChain,
   SupportedChainId,
