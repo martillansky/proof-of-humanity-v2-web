@@ -11,47 +11,46 @@ export type queryReturnType<Q extends queryType> = Record<
   Awaited<ReturnType<sdkReturnType[Q]>>
 >;
 
-export const sdk = {
-  [mainnet.id]: getSdk(
-    new GraphQLClient(
-      (configSetSelection.id === configSets.main.id) ? 
-      "https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/version/latest"
-      : (configSetSelection.id === configSets.mainOld.id) ? 
-      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
-      : (configSetSelection.id === configSets.mainPreAudit.id) ? 
-      "https://api.studio.thegraph.com/query/64099/pohv2-prod-mainnet/version/latest"
-      : ""
-    )
+export const subgraph_url = {
+  [mainnet.id]: (
+    (configSetSelection.id === configSets.main.id) ? 
+    "https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/version/latest"
+    : (configSetSelection.id === configSets.mainOld.id) ? 
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
+    : (configSetSelection.id === configSets.mainPreAudit.id) ? 
+    "https://api.studio.thegraph.com/query/64099/pohv2-prod-mainnet/version/latest"
+    : ""
   ),
-  [gnosis.id]: getSdk(
-    new GraphQLClient(
-      (configSetSelection.id === configSets.main.id) ? 
-      "https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/version/latest"
-      : (configSetSelection.id === configSets.mainOld.id) ? 
-      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
-      : (configSetSelection.id === configSets.mainPreAudit.id) ? 
-      "https://api.studio.thegraph.com/query/64099/pohv2-prod-gnosis/version/latest"
-      : ""
-    )
+  [gnosis.id]: (
+    (configSetSelection.id === configSets.main.id) ? 
+    "https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/version/latest"
+    : (configSetSelection.id === configSets.mainOld.id) ? 
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
+    : (configSetSelection.id === configSets.mainPreAudit.id) ? 
+    "https://api.studio.thegraph.com/query/64099/pohv2-prod-gnosis/version/latest"
+    : ""
   ),
-  [sepolia.id]: getSdk(
-    new GraphQLClient(
-      (configSetSelection.id === configSets.testOld.id) ? 
-      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // OLD
-      //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/v0.1.5" // OLD
-      : (configSetSelection.id === configSets.testNew.id) ? 
-      "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
-      : ""
-    )
+  [sepolia.id]: (
+    (configSetSelection.id === configSets.testOld.id) ? 
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // OLD
+    //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/v0.1.5" // OLD
+    : (configSetSelection.id === configSets.testNew.id) ? 
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
+    : ""
   ),
-  [gnosisChiado.id]: getSdk(
-    new GraphQLClient(
-      (configSetSelection.id === configSets.testOld.id) ? 
-      "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.2/gn" // OLD
-      //"https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.0/gn" // OLD
-      : (configSetSelection.id === configSets.testNew.id) ? 
-      "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.1/gn"
-      : ""
-    )
-  ),
+  [gnosisChiado.id]: (
+    (configSetSelection.id === configSets.testOld.id) ? 
+    "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.2/gn" // OLD
+    //"https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.0/gn" // OLD
+    : (configSetSelection.id === configSets.testNew.id) ? 
+    "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.1/gn"
+    : ""
+  )
 };
+
+export const sdk = {
+  [mainnet.id]: getSdk(new GraphQLClient(subgraph_url[mainnet.id])),
+  [gnosis.id]: getSdk(new GraphQLClient(subgraph_url[gnosis.id])),
+  [sepolia.id]: getSdk(new GraphQLClient(subgraph_url[sepolia.id])),
+  [gnosisChiado.id]: getSdk(new GraphQLClient(subgraph_url[gnosisChiado.id]))
+}
