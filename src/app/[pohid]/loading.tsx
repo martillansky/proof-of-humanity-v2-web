@@ -6,7 +6,7 @@ export default function Loading() {
     alt="logo loading"
     className="mx-auto animate-flip my-40"
     src="/logo/poh-colored.svg"
-    width={256}
-    height={256}
+    width={64}
+    height={64}
   />;
 }

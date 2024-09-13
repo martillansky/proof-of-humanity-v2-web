@@ -1,21 +1,21 @@
 "use client";
 
+import { SupportedChainId, idToChain } from "config/chains";
 import { colorForStatus } from "config/misc";
 import { queryToStatus } from "config/requests";
-import { WinnerClaimFragment } from "generated/graphql";
-import { camelToTitle } from "utils/case";
-import { prettifyId } from "utils/identifier";
-import { idToChain, SupportedChainId } from "config/chains";
-import { Address, Hash } from "viem";
-import { ipfs } from "utils/ipfs";
-import { shortenAddress } from "utils/address";
 import Link from "next/link";
-import ErrorBoundary from "components/ErrorBoundary";
 import { Suspense } from "react";
+import { Address, Hash } from "viem";
+import ChainLogo from "components/ChainLogo";
+import ErrorBoundary from "components/ErrorBoundary";
+import { WinnerClaimFragment } from "generated/graphql";
 import useIPFS from "hooks/useIPFS";
 import { EvidenceFile, RegistrationFile } from "types/docs";
+import { shortenAddress } from "utils/address";
+import { camelToTitle } from "utils/case";
+import { prettifyId } from "utils/identifier";
+import { ipfs } from "utils/ipfs";
 import { RequestsQueryItem } from "./Grid";
-import ChainLogo from "components/ChainLogo";
 
 interface ContentProps {
   chainId: SupportedChainId;
@@ -61,11 +61,10 @@ const Content = ({
   expired,
 }: ContentProps) => {
   const [evidenceURI] = useIPFS<EvidenceFile>(
-    revocation?
-      !!registrationEvidenceRevokedReq? 
-        registrationEvidenceRevokedReq
-      : 
-        humanity.winnerClaim.at(0)?.evidenceGroup.evidence.at(-1)?.uri
+    revocation
+      ? !!registrationEvidenceRevokedReq
+        ? registrationEvidenceRevokedReq
+        : humanity.winnerClaim.at(0)?.evidenceGroup.evidence.at(-1)?.uri
       : evidence.at(-1)?.uri,
     { suspense: true }
   );
@@ -73,14 +72,14 @@ const Content = ({
     suspense: true,
   });
 
-  let name = 
+  let name =
     data && claimer.name && data.name !== claimer.name
-    ? `${data?.name} (aka ${claimer.name})`
-    : claimer.name
+      ? `${data?.name} (aka ${claimer.name})`
+      : claimer.name
       ? claimer.name
       : data && data.name
-        ? data.name 
-        : '';
+      ? data.name
+      : "";
 
   return (
     <div className="p-3 h-full flex flex-col items-center bg-white">
@@ -117,17 +116,15 @@ function Card({
   return (
     <Link
       href={`/${prettifyId(pohId)}/${chain.name.toLowerCase()}/${index}`}
-      className="h-84 rounded border bg-white shadow-sm flex-col overflow-hidden hover:scale-110 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
+      className="h-84 rounded border bg-white shadow-sm flex-col overflow-hidden hover:scale-105 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
       <div className="justify-between font-light">
         <div className={`w-full h-1 bg-status-${statusColor}`} />
         <div className="p-2 centered font-medium">
           <span className={`text-status-${statusColor}`}>
-            {status === "resolved" && expired && !revocation?
-              'Expired'
-            :
-              camelToTitle(statusTitle, revocation, expired)
-            }
+            {status === "resolved" && expired && !revocation
+              ? "Expired"
+              : camelToTitle(statusTitle, revocation, expired)}
           </span>
           <span className={`dot ml-2 bg-status-${statusColor}`} />
         </div>

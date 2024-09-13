@@ -27,11 +27,13 @@
     "postcss-nested": "^6.0.0",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
-    "tailwindcss": "^3.2.1",
+    "tailwindcss": "^3.4.10",
     "typescript": "^5.0.4",
     "util": "^0.12.4"
   },
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.16.3",
+    "react-markdown": "^8.0.7",
     "@ffmpeg/ffmpeg": "^0.10.1",
     "@legendapp/state": "^1.11.1",
     "@web3modal/ethereum": "^2.7.1",
