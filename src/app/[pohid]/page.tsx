@@ -199,7 +199,7 @@ async function Profile({ params: { pohid } }: PageProps) {
     <div className="content">
       <div className="mt-24 paper pt-20 relative flex flex-col items-center">
         <div className="absolute bordered left-1/2 -top-16 -translate-x-1/2 rounded-full shadow">
-          <div className="w-32 h-32 px-6 pt-5 rounded-full bg-white">
+          <div className="w-32 h-32 px-6 pt-5 rounded-full bg-whiteBackground">
             <Image
               alt="poh id"
               src="/logo/pohid.svg"
@@ -234,7 +234,7 @@ async function Profile({ params: { pohid } }: PageProps) {
               </ExternalLink>
             </div>
 
-            <span className="mb-2 text-slate-500">
+            <span className="mb-2 text-secondaryText">
               {humanity[homeChain.id]!.humanity!.registration!.expirationTime <
               Date.now() / 1000
                 ? "Expired "
@@ -254,7 +254,7 @@ async function Profile({ params: { pohid } }: PageProps) {
                 pohId={pohId}
               />
             ) : (
-              <span className="text-slate-500">
+              <span className="text-secondaryText">
                 Renewal available{" "}
                 <TimeAgo
                   time={
@@ -300,7 +300,7 @@ async function Profile({ params: { pohid } }: PageProps) {
       <div className={"flex flex-col sm:flex-row sm:gap-4"}>
         {winnerClaimData.exists && (
           <div>
-            <div className="p-4 mt-4 mb-1">
+            <div className="p-4 mt-4 mb-1 text-primaryText">
             {winnerClaimData.status !== "transferring"? 
               'Winning claim'
               :
@@ -342,7 +342,7 @@ async function Profile({ params: { pohid } }: PageProps) {
 
         {pendingRequests.length > 0 && (
           <div>
-            <div className="p-4 mt-4 mb-1">
+            <div className="p-4 mt-4 mb-1 text-primaryText">
               {pendingRequests.length} pending request
               {pendingRequests.length !== 1 && "s"}
             </div>
@@ -378,7 +378,7 @@ async function Profile({ params: { pohid } }: PageProps) {
       </div>
       {pastRequests.length > 0 && (
         <>
-          <div className="p-4 mt-8 mb-1">
+          <div className="p-4 mt-8 mb-1 text-primaryText">
             {pastRequests.length} past request
             {pastRequests.length !== 1 && "s"}
           </div>

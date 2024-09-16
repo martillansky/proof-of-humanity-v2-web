@@ -36,7 +36,7 @@ const Vouch: React.FC<VouchingTooltipProps> = ({
         group-hover:translate-y-6 ease-in-out transition transform absolute \
         content-between place-content-center \
         flex-shrink-0 rounded-[3px] border-[1px] border-[solid] \
-        bg-[var(--Light-Mode-White-background,_#FFF)] [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] text-center text-[14px] \
+        bg-whiteBackground [box-shadow:0px_2px_3px_0px_rgba(0,_0,_0,_0.06)] text-center text-[14px] \
         left-1/2 -translate-x-1/2 translate-y-full m-4 mx-auto p-[8px] z-10 \
         not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
         ${reducedTooltip ? "" : "w-[219px] h-[72px]"}`;

@@ -53,13 +53,13 @@ function Review({
 
       <div className="centered flex-col mb-4">
         <ExternalLink
-          className="flex mr-1 text-theme font-semibold"
+          className="flex mr-1 text-orange font-semibold"
           href={ipfs(arbitrationInfo.policy)}
         >
-          <DocumentIcon className="fill-theme w-6 h-6" />
+          <DocumentIcon className="fill-orange w-6 h-6" />
           Registration Policy
         </ExternalLink>
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-secondaryText">
           Updated: <TimeAgo time={arbitrationInfo.updateTime} />
         </span>
       </div>
@@ -118,7 +118,7 @@ function Review({
           <div className="flex items-center">
             Initial deposit
             {balance && (
-              <span className="ml-8 text-slate-700 normal-case">
+              <span className="ml-8 text-primaryText normal-case">
                 Your balance:{" "}
                 <strong>
                   {formatEth(balance.value)} {nativeCurrency.symbol}
@@ -143,7 +143,7 @@ function Review({
             of
             <span
               onClick={() => selfFunded$.set(formatEth(totalCost))}
-              className="mx-1 text-theme font-semibold underline underline-offset-2 cursor-pointer"
+              className="mx-1 text-orange font-semibold underline underline-offset-2 cursor-pointer"
             >
               {formatEther(totalCost)}
             </span>{" "}

@@ -239,18 +239,18 @@ export default async function Request({ params }: PageProps) {
 
       <div className="mb-6 border border-stroke shadow bg-whiteBackground rounded">
         {request.revocation && revocationFile && (
-          <div className="p-4 bg-shade-100">
+          <div className="p-4 bg-primaryBackground">
             <div className="relative">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-primaryText">
                 Revocation requested - {revocationFile.name}
                 {revocationFile.fileURI && (
                   <Attachment uri={revocationFile.fileURI} />
                 )}
               </div>
-              <p className="text-slate-600">{revocationFile.description}</p>
+              <p className="text-primaryText">{revocationFile.description}</p>
             </div>
             <div className="flex font-normal flex-wrap text-sm">
-              <span className="mr-2">Requested by</span>
+              <span className="mr-2 text-secondaryText">Requested by</span>
               <Identicon diameter={16} address={request.requester} />
               <ExternalLink
                 className="ml-1 text-blue-500 flex flex-wrap underline underline-offset-2 break-words break-all"
@@ -377,7 +377,7 @@ export default async function Request({ params }: PageProps) {
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
                 <Link 
                   href={`/attachment?url=${ipfs(policyLink)}`}
-                  className="ml-2 underline underline-offset-2"
+                  className="ml-2 underline text-primaryText"
                 >
                   <div className="group flex py-[8px] relative text-primaryText">
                     Policy in force at submission

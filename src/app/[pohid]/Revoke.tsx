@@ -103,18 +103,18 @@ export default withClientConnected<RevokeProps>(function Revoke({
     >
       <div className="p-4 flex flex-col items-center">
         <ALink className="flex" href={ipfs(arbitrationInfo.policy)}>
-          <DocumentIcon className="fill-theme w-6 h-6" />
-          <strong className="mr-1 text-theme font-semibold">Policy</strong>
+          <DocumentIcon className="fill-orange w-6 h-6" />
+          <strong className="mr-1 text-orange font-semibold">Policy</strong>
         </ALink>
 
-        <span className="txt mt-8">
+        <span className="txt mt-8 text-primaryText">
           In order to request removal you need to deposit
         </span>
-        <span className="font-semibold text-xl">
+        <span className="font-semibold text-xl text-primaryText">
           {formatEth(cost)} {homeChain.nativeCurrency.symbol}
         </span>
 
-        <span className="m-4">
+        <span className="m-4 text-primaryText">
           Anyone can put a deposit claiming the removal to be incorrect. If no
           one does, the individual is removed from the list. If one does, a
           dispute is created.
@@ -134,7 +134,7 @@ export default withClientConnected<RevokeProps>(function Revoke({
         <Label>File</Label>
         <div className="bordered w-full rounded-sm">
           <Uploader
-            className="w-full flex justify-center bg-white p-2 outline-dotted outline-white rounded-sm"
+            className="w-full flex justify-center bg-whiteBackgroundWithOpacity p-2 outline-dotted outline-white rounded-sm text-primaryText"
             type="all"
             onDrop={(acceptedFiles) => setFile(acceptedFiles[0])}
           >

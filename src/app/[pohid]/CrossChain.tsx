@@ -107,9 +107,9 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   return (
     <div className="w-full p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t">
       <div className="flex flex-col">
-        <span className="text-slate-500">Home chain</span>
+        <span className="text-secondaryText">Home chain</span>
         <span className="flex items-center font-semibold">
-          <ChainLogo chainId={homeChain.id} className="w-4 h-4 ml-1" />
+          <ChainLogo chainId={homeChain.id} className="w-4 h-4 mr-2 fill-primaryText" />
           {homeChain.name}
         </span>
       </div>
@@ -123,7 +123,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
             trigger={<button className="text-sky-500" onClick={doTransfer}>Transfer</button>}
           >
             <div className="p-4">
-              <span className="txt m-2">
+              <span className="txt m-2 text-primaryText">
                 Transfer your humanity to another chain. If you use a contract
                 wallet make sure it has the same address on both chains.
               </span>

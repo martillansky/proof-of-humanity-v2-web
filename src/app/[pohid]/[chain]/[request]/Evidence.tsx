@@ -59,7 +59,7 @@ function Item({ index, uri, creationTime, sender }: ItemInterface) {
       </div>
       <div className="px-4 py-2 flex items-center">
         <Identicon diameter={32} address={sender} />
-        <div className="pl-2 flex flex-col">
+        <div className="pl-2 flex flex-col text-primaryText">
           <span>
             submitted by{" "}
             <ExternalLink
@@ -152,20 +152,20 @@ export default withClientConnected<EvidenceProps>(function Evidence({
             </button>
           }
         >
-          <div className="p-4 flex flex-col">
+          <div className="p-4 flex flex-col flex-wrap bg-whiteBackground">
             {policy && (
-              <div className="centered flex-col">
+              <div className="centered flex-col text-primaryText">
                 <ExternalLink
-                  className="flex"
+                  className="flex flex-wrap gap-y-[8px] lg:gap-y-[0]"
                   href={ipfs(arbitrationInfo.registrationMeta)}
                 >
-                  <DocumentIcon className="fill-theme w-6 h-6" />
-                  <strong className="mr-1 text-theme font-semibold">
+                  <DocumentIcon className="fill-orange w-6 h-6" />
+                  <strong className="mr-1 text-orange font-semibold">
                     Registration Policy
                   </strong>
                   (at the time of submission)
                 </ExternalLink>
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-secondaryText">
                   Updated: <TimeAgo time={arbitrationInfo.updateTime} />
                 </span>
               </div>
@@ -185,7 +185,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
             <Label>File</Label>
             <div className="bordered w-full rounded-sm">
               <Uploader
-                className="w-full flex justify-center bg-white p-2 outline-dotted outline-white rounded-sm"
+                className="w-full flex justify-center bg-whiteBackgroundWithOpacity p-2 outline-dotted outline-white rounded-sm text-primaryText"
                 type="all"
                 onDrop={(acceptedFiles) => setFile(acceptedFiles[0])}
               >

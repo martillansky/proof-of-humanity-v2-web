@@ -93,11 +93,11 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
         <strong className="my-2">{address}</strong>
         <span>and say the phrase</span>
         <span className="my-2">
-          <code className="text-theme">"</code>
+          <code className="text-orange">"</code>
           <strong>
             {phrase}
           </strong>
-          <code className="text-theme">"</code>
+          <code className="text-orange">"</code>
         </span>
       </span>
 
@@ -112,7 +112,7 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
       {!showCamera && !video && (
         <div className="relative w-full mt-12 bordered grid grid-cols-2">
           <Uploader
-            className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-white rounded"
+            className="h-full flex items-center justify-center p-2 outline-dotted outline-white bg-whiteBackground rounded"
             type="video"
             onDrop={async (received) => {
               const file = received[0];
@@ -139,13 +139,13 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
               });
             }}
           >
-            <div className="mr-4 bg-theme w-12 h-12 rounded-full flex items-center justify-center">
+            <div className="mr-4 bg-orange w-12 h-12 rounded-full flex items-center justify-center">
               <UploadIcon className="w-6 h-6" />
             </div>
             <span className="text-lg font-medium">Upload video</span>
           </Uploader>
 
-          <span className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 p-1 border-2 border-slate-200 bg-white rounded-full text-theme text-xs font-semibold">
+          <span className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 p-1 border-2 border-slate-200 bg-whiteBackground rounded-full text-orange text-xs font-semibold">
             OR
           </span>
 
@@ -187,10 +187,10 @@ function VideoStep({ advance, video$, isRenewal }: PhotoProps) {
 
       {(showCamera || !!video) && (
         <button
-          className="centered mt-4 text-theme font-semibold text-lg uppercase"
+          className="centered mt-4 text-orange font-semibold text-lg uppercase"
           onClick={() => retakeVideo()}
         >
-          <ResetIcon className="w-6 h-6 mr-2 fill-theme" />
+          <ResetIcon className="w-6 h-6 mr-2 fill-orange" />
           {showCamera ? "Return" : "Retake"}
         </button>
       )}

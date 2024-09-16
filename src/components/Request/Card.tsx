@@ -35,8 +35,8 @@ interface CardInterface extends ContentProps {
 
 const LoadingFallback: React.FC = () => (
   <div className="p-2 h-84 flex flex-col items-center bg-whiteBackground">
-    <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-shade-200 rounded-full" />
-    <div className="animate-pulse w-1/2 h-4 bg-shade-200 rounded" />
+    <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-grey rounded-full" />
+    <div className="animate-pulse w-1/2 h-4 bg-grey rounded" />
   </div>
 );
 
