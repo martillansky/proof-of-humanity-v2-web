@@ -1,7 +1,7 @@
 import cn from "classnames";
 import { HumanityQuery } from "generated/graphql";
 import { shortenAddress } from "utils/address";
-import { explorerLink } from "config/chains";
+import { explorerLink, getForeignChain, idToChain } from "config/chains";
 import { machinifyId, prettifyId } from "utils/identifier";
 import { SupportedChainId, supportedChains } from "config/chains";
 import Link from "next/link";
@@ -287,6 +287,19 @@ async function Profile({ params: { pohid } }: PageProps) {
               winningStatus={winnerClaimData.status}
             />
           </>
+        ) : (pastRequests.length > 0 && pastRequests[0].status.id === 'transferred') ? (
+            <CrossChain
+              claimer={
+                humanity[lastTransferChain.id]?.humanity!.registration?.claimer.id
+              }
+              contractData={contractData}
+              homeChain={idToChain(getForeignChain(lastTransferChain.id))!}
+              pohId={pohId}
+              humanity={humanity}
+              lastTransfer={humanity[lastTransferChain.id].outTransfer}
+              lastTransferChain={lastTransferChain}
+              winningStatus={'transferred'}
+            />
         ) : (
           <>
             <span className="mb-6 text-theme">Not claimed</span>

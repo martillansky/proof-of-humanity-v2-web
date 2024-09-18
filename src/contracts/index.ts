@@ -13,7 +13,9 @@ export const configSets = {
   'mainPreAudit': {chainSet: ChainSet.MAINNETS, chainSetId: 'mainPreAudit', id: '5'},
 };
 
-export const configSetSelection = process.env.DEPLOYED_APP == 'https://testnets--proof-of-humanity-v2.netlify.app/'? configSets.testOld : configSets.main;
+//export const configSetSelection = process.env.DEPLOYED_APP == 'https://testnets--proof-of-humanity-v2.netlify.app/'? configSets.testOld : configSets.main;
+//export const configSetSelection = configSets.testNew;
+export const configSetSelection = configSets.mainOld;
 
 export const Contract = {
   ProofOfHumanity: 
@@ -53,19 +55,78 @@ export const Contract = {
   } : (configSetSelection.id === configSets.main.id)? {
     [gnosis.id]: "0x16044E1063C08670f8653055A786b7CC2034d2b0",
     [mainnet.id]: "0xa478095886659168E8812154fB0DE39F103E74b2",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
   } : (configSetSelection.id === configSets.mainPreAudit.id)? {
     [gnosis.id]: "0xF921b42B541bc53a07067B65207F879c9377bf7F",
     [mainnet.id]: "0xD8D462ac9F3FAD77Af2ae2640fE7F591F1651A2C",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
   } : (configSetSelection.id === configSets.mainOld.id)? {
     [gnosis.id]: "0x6cbEdC1920090EA4F28A38C1CD61c8D37b2cc323",
     [mainnet.id]: "0xD6F4E9d906CD7736a83e0AFa7EE9491658B4afA7",
-  } : {},
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
+  } : {
+    [mainnet.id]: "0x",
+    [gnosis.id]: "0x",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
+  },
   Multicall3: {
     [mainnet.id]: mainnet.contracts.multicall3.address,
     [sepolia.id]: sepolia.contracts.multicall3.address,
     [gnosis.id]: gnosis.contracts.multicall3.address,
     [gnosisChiado.id]: gnosisChiado.contracts.multicall3.address,
   },
+  GnosisAMBHelper: {
+    [mainnet.id]: "0x",
+    [sepolia.id]: "0x",
+    [gnosis.id]: "0x7d94ece17e81355326e3359115D4B02411825EdD",
+    [gnosisChiado.id]: "0x3cc500B3c01D04C265c9293cB35BA2Fd8eA6dc1b",
+  },
+  EthereumAMBBridge: {
+    [mainnet.id]: "0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e",
+    [sepolia.id]: "0xf2546D6648BD2af6a008A7e7C1542BB240329E11",
+    [gnosis.id]: "0x",
+    [gnosisChiado.id]: "0x",
+  },
 } as const;
+
+export const CreationBlockNumber = {
+  CrossChainProofOfHumanity:
+  (configSetSelection.id === configSets.testOld.id) ? 
+  {
+    [mainnet.id]: 0, //OLD
+    [sepolia.id]: 0, //OLD
+    [gnosisChiado.id]: BigInt(8944663), //OLD
+    [gnosis.id]: 0,
+  } : (configSetSelection.id === configSets.testNew.id)? {
+    [gnosis.id]: 0,
+    [mainnet.id]: 0, 
+    [sepolia.id]: 0,
+    [gnosisChiado.id]: BigInt(10533290),
+  } : (configSetSelection.id === configSets.main.id)? {
+    [gnosis.id]: BigInt(35846905),
+    [mainnet.id]: 0,
+    [sepolia.id]: 0,
+    [gnosisChiado.id]: 0,
+  } : (configSetSelection.id === configSets.mainPreAudit.id)? {
+    [gnosis.id]: BigInt(35610817),
+    [mainnet.id]: 0,
+    [sepolia.id]: 0,
+    [gnosisChiado.id]: 0,
+  } : (configSetSelection.id === configSets.mainOld.id)? {
+    [gnosis.id]: BigInt(34761332),
+    [mainnet.id]: 0,
+    [sepolia.id]: 0,
+    [gnosisChiado.id]: 0,
+  } : {
+    [mainnet.id]: 0,
+    [gnosis.id]: 0,
+    [sepolia.id]: 0,
+    [gnosisChiado.id]: 0,
+  },
+}
 
 export type ContractName = keyof typeof Contract;

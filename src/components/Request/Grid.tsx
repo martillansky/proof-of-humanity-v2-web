@@ -77,9 +77,10 @@ const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
       val,
       (req) => req!.status.id === "transferred"
     );
-    for (let i = 0; i < iTransfArr.length; i++) {
+    //for (let i = 0; i < iTransfArr.length; i++) {
+      let i = 0;
       if (iTransfArr[i] >= 0) {
-        let iReceived = iTransfArr[i] + 1;
+        let iReceived = iTransfArr[i] + 2;
         // A transferred request is set to transferred after the receiving request is created, so we need to swap their order
         if (val[iReceived])
           [val[iTransfArr[i]], val[iReceived]] = [
@@ -87,7 +88,7 @@ const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
             val[iTransfArr[i]],
           ];
       }
-    }
+    //}
   });
   let requestsOut: RequestInterface[] = new Array<RequestInterface>();
   pohIdGrouped.forEach((val, key) => {
