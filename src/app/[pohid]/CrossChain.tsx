@@ -25,6 +25,7 @@ import useRelayWrite from "contracts/hooks/useRelayWrite";
 import gnosisAmbHelper from "contracts/abis/gnosis-amb-helper";
 import crossChainProofOfHumanity from "contracts/abis/cross-chain-proof-of-humanity";
 import { gnosisChiado } from "viem/chains";
+import { toast } from "react-toastify";
 
 interface CrossChainProps extends JSX.IntrinsicAttributes {
   contractData: Record<SupportedChainId, ContractData>;
@@ -312,15 +313,19 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                 const subEnd = lastTransferChain.id === gnosisChiado.id? 754 : 748;
                 const encodedData = `0x${data?.substring(130, subEnd)}` as `0x${string}`;
                 
-                const signatures = await publicClient.readContract({
+                await publicClient.readContract({
                   address: Contract.GnosisAMBHelper[lastTransferChain.id],
                   abi: gnosisAmbHelper,
                   functionName: 'getSignatures',
                   args: [encodedData]
-                });
-
-                prepareRelayWrite({
-                  args: [encodedData, signatures],
+                })
+                .then((signatures)=> {
+                  prepareRelayWrite({
+                    args: [encodedData, signatures],
+                  });
+                })
+                .catch(e => {
+                  toast.info("Confirmation takes around 10 minutes. Come back later");
                 });
               }}
             >
