@@ -262,7 +262,6 @@ export const sanitizeHeadRequests = async (
             transferringRequest = (await getRequestDataReduced(chain.id, pohId, -1));
           }
         } */ 
-        console.log("TRANSFFF>>>> ", transferringRequest)
         req.claimer.name = transferringRequest?.claimer.name;
         if (req.revocation) {
           if (req.registrationEvidenceRevokedReq == "" && transferringRequest) {

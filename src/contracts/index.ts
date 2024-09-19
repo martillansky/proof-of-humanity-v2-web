@@ -14,8 +14,8 @@ export const configSets = {
 };
 
 //export const configSetSelection = process.env.DEPLOYED_APP == 'https://testnets--proof-of-humanity-v2.netlify.app/'? configSets.testOld : configSets.main;
-//export const configSetSelection = configSets.testNew;
-export const configSetSelection = configSets.mainOld;
+export const configSetSelection = configSets.testNew;
+//export const configSetSelection = configSets.mainOld;
 
 export const Contract = {
   ProofOfHumanity: 
@@ -39,7 +39,12 @@ export const Contract = {
   } : (configSetSelection.id === configSets.mainOld.id)? {
     [gnosis.id]: "0xe6573F65efAbc351b69F9b73ed8e95772698938b",
     [mainnet.id]: "0x6cbEdC1920090EA4F28A38C1CD61c8D37b2cc323",
-  } : {},
+  } : {
+    [mainnet.id]: "0x",
+    [gnosis.id]: "0x",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
+  },
   CrossChainProofOfHumanity:
   (configSetSelection.id === configSets.testOld.id) ? 
   {
@@ -98,27 +103,27 @@ export const CreationBlockNumber = {
   (configSetSelection.id === configSets.testOld.id) ? 
   {
     [mainnet.id]: 0, //OLD
-    [sepolia.id]: 0, //OLD
+    [sepolia.id]: BigInt(4640835), //OLD
     [gnosisChiado.id]: BigInt(8944663), //OLD
     [gnosis.id]: 0,
   } : (configSetSelection.id === configSets.testNew.id)? {
     [gnosis.id]: 0,
     [mainnet.id]: 0, 
-    [sepolia.id]: 0,
+    [sepolia.id]: BigInt(6198860),
     [gnosisChiado.id]: BigInt(10533290),
   } : (configSetSelection.id === configSets.main.id)? {
     [gnosis.id]: BigInt(35846905),
-    [mainnet.id]: 0,
+    [mainnet.id]: BigInt(20685150),
     [sepolia.id]: 0,
     [gnosisChiado.id]: 0,
   } : (configSetSelection.id === configSets.mainPreAudit.id)? {
     [gnosis.id]: BigInt(35610817),
-    [mainnet.id]: 0,
+    [mainnet.id]: BigInt(20584115),
     [sepolia.id]: 0,
     [gnosisChiado.id]: 0,
   } : (configSetSelection.id === configSets.mainOld.id)? {
     [gnosis.id]: BigInt(34761332),
-    [mainnet.id]: 0,
+    [mainnet.id]: BigInt(20218936),
     [sepolia.id]: 0,
     [gnosisChiado.id]: 0,
   } : {
