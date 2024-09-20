@@ -13,6 +13,10 @@ const nextConfig = {
   env: {
     REACT_APP_IPFS_GATEWAY: process.env.REACT_APP_IPFS_GATEWAY,
     DEPLOYED_APP: process.env.DEPLOYED_APP,
+    CHIADO_RPC: process.env.CHIADO_RPC,
+    SEPOLIA_RPC: process.env.SEPOLIA_RPC,
+    GNOSIS_RPC: process.env.GNOSIS_RPC,
+    MAINNET_RPC: process.env.MAINNET_RPC
   },
   images: {
     remotePatterns: [

@@ -57,42 +57,11 @@ const sortRequests = (request: RequestInterface[]): RequestInterface[] => {
     pohIdGrouped.set(req.humanity.id, pohIdArray);
   });
   pohIdGrouped.forEach((val, key) => {
-    type CompareFunction = (req: RequestsQueryItem) => boolean;
-
-    function findAllIndex<T>(
-      arr: RequestInterface[],
-      conditionFn: CompareFunction
-    ): number[] {
-      const indexes: number[] = [];
-      for (let i = 0; i < arr.length; i++) {
-        if (conditionFn(arr[i])) {
-          indexes.push(i);
-        }
-      }
-      return indexes;
-    }
     val.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange);
-
-    let iTransfArr = findAllIndex(
-      val,
-      (req) => req!.status.id === "transferred"
-    );
-    for (let i = 0; i < iTransfArr.length; i++) {
-      if (iTransfArr[i] >= 0) {
-        let iReceived = iTransfArr[i] + 1;
-        // A transferred request is set to transferred after the receiving request is created, so we need to swap their order
-        if (val[iReceived])
-          [val[iTransfArr[i]], val[iReceived]] = [
-            val[iReceived],
-            val[iTransfArr[i]],
-          ];
-      }
-    }
   });
   let requestsOut: RequestInterface[] = new Array<RequestInterface>();
   pohIdGrouped.forEach((val, key) => {
     // We keep only the head request of each pohIdGrouped array which is the one representing the current status of the personhood
-
     requestsOut.push(val[0]);
   });
 

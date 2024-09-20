@@ -1,7 +1,7 @@
 import cn from "classnames";
 import { HumanityQuery } from "generated/graphql";
 import { shortenAddress } from "utils/address";
-import { explorerLink } from "config/chains";
+import { explorerLink, getForeignChain, idToChain } from "config/chains";
 import { machinifyId, prettifyId } from "utils/identifier";
 import { SupportedChainId, supportedChains } from "config/chains";
 import Link from "next/link";
@@ -130,27 +130,7 @@ async function Profile({ params: { pohid } }: PageProps) {
   );
 
   const sortRequests = (requests: PoHRequest[]): PoHRequest[] => {
-    type CompareFunction = (req: PoHRequest) => boolean;
-    
-    function findAllIndex<T>(arr: PoHRequest[], conditionFn: CompareFunction): number[] {
-      const indexes: number[] = [];
-      for (let i = 0; i < arr.length; i++) {
-        if (conditionFn(arr[i])) {
-          indexes.push(i);
-        }
-      }
-      return indexes;
-    }
-    requests.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange)
-    
-    let iTransfArr = findAllIndex(requests, (req) => req!.status.id === "transferred");
-    for(let i = 0; i < iTransfArr.length; i++) {
-      if (iTransfArr[i] >= 0) {
-        let iReceived = iTransfArr[i]+1;
-        // A transferred request is set to transferred after the receiving request is created, so we need to swap their order 
-        if (requests[iReceived]) [requests[iTransfArr[i]], requests[iReceived]] = [requests[iReceived], requests[iTransfArr[i]]];
-      }
-    }
+    requests.sort((req1, req2) => req2.lastStatusChange - req1.lastStatusChange);
     return requests;
   }
   
@@ -287,6 +267,19 @@ async function Profile({ params: { pohid } }: PageProps) {
               winningStatus={winnerClaimData.status}
             />
           </>
+        ) : (pastRequests.length > 0 && pastRequests[0].status.id === 'transferred') ? (
+            <CrossChain
+              claimer={
+                humanity[lastTransferChain.id]?.humanity!.registration?.claimer.id
+              }
+              contractData={contractData}
+              homeChain={idToChain(getForeignChain(lastTransferChain.id))!}
+              pohId={pohId}
+              humanity={humanity}
+              lastTransfer={humanity[lastTransferChain.id].outTransfer}
+              lastTransferChain={lastTransferChain}
+              winningStatus={'transferred'}
+            />
         ) : (
           <>
             <span className="mb-6 text-theme">Not claimed</span>

@@ -2,20 +2,24 @@ import { useMemo } from "react";
 import Modal from "components/Modal";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
 import { Address, Hash } from "viem";
-import useChainParam from "hooks/useChainParam";
-import { useAccount, useSignTypedData } from "wagmi";
+import { useSignTypedData } from "wagmi";
 import { useEffectOnce } from "@legendapp/state/react";
 import axios from "axios";
 import { Contract } from "contracts";
 import cn from "classnames";
 import { toast } from "react-toastify";
+import { SupportedChain } from "config/chains";
 
 interface VouchButtonProps {
   pohId: Hash;
   claimer: Address;
+  web3Loaded: any;
+  me: any;
+  chain: SupportedChain;
+  address: Address | undefined;
 }
 
-export default function Vouch({ pohId, claimer }: VouchButtonProps) {
+export default function Vouch({ pohId, claimer, web3Loaded, me, chain, address }: VouchButtonProps) {
   const [prepare, addVouch] = usePoHWrite(
     "addVouch",
     useMemo(
@@ -33,13 +37,11 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
       []
     )
   );
-  const { address } = useAccount();
 
   useEffectOnce(() => {
     prepare({ args: [claimer, pohId] });
   });
 
-  const chain = useChainParam()!;
   const expiration = useMemo(
     () => Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 * 6,
     []
@@ -87,6 +89,9 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
   };
 
   return (
+    web3Loaded &&
+    me && me.homeChain?.id === chain.id && 
+    me.pohId && (
     <Modal
       formal
       header="Vouch"
@@ -118,5 +123,6 @@ export default function Vouch({ pohId, claimer }: VouchButtonProps) {
         </span>
       </div>
     </Modal>
+    )
   );
 }
