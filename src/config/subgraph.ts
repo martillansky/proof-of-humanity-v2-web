@@ -14,7 +14,8 @@ export type queryReturnType<Q extends queryType> = Record<
 export const subgraph_url = {
   [mainnet.id]: (
     (configSetSelection.id === configSets.main.id) ? 
-    "https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/version/latest"
+    "https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/v0.0.1"
+    //"https://api.studio.thegraph.com/query/64099/poh-origin-mainnet/version/latest"
     : (configSetSelection.id === configSets.mainOld.id) ? 
     "https://api.studio.thegraph.com/query/64099/proof-of-humanity-mainnet/version/latest"
     : (configSetSelection.id === configSets.mainPreAudit.id) ? 
@@ -23,7 +24,8 @@ export const subgraph_url = {
   ),
   [gnosis.id]: (
     (configSetSelection.id === configSets.main.id) ? 
-    "https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/version/latest"
+    "https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/v0.0.1"
+    //"https://api.studio.thegraph.com/query/64099/poh-origin-gnosis/version/latest"
     : (configSetSelection.id === configSets.mainOld.id) ? 
     "https://api.studio.thegraph.com/query/64099/proof-of-humanity-gnosis/version/latest"
     : (configSetSelection.id === configSets.mainPreAudit.id) ? 
@@ -32,8 +34,8 @@ export const subgraph_url = {
   ),
   [sepolia.id]: (
     (configSetSelection.id === configSets.testOld.id) ? 
-    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // OLD
-    //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/v0.1.5" // OLD
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/v0.0.5" // OLD
+    //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // OLD
     : (configSetSelection.id === configSets.testNew.id) ? 
     "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
     : ""
