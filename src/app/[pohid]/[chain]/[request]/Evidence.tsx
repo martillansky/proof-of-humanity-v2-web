@@ -5,7 +5,7 @@ import usePoHWrite from "contracts/hooks/usePoHWrite";
 import AttachmentIcon from "icons/AttachmentMajor.svg";
 import DocumentIcon from "icons/NoteMajor.svg";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 import { Address, Hash } from "viem";
@@ -27,6 +27,7 @@ import { shortenAddress } from "utils/address";
 import { explorerLink } from "config/chains";
 import { ipfs, ipfsFetch, uploadToIPFS } from "utils/ipfs";
 import { romanize } from "utils/misc";
+import { usePublicClient } from "wagmi";
 
 enableReactUse();
 
@@ -89,6 +90,8 @@ export default withClientConnected<EvidenceProps>(function Evidence({
   list,
   arbitrationInfo,
 }) {
+  const chainReq = useChainParam()!;
+  const { chain } = usePublicClient();
   const { data: policy } = useSWR(
     arbitrationInfo.registrationMeta,
     async (metaEvidenceLink) =>
@@ -136,6 +139,12 @@ export default withClientConnected<EvidenceProps>(function Evidence({
     loading.stop();
   };
 
+  const [isEvidenceDisabled, setIsEvidenceDisabled] = useState(false);
+
+  useEffect(() => {
+    setIsEvidenceDisabled(chainReq.id !== chain.id)
+  }, [chain]);
+
   return (
     <Accordion title="Evidence">
       {requestIndex >= 0 && (
@@ -145,6 +154,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
           header="Evidence"
           trigger={
             <button
+              disabled={isEvidenceDisabled}
               onClick={() => setModalOpen(true)}
               className="btn-main w-48 self-end mx-2 mt-2"
             >
@@ -190,7 +200,7 @@ export default withClientConnected<EvidenceProps>(function Evidence({
                 onDrop={(acceptedFiles) => setFile(acceptedFiles[0])}
               >
                 {file
-                  ? file.name
+                  ? file?.name
                   : "Drag 'n drop some files here, or click to select files"}
               </Uploader>
             </div>

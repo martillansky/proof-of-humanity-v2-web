@@ -38,10 +38,6 @@ export default function Vouch({ pohId, claimer, web3Loaded, me, chain, address }
     )
   );
 
-  /* useEffect(()=> {
-
-  }, [me, address, chain]);
- */
   useEffectOnce(() => {
     prepare({ args: [claimer, pohId] });
   });
