@@ -11,7 +11,7 @@ export const requestStatus = {
   resolvedRevocation: { filter: { status: "resolved", revocation: true } },
   withdrawn: { filter: { status: "withdrawn" } },
   transferred: { filter: { status: "transferred" } },
-  transferring: { filter: { status: "transferring" } },
+  //transferring: { filter: { status: "transferring" } },
 } as Record<string, { filter: Request_Filter }>;
 
 export type RequestStatus = keyof typeof requestStatus;

@@ -22,6 +22,8 @@ import Challenge from "./Challenge";
 import FundButton from "./Funding";
 import RemoveVouch from "./RemoveVouch";
 import Vouch from "./Vouch";
+import { getMyData } from "data/user";
+import useSWR from "swr";
 
 
 enableReactUse();
@@ -74,6 +76,8 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const [pending] = loading.use();
   const web3Loaded = useWeb3Loaded();
   const userChainId = useChainId();
+  const { data: me } = useSWR(address, getMyData);
+  
   // const [prepareMulticallAdvance, multicallAdvanceFire] = useWagmiWrite(
   //   "Multicall3",
   //   "aggregate",
@@ -332,9 +336,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                     Withdraw
                   </button>
                 ) : !isVouchGranted.didIVouchFor ? (
-                  <Vouch pohId={pohId} claimer={requester} />
+                  <Vouch pohId={pohId} claimer={requester} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
                 ) : isVouchGranted.isVouchOnchain ? (
-                  <RemoveVouch requester={requester} pohId={pohId} />
+                  <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
                 ) : null}
               </div>
             </>
@@ -354,9 +358,9 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   Withdraw
                 </button>
               ) : !isVouchGranted.didIVouchFor ? (
-                <Vouch pohId={pohId} claimer={requester} />
+                <Vouch pohId={pohId} claimer={requester} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
               ) : isVouchGranted.isVouchOnchain ? (
-                <RemoveVouch requester={requester} pohId={pohId} />
+                <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
               ) : null}
               <button
                 disabled={pending}
