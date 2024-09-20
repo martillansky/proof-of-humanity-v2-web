@@ -5,15 +5,20 @@ import { useLoading } from "hooks/useLoading";
 import { enableReactUse } from "@legendapp/state/config/enableReactUse";
 import { toast } from "react-toastify";
 import { useEffectOnce } from "@legendapp/state/react";
+import { SupportedChain } from "config/chains";
 
 enableReactUse();
 
 interface RemoveVouchProps {
   pohId: Hash;
   requester: Address;
+  web3Loaded: any;
+  me: any;
+  chain: SupportedChain;
+  address: Address | undefined;
 }
 
-export default function RemoveVouch({ pohId, requester }: RemoveVouchProps) {
+export default function RemoveVouch({ pohId, requester, web3Loaded, me, chain, address }: RemoveVouchProps) {
   const loading = useLoading();
   const [pending] = loading.use();
 
@@ -41,6 +46,9 @@ export default function RemoveVouch({ pohId, requester }: RemoveVouchProps) {
   });
 
   return (
+    web3Loaded &&
+    me && me.homeChain?.id === chain.id && 
+    me.pohId && (
     <div className="flex gap-4">
       <button
         disabled={pending}
@@ -50,5 +58,6 @@ export default function RemoveVouch({ pohId, requester }: RemoveVouchProps) {
         Remove Vouch
       </button>
     </div>
+    )
   );
 };

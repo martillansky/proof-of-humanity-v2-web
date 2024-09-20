@@ -230,12 +230,12 @@ export const sanitizeHeadRequests = async (
         var transferringRequest;
         if (foreignChainId && all[foreignChainId].length>0 && (Number(req.index) <= -100 || (Number(req.index) >= 0 && req.revocation))) {
           transferringRequest = all[foreignChainId]
-          .filter(req => (req.humanity.id === pohId && (req.status.id == "transferred")))// || req.status.id == "transferring")))
+          .filter(req => (req.humanity.id === pohId && (req.status.id == "transferred") && !!req.evidenceGroup.evidence.at(0)))// || req.status.id == "transferring")))
           .sort((req1, req2) => req2.creationTime - req1.creationTime)
           .at(0);
           if (!(!!transferringRequest?.evidenceGroup.evidence.at(0))) {
             transferringRequest = all[chain.id]
-            .filter(req => (req.humanity.id === pohId && (req.status.id == "transferred")))// || req.status.id == "transferring")))
+            .filter(req => (req.humanity.id === pohId && (req.status.id == "transferred" && !!req.evidenceGroup.evidence.at(0))))// || req.status.id == "transferring")))
             .sort((req1, req2) => req2.creationTime - req1.creationTime)
             .at(0);
           }
