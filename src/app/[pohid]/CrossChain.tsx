@@ -24,9 +24,9 @@ import useWeb3Loaded from "hooks/useWeb3Loaded";
 import { ContractData } from "data/contract";
 import useRelayWrite from "contracts/hooks/useRelayWrite";
 import gnosisAmbHelper from "contracts/abis/gnosis-amb-helper";
-import crossChainProofOfHumanity from "contracts/abis/cross-chain-proof-of-humanity";
 import { gnosisChiado } from "viem/chains";
 import { toast } from "react-toastify";
+import abis from "contracts/abis";
 
 interface CrossChainProps extends JSX.IntrinsicAttributes {
   contractData: Record<SupportedChainId, ContractData>;
@@ -101,7 +101,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   );
 
   type RelayUpdateParams = {
-    sideChainId: 100|10200, 
+    sideChainId: SupportedChainId,
     publicClientSide: any, 
     encodedData: `0x${string}`
   };
@@ -115,72 +115,85 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
 
   const pendingRelayUpdateEthereum = async () => {
     if (web3Loaded && 
-      //(chainId === mainnet.id || chainId === sepolia.id) &&
       (winningStatus !== "transferring" && winningStatus !== "transferred")
     ) {
-      const sideChain = idToChain(getForeignChain(chainId));
-      const sideChainId = sideChain!.id as 100|10200;
-      const publicClientSide = createPublicClient({
-        chain: supportedChains[sideChainId],
-        transport: http(getChainRpc(sideChainId)),
+      const sendingChain = idToChain(getForeignChain(chainId));
+      const sendingChainId = sendingChain!.id as SupportedChainId;
+      const publicClientSending = createPublicClient({
+        chain: supportedChains[sendingChainId],
+        transport: http(getChainRpc(sendingChainId)),
       });
-      const address = Contract.CrossChainProofOfHumanity[sideChainId] as Address;
-      const allTxs = await publicClientSide.getContractEvents({
-        address: address,
-        abi: crossChainProofOfHumanity,
+      const sendingCCPoHAddress = Contract.CrossChainProofOfHumanity[sendingChainId] as Address;
+      const allSendingTxs = await publicClientSending.getContractEvents({
+        address: sendingCCPoHAddress,
+        abi: abis.CrossChainProofOfHumanity,
         eventName: 'UpdateInitiated',
-        fromBlock: CreationBlockNumber.CrossChainProofOfHumanity[sideChainId] as bigint,
+        fromBlock: CreationBlockNumber.CrossChainProofOfHumanity[sendingChainId] as bigint,
         strict: true,
         args: {humanityId: pohId},
       });
       
-      if (allTxs.length == 0) return ;
+      if (allSendingTxs.length == 0) {
+        setPendingRelayUpdate({} as RelayUpdateParams);
+        return ;
+      }
 
-      const txHash = allTxs && allTxs[0].transactionHash;
+      const txHashSending = allSendingTxs && allSendingTxs[allSendingTxs.length-1].transactionHash;
       
-      const tx = await publicClientSide.getTransactionReceipt({hash: txHash});
-      const messageId = tx.logs.at(0)?.topics.at(1);
+      const txSending = await publicClientSending.getTransactionReceipt({hash: txHashSending});
+      
+      const messageIdSending = txSending.logs.at(0)?.topics.at(1);
+      const expirationTime = txSending.logs.at(1)?.data.substring(0,66);
+      const expired = Number(expirationTime) < Date.now() / 1000;
+      if (expired) {
+        setPendingRelayUpdate({} as RelayUpdateParams);
+        return ;
+      }
 
       // Looking for the received update with same messageId, if there is no such tx, then it is pending
-
-      const publicClientEthereum = createPublicClient({
+      const publicClientReceiving = createPublicClient({
         chain: supportedChains[chainId],
         transport: http(getChainRpc(chainId)),
       });
-      const addressEthereum = Contract.CrossChainProofOfHumanity[chainId] as Address;
-      const allTxsEthereum = await publicClientEthereum.getContractEvents({
-        address: addressEthereum,
-        abi: crossChainProofOfHumanity,
+      const receivingCCPoHAddress = Contract.CrossChainProofOfHumanity[chainId] as Address;
+      const allReceivingTxs = await publicClientReceiving.getContractEvents({
+        address: receivingCCPoHAddress,
+        abi: abis.CrossChainProofOfHumanity,
         eventName: 'UpdateReceived',
         fromBlock: CreationBlockNumber.CrossChainProofOfHumanity[chainId] as bigint,
         strict: true,
         args: {humanityId: pohId},
       });
       
-      var messageIdEthereum;
-      if (allTxsEthereum.length > 0) {
-        const txHashEthereum = allTxsEthereum[0].transactionHash;
+      var messageIdReceiving;
+      if (allReceivingTxs.length > 0) {
+        const txHashReceiving = allReceivingTxs[allReceivingTxs.length-1].transactionHash;
         
-        const txEthereum = await publicClientEthereum.getTransactionReceipt({hash: txHashEthereum});
-        messageIdEthereum = txEthereum.logs.at(1)?.topics.at(3);
+        const txReceiving = await publicClientReceiving.getTransactionReceipt({hash: txHashReceiving});
+        
+        // On main and sepolia we look into the first event, on gnosis side its the second one
+        const eventIndex = (chainId === 1 || chainId === 11155111)? 1 : 2; 
+        messageIdReceiving = txReceiving.logs.at(eventIndex)?.topics.at(3);
       }
 
-      if (allTxsEthereum.length == 0 || messageId !== messageIdEthereum) {
-        const data = (tx.logs.at(0)?.data);
+      if (allReceivingTxs.length == 0 || messageIdSending !== messageIdReceiving) {
+        const data = (txSending.logs.at(0)?.data);
       
         // Encoded data has a different length in Gnosis compared to Chiado
-        const subEnd = sideChainId === gnosisChiado.id? 754 : 748;
+        const subEnd = sendingChainId === gnosisChiado.id? 754 : 748;
         const encodedData = `0x${data?.substring(130, subEnd)}` as `0x${string}`;
         
-        setPendingRelayUpdate({sideChainId: sideChainId, publicClientSide: publicClientSide, encodedData: encodedData});
+        setPendingRelayUpdate({sideChainId: sendingChainId, publicClientSide: publicClientSending, encodedData: encodedData});
         return ;
       }
-      return ;
     }
+    setPendingRelayUpdate({} as RelayUpdateParams);
     return ;
   }
 
   const showPendingUpdate = () => {
+    const sendingChainName = idToChain(pendingRelayUpdate.sideChainId)?.name;
+    const receivingChainName = idToChain(getForeignChain(pendingRelayUpdate.sideChainId))?.name;
     return (
       <Modal
         trigger={
@@ -192,7 +205,11 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
       >
       <div className="paper p-4 flex flex-col">
         <span className="txt m-2">
-          There is a pending state update that needs to be relayed on this chain. 
+          {sendingChainName} ▶{" "}
+          {receivingChainName}
+        </span>
+        <span className="txt m-2">
+          There is a pending state update that needs to be relayed on {receivingChainName}.
         </span>
         {(pendingRelayUpdate.sideChainId === 100 || pendingRelayUpdate.sideChainId === 10200)? (
           <button
@@ -230,7 +247,6 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
   
   useEffect(()=>{
     if (web3Loaded && 
-      //(chainId === mainnet.id || chainId === sepolia.id) &&
       (winningStatus !== "transferring" && winningStatus !== "transferred")
     )
       pendingRelayUpdateEthereum()
@@ -372,7 +388,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
                 const address = Contract.CrossChainProofOfHumanity[lastTransferChain.id] as Address;
                 const allTxs = await publicClient.getContractEvents({
                   address: address,
-                  abi: crossChainProofOfHumanity,
+                  abi: abis.CrossChainProofOfHumanity,
                   eventName: 'TransferInitiated',
                   fromBlock: CreationBlockNumber.CrossChainProofOfHumanity[lastTransferChain.id] as bigint,
                   strict: true,
