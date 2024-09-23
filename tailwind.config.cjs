@@ -1,6 +1,7 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
+  darkMode: ["class", '[data-theme="dark"]'],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,27 +10,51 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        theme: "#ff9966",
-        status: {
-          vouching: "#BE75FF",
-          registered: "#00D9A1",
-          removed: "#F60C36",
-          revocation: "#FF7A00",
-          claim: "#00D1FF",
-          challenged: "#FFBE66",
-          withdrawn: "#999999",
-          expired: "#000000",
-          transferred: "#3F6212",
-          transferring: "#ba7264",
+        light: {
+          whiteBackground: "#FFFFFF",
+          primaryBackground: "#FFFCFA",
+          stroke: "#E5E5E5",
+          theme: "#ff9966",
+          primaryText: "#333333",
+          secondaryText: "#999999",
+          orange: "#FF9966",
+          lightOrange: "#fff4f4",
+          grey: "#fff7f0",
+          status: {
+            vouching: "#BE75FF",
+            registered: "#00D9A1",
+            removed: "#F60C36",
+            revocation: "#FF7A00",
+            claim: "#00D1FF",
+            challenged: "#FFBE66",
+            withdrawn: "#999999",
+            expired: "#000000",
+            transferred: "#3F6212",
+            transferring: "#ba7264",
+          },
         },
-        shade: {
-          50: "#fffcfa",
-          100: "#fffaf5",
-          200: "#fff7f0",
-          300: "#fff5eb",
-          400: "#fff0e0",
-          500: "#ffe0c2",
-          600: "#ffD6ad",
+        dark: {
+          whiteBackground: "#2D0050",
+          primaryBackground: "#1B003F",
+          stroke: "#42498F",
+          theme: "#1b003f",
+          primaryText: "#DAF0FF",
+          secondaryText: "#BECCE5",
+          orange: "#FFBE66",
+          lightOrange: "#480c54",
+          grey: "#666666",
+          status: {
+            vouching: "#7C3AED",
+            registered: "#0ACF83",
+            removed: "#F44336",
+            revocation: "#FF5722",
+            claim: "#03A9F4",
+            challenged: "#FFC107",
+            withdrawn: "#BDBDBD",
+            expired: "#9E9E9E",
+            transferred: "#8BC34A",
+            transferring: "#795548",
+          },
         },
       },
       animation: {

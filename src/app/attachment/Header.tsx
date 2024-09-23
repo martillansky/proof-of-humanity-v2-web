@@ -11,11 +11,11 @@ const Header: React.FC = () => {
         <Image
           src="/logo/paperclip.svg"
           alt="Paperclip Icon"
-          className="w-6 h-6 text-purple-500"
+          className="w-6 h-6"
           width={24}
           height={24}
         />
-        <h1 className="text-lg md:text-xl font-semibold">File</h1>
+        <h1 className="text-lg md:text-xl font-semibold text-primaryText">File</h1>
       </div>
       <button
         onClick={() => router.back()}

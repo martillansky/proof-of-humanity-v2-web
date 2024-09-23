@@ -14,7 +14,7 @@ const FileViewer: React.FC<{ url: string }> = ({ url }) => {
   const docs = [{ uri: url }];
 
   return (
-    <div className="bg-shade-50 rounded-lg shadow-sm max-h-[1050px] overflow-auto">
+    <div className="text-primaryText">
       <DocViewer
         documents={docs}
         pluginRenderers={[...DocViewerRenderers, MarkdownRenderer]}
@@ -29,7 +29,7 @@ const FileViewer: React.FC<{ url: string }> = ({ url }) => {
           },
           pdfVerticalScrollByDefault: true,
         }}
-        className="bg-shade-50"
+        className="bg-primaryBackground"
       />
     </div>
   );
