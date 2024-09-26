@@ -31,7 +31,7 @@ export default function Info({ nbRequests }: InfoProps) {
         unique human registered on Proof of Humanity.
       </p>
       <p>
-        This POH ID had <strong>{nbRequests} requests</strong> in total
+        This POH ID had <strong>{nbRequests} requests</strong> claimed in this chain
       </p>
     </Modal>
   );

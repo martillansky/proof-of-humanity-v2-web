@@ -24,6 +24,7 @@ import RemoveVouch from "./RemoveVouch";
 import Vouch from "./Vouch";
 import { getMyData } from "data/user";
 import useSWR from "swr";
+import Appeal from "./Appeal";
 
 
 enableReactUse();
@@ -425,13 +426,29 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               )}
               .
             </span>
+            
+            <div className="flex gap-4">
+            <Appeal
+              disputeId={currentChallenge.disputeId}
+              arbitrator={contractData.arbitrationInfo.arbitrator}
+              extraData={contractData.arbitrationInfo.extraData}
+              contributor={address!}
+              claimer={requester}
+              challenger={currentChallenge.challenger?.id}
+              // Appelate instance funds makes sense when current round is bigger than zero which is the initial round
+              challengerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(-1)?.challengerFund?.amount}
+              claimerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(-1)?.requesterFund.amount}
+              chainId={chain.id}
+            />
 
             <ExternalLink
               href={`https://resolve.kleros.io/cases/${currentChallenge.disputeId}`}
-              className="btn-main px-[24px]"
+              //className="btn-main px-[24px]"
+              className="btn-main mb-2" 
             >
               View case #{currentChallenge.disputeId}
             </ExternalLink>
+            </div>
           </>
         )}
 

@@ -41,6 +41,9 @@ export const randomString = (length: number) =>
 export const formatEth = (wei: bigint, precision: number = 4) =>
   +parseFloat(formatEther(wei)).toFixed(precision);
 
+export const eth2Wei = (ethAmount: number): bigint =>
+  BigInt(ethAmount * Math.pow(10, 18));
+
 export function romanize(n: number): string {
   if (n < 1) return "";
   if (n >= 40) return `XL${romanize(n - 40)}`;
