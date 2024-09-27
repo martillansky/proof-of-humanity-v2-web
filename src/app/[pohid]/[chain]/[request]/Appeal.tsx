@@ -5,26 +5,18 @@ import Identicon from "components/Identicon";
 import Progress from "components/Progress";
 import { eth2Wei, formatEth } from "utils/misc";
 import usePoHWrite from "contracts/hooks/usePoHWrite";
-import { Address, createPublicClient, http } from "viem";
+import { Address } from "viem";
 import { useMemo, useRef, useState } from "react";
 import Field from "components/Field";
 import Modal from "components/Modal";
-import klerosLiquid from "contracts/abis/kleros-liquid";
-import { SupportedChainId, getChainRpc, supportedChains } from "config/chains";
+import { SupportedChainId } from "config/chains";
 import { toast } from "react-toastify";
 import { useEffectOnce } from "@legendapp/state/react";
 import TimeAgo from "components/TimeAgo";
-import { Contract } from "contracts";
-import abis from "contracts/abis";
 import { useLoading } from "hooks/useLoading";
-import Error from "next/error";
+import { APIPoH, ArbitratorFromRequest, CurrentRoundSideFunds, StakeMultipliers } from "contracts/apis/APIPoH";
+import { APIArbitrator, ArbitratorsData, DisputeStatusEnum, SideEnum } from "contracts/apis/APIArbitrator";
 
-
-enum SideEnum {
-  shared,
-  claimer,
-  challenger
-}
 
 interface SideFundingProps {
   side: SideEnum;
@@ -114,12 +106,6 @@ const SideFunding: React.FC<SideFundingProps> = ({
   )
 }
 
-enum DisputeStatusEnum {
-  Waiting, 
-  Appealable, 
-  Solved
-};
-
 interface AppealProps {
   pohId: Address;
   requestIndex: number;
@@ -147,13 +133,10 @@ const Appeal: React.FC<AppealProps> = ({
   /* claimerFunds,
   challengerFunds, */
 }) => {
-  
-  const hardcodedTest = false; // ------------------------------------------------- LOOK AFTER!!!!!!!!
-
   const [totalClaimerCost, setTotalClaimerCost] = useState(0n);
   const [totalChallengerCost, setTotalChallengerCost] = useState(0n);
   const [formatedCurrentRuling, setFormatedCurrentRuling] = useState("");
-  const defaultPeriod = hardcodedTest? [1726999079n,1827290679n] : [0n,0n];
+  const defaultPeriod = [0n,0n];
   const [period, setPeriod] = useState(defaultPeriod);
   const [disputeStatus, setDisputeStatus] = useState(DisputeStatusEnum.Appealable);
   const [error, setError] = useState(false);
@@ -162,9 +145,7 @@ const Appeal: React.FC<AppealProps> = ({
   const [arbitrator, setArbitrator] = useState(null);
   const [claimerFunds, setClaimerFunds] = useState(0n);
   const [challengerFunds, setChallengerFunds] = useState(0n);
-  const challengeIdRef = useRef(null);
-  const lastRoundIdRef = useRef(null);
-
+  
   useEffectOnce(() => {
     const formatCurrentRuling = (currentRuling: SideEnum) => {
       var text = "Undecided";
@@ -197,137 +178,39 @@ const Appeal: React.FC<AppealProps> = ({
     }
 
     const getAppealData = async () => {
-      const publicClient = createPublicClient({
-        chain: supportedChains[chainId],
-        transport: http(getChainRpc(chainId)),
-      });
-
       try{
-        const [arbitrator, extraData] = await publicClient.readContract({
-          address: Contract.ProofOfHumanity[chainId] as Address,
-          abi: abis.ProofOfHumanity as any,
-          functionName: 'getRequestInfo',
-          args: [pohId, requestIndex]
-        })
-        .then(async data => {
-          return await publicClient.readContract({
-            address: Contract.ProofOfHumanity[chainId] as Address,
-            abi: abis.ProofOfHumanity as any,
-            functionName: 'arbitratorDataHistory',
-            args: [data[2]]
-          })
-          .then(data => {
-            setArbitrator(data[1]);
-            return [data[1], data[2]];
-          })
-        })
-        .catch(e => {
-          !errorRef.current && toast.info("Unexpected error while reading arbitration info. Come back later");
-          setError(true);
-          errorRef.current = true;
-          throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
-        });
+        const arbitratorFromRequest: ArbitratorFromRequest = await APIPoH.getArbitratorFromRequest(chainId, pohId, requestIndex);
+        const arbitrator = arbitratorFromRequest.arbitrator!;
+        const extraData = arbitratorFromRequest.extraData!;
+        setArbitrator(arbitrator as any);
 
+        const currentRoundSideFunds: CurrentRoundSideFunds = await APIPoH.getCurrentRoundSideFunds(chainId, pohId, requestIndex, arbitrator, disputeId);
+        setClaimerFunds(currentRoundSideFunds.claimerFunds!);
+        setChallengerFunds(currentRoundSideFunds.challengerFunds!);
 
-        await publicClient.readContract({
-          address: Contract.ProofOfHumanity[chainId] as Address,
-          abi: abis.ProofOfHumanity as any,
-          functionName: 'disputeIdToData',
-          args: [arbitrator, disputeId]
-        })
-        .then(async data => {
-          challengeIdRef.current = data[1];
-          await publicClient.readContract({
-            address: Contract.ProofOfHumanity[chainId] as Address,
-            abi: abis.ProofOfHumanity as any,
-            functionName: 'getChallengeInfo',
-            args: [pohId, requestIndex, challengeIdRef.current]
-          })
-          .then(async data => {
-            lastRoundIdRef.current = data[0];
-            await publicClient.readContract({
-              address: Contract.ProofOfHumanity[chainId] as Address,
-              abi: abis.ProofOfHumanity as any,
-              functionName: 'getRoundInfo',
-              args: [pohId, requestIndex, challengeIdRef.current, lastRoundIdRef.current]
-            })
-            .then(data => {
-              setClaimerFunds(data[1]);
-              setChallengerFunds(data[2]);
-            })
-          })
-        })
-        .catch(e => {
-          !errorRef.current && toast.info("Unexpected error while reading appelate round info. Come back later");
-          setError(true);
-          errorRef.current = true;
-          throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
-        });
+        const stakeMultipliers: StakeMultipliers = await APIPoH.getStakeMultipliers(chainId);
+        const winnerMult = stakeMultipliers.winnerStakeMultiplier;
+        const loserMult = stakeMultipliers.looserStakeMultiplier;
+        const sharedMult = stakeMultipliers.sharedStakeMultiplier; 
 
+        const arbitratorsData: ArbitratorsData = await APIArbitrator.getArbitratorsData(chainId, arbitrator, disputeId, extraData);
+        const status = arbitratorsData.status;
+        const cost = arbitratorsData.cost;
+        const period = arbitratorsData.period;
+        const currentRuling = arbitratorsData.currentRuling;
+      
         
-        const getStakeMultiplier = async (func: string) => {
-          return await publicClient.readContract({
-            address: Contract.ProofOfHumanity[chainId] as Address,
-            abi: abis.ProofOfHumanity as any,
-            functionName: func,
-            args: []
-          })
-          .catch(e => {
-            !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
-            setError(true);
-            errorRef.current = true;
-            throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
-          });
-        }
-
-        const getArbitratorsData = async (func: string, args: Array<any>) => {
-          return await publicClient.readContract({
-            address: arbitrator,
-            abi: klerosLiquid as any,
-            functionName: func,
-            args: args
-          })
-          .catch(e => {
-            !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
-            setError(true);
-            errorRef.current = true;
-            throw new Error({statusCode: 521, title: "Error while reading Arbitrator"});
-          });
-        }
-
-      
-        const status = await Promise.resolve(
-          getArbitratorsData('disputeStatus', [disputeId])
-        );
-
-        const [winnerMult, loserMult, sharedMult, cost, period, currentRuling] = await Promise.all([
-          getStakeMultiplier('winnerStakeMultiplier'),
-          getStakeMultiplier('loserStakeMultiplier'),
-          getStakeMultiplier('sharedStakeMultiplier'),
-          getArbitratorsData('appealCost', [disputeId, extraData]),
-          getArbitratorsData('appealPeriod', [disputeId]),
-          getArbitratorsData('currentRuling', [disputeId]),
-        ]);
-      
-        if (hardcodedTest) {
-          formatCurrentRuling(2 as SideEnum);
-          calculateTotalCost(cost as any, 2 as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));
-        } else {
-          setPeriod(period as any);
-          setDisputeStatus(Number(status) as DisputeStatusEnum);
-          //setDisputeStatus(1 as DisputeStatusEnum);
-          formatCurrentRuling(Number(currentRuling) as SideEnum);
-          calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));  
-        }
-        /* 
         setPeriod(period as any);
         setDisputeStatus(Number(status) as DisputeStatusEnum);
+        //setDisputeStatus(1 as DisputeStatusEnum); // -------------------------------- JUST FOR TESTING
         formatCurrentRuling(Number(currentRuling) as SideEnum);
-        calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));
-        */
-
+        calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));  
+        
         setLoading(false);
       } catch (e) {
+        !errorRef.current && toast.info("Unexpected error while reading appelate round info. Come back later");
+        setError(true);
+        errorRef.current = true;
         console.log(e);
       }
     }
@@ -337,7 +220,6 @@ const Appeal: React.FC<AppealProps> = ({
   return (
     disputeStatus === DisputeStatusEnum.Appealable && !error && !loading?
     <Modal
-      // formal
       header={`Appeal case #${disputeId}`}
       trigger={
         <button className="btn-sec mb-2">
