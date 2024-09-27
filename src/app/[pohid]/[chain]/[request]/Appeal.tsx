@@ -222,7 +222,7 @@ const Appeal: React.FC<AppealProps> = ({
     <Modal
       header={`Appeal case #${disputeId}`}
       trigger={
-        <button className="btn-sec mb-2">
+        <button className="btn-sec px-[24px] h-[48px] rounded">
           Fund Appeal (ends&nbsp;<TimeAgo time={parseInt(String(period[1]))}/>)
         </button>}
     >
