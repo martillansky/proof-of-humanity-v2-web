@@ -429,15 +429,19 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             
             <div className="flex gap-4">
             <Appeal
+              pohId={pohId}
+              requestIndex={index}
               disputeId={currentChallenge.disputeId}
+              /* Subgraph does not update correctly arbitration data changes
               arbitrator={contractData.arbitrationInfo.arbitrator}
-              extraData={contractData.arbitrationInfo.extraData}
+              extraData={contractData.arbitrationInfo.extraData} */
               contributor={address!}
               claimer={requester}
               challenger={currentChallenge.challenger?.id}
               // Appelate instance funds makes sense when current round is bigger than zero which is the initial round
-              challengerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(-1)?.challengerFund?.amount}
-              claimerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(-1)?.requesterFund.amount}
+              /* Subgraph needs redesign to have created a fresh round right after appelate is created
+              challengerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.challengerFund?.amount}
+              claimerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.requesterFund.amount} */
               chainId={chain.id}
             />
 

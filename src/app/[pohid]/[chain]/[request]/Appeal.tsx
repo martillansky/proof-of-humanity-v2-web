@@ -50,6 +50,9 @@ const SideFunding: React.FC<SideFundingProps> = ({
   const [requesterInput, setRequesterInput] = useState(0n);
   const loading = useLoading();
   const errorRef = useRef(false);
+
+  const value = formatEth(requesterFunds)*100/formatEth(appealCost);
+  const valueProgress = value > 100? 100 : value;
   
   const [prepareFundAppeal] = usePoHWrite(
     "fundAppeal",
@@ -103,7 +106,7 @@ const SideFunding: React.FC<SideFundingProps> = ({
           </button>
         </div>
         <Progress
-          value={formatEth(requesterFunds)*100/formatEth(appealCost)}
+          value={valueProgress}
           label={`${formatEth(requesterFunds)} ETH of ${formatEth(appealCost)} ETH`}
         />
       </div>
@@ -118,27 +121,31 @@ enum DisputeStatusEnum {
 };
 
 interface AppealProps {
-  arbitrator: Address;
-  extraData: any,
+  pohId: Address;
+  requestIndex: number;
+  /* arbitrator: Address;
+  extraData: any, */
   contributor: Address;
   claimer: Address;
   challenger: Address;
   disputeId: bigint;
-  challengerFunds: bigint;
-  claimerFunds: bigint;
+  /* challengerFunds: bigint;
+  claimerFunds: bigint; */
   chainId: SupportedChainId;
 }
 
 const Appeal: React.FC<AppealProps> = ({
+  pohId,
+  requestIndex,
   disputeId,
-  arbitrator,
-  extraData,
+  /* arbitrator,
+  extraData, */
   contributor,
   chainId,
   claimer,
   challenger,
-  claimerFunds,
-  challengerFunds,
+  /* claimerFunds,
+  challengerFunds, */
 }) => {
   
   const hardcodedTest = false; // ------------------------------------------------- LOOK AFTER!!!!!!!!
@@ -152,7 +159,12 @@ const Appeal: React.FC<AppealProps> = ({
   const [error, setError] = useState(false);
   const errorRef = useRef(false);
   const [loading, setLoading] = useState(true);
-  
+  const [arbitrator, setArbitrator] = useState(null);
+  const [claimerFunds, setClaimerFunds] = useState(0n);
+  const [challengerFunds, setChallengerFunds] = useState(0n);
+  const challengeIdRef = useRef(null);
+  const lastRoundIdRef = useRef(null);
+
   useEffectOnce(() => {
     const formatCurrentRuling = (currentRuling: SideEnum) => {
       var text = "Undecided";
@@ -184,43 +196,106 @@ const Appeal: React.FC<AppealProps> = ({
       setTotalChallengerCost(BigInt(totalChallengerCost));
     }
 
-    const readAppealCost = async () => {
+    const getAppealData = async () => {
       const publicClient = createPublicClient({
         chain: supportedChains[chainId],
         transport: http(getChainRpc(chainId)),
       });
 
-      const getStakeMultiplier = async (func: string) => {
-        return await publicClient.readContract({
+      try{
+        const [arbitrator, extraData] = await publicClient.readContract({
           address: Contract.ProofOfHumanity[chainId] as Address,
           abi: abis.ProofOfHumanity as any,
-          functionName: func,
-          args: []
+          functionName: 'getRequestInfo',
+          args: [pohId, requestIndex]
+        })
+        .then(async data => {
+          return await publicClient.readContract({
+            address: Contract.ProofOfHumanity[chainId] as Address,
+            abi: abis.ProofOfHumanity as any,
+            functionName: 'arbitratorDataHistory',
+            args: [data[2]]
+          })
+          .then(data => {
+            setArbitrator(data[1]);
+            return [data[1], data[2]];
+          })
         })
         .catch(e => {
-          !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
+          !errorRef.current && toast.info("Unexpected error while reading arbitration info. Come back later");
           setError(true);
           errorRef.current = true;
           throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
         });
-      }
 
-      const getArbitratorsData = async (func: string, args: Array<any>) => {
-        return await publicClient.readContract({
-          address: arbitrator,
-          abi: klerosLiquid as any,
-          functionName: func,
-          args: args
+
+        await publicClient.readContract({
+          address: Contract.ProofOfHumanity[chainId] as Address,
+          abi: abis.ProofOfHumanity as any,
+          functionName: 'disputeIdToData',
+          args: [arbitrator, disputeId]
+        })
+        .then(async data => {
+          challengeIdRef.current = data[1];
+          await publicClient.readContract({
+            address: Contract.ProofOfHumanity[chainId] as Address,
+            abi: abis.ProofOfHumanity as any,
+            functionName: 'getChallengeInfo',
+            args: [pohId, requestIndex, challengeIdRef.current]
+          })
+          .then(async data => {
+            lastRoundIdRef.current = data[0];
+            await publicClient.readContract({
+              address: Contract.ProofOfHumanity[chainId] as Address,
+              abi: abis.ProofOfHumanity as any,
+              functionName: 'getRoundInfo',
+              args: [pohId, requestIndex, challengeIdRef.current, lastRoundIdRef.current]
+            })
+            .then(data => {
+              setClaimerFunds(data[1]);
+              setChallengerFunds(data[2]);
+            })
+          })
         })
         .catch(e => {
-          !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
+          !errorRef.current && toast.info("Unexpected error while reading appelate round info. Come back later");
           setError(true);
           errorRef.current = true;
-          throw new Error({statusCode: 521, title: "Error while reading Arbitrator"});
+          throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
         });
-      }
 
-      try{
+        
+        const getStakeMultiplier = async (func: string) => {
+          return await publicClient.readContract({
+            address: Contract.ProofOfHumanity[chainId] as Address,
+            abi: abis.ProofOfHumanity as any,
+            functionName: func,
+            args: []
+          })
+          .catch(e => {
+            !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
+            setError(true);
+            errorRef.current = true;
+            throw new Error({statusCode: 520, title: "Error while reading ProofOfHumanity"});
+          });
+        }
+
+        const getArbitratorsData = async (func: string, args: Array<any>) => {
+          return await publicClient.readContract({
+            address: arbitrator,
+            abi: klerosLiquid as any,
+            functionName: func,
+            args: args
+          })
+          .catch(e => {
+            !errorRef.current && toast.info("Unexpected error while reading appeal info. Come back later");
+            setError(true);
+            errorRef.current = true;
+            throw new Error({statusCode: 521, title: "Error while reading Arbitrator"});
+          });
+        }
+
+      
         const status = await Promise.resolve(
           getArbitratorsData('disputeStatus', [disputeId])
         );
@@ -233,28 +308,30 @@ const Appeal: React.FC<AppealProps> = ({
           getArbitratorsData('appealPeriod', [disputeId]),
           getArbitratorsData('currentRuling', [disputeId]),
         ]);
-
       
         if (hardcodedTest) {
           formatCurrentRuling(2 as SideEnum);
           calculateTotalCost(cost as any, 2 as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));
         } else {
           setPeriod(period as any);
-          setDisputeStatus(status as any);
+          setDisputeStatus(Number(status) as DisputeStatusEnum);
+          //setDisputeStatus(1 as DisputeStatusEnum);
           formatCurrentRuling(Number(currentRuling) as SideEnum);
           calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));  
         }
-        /* setPeriod(period as any);
-        setDisputeStatus(status as any);
+        /* 
+        setPeriod(period as any);
+        setDisputeStatus(Number(status) as DisputeStatusEnum);
         formatCurrentRuling(Number(currentRuling) as SideEnum);
-        calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult)); */
+        calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));
+        */
 
         setLoading(false);
       } catch (e) {
         console.log(e);
       }
     }
-    readAppealCost();  
+    getAppealData();  
   });
   
   return (
@@ -280,7 +357,7 @@ const Appeal: React.FC<AppealProps> = ({
         <SideFunding
           side={SideEnum.claimer}
           disputeId={disputeId}
-          arbitrator={arbitrator}
+          arbitrator={arbitrator!}
           contributor={contributor}
           
           requester={claimer}
@@ -291,7 +368,7 @@ const Appeal: React.FC<AppealProps> = ({
         <SideFunding
           side={SideEnum.challenger}
           disputeId={disputeId}
-          arbitrator={arbitrator}
+          arbitrator={arbitrator!}
           contributor={contributor}
 
           requester={challenger}
