@@ -24,6 +24,7 @@ import RemoveVouch from "./RemoveVouch";
 import Vouch from "./Vouch";
 import { getMyData } from "data/user";
 import useSWR from "swr";
+import Appeal from "./Appeal";
 
 
 enableReactUse();
@@ -425,6 +426,24 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               )}
               .
             </span>
+            
+            <div className="flex gap-4">
+            <Appeal
+              pohId={pohId}
+              requestIndex={index}
+              disputeId={currentChallenge.disputeId}
+              /* Subgraph does not update correctly arbitration data changes
+              arbitrator={contractData.arbitrationInfo.arbitrator}
+              extraData={contractData.arbitrationInfo.extraData} */
+              contributor={address!}
+              claimer={requester}
+              challenger={currentChallenge.challenger?.id}
+              // Appelate instance funds makes sense when current round is bigger than zero which is the initial round
+              /* Subgraph needs redesign to have created a fresh round right after appelate is created
+              challengerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.challengerFund?.amount}
+              claimerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.requesterFund.amount} */
+              chainId={chain.id}
+            />
 
             <ExternalLink
               href={`https://resolve.kleros.io/cases/${currentChallenge.disputeId}`}
@@ -432,6 +451,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             >
               View case #{currentChallenge.disputeId}
             </ExternalLink>
+            </div>
           </>
         )}
 

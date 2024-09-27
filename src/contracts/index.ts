@@ -31,12 +31,18 @@ export const Contract = {
   } : (configSetSelection.id === configSets.main.id)? {
     [gnosis.id]: "0xa4AC94C4fa65Bb352eFa30e3408e64F72aC857bc",
     [mainnet.id]: "0xbE9834097A4E97689d9B667441acafb456D0480A",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
   } : (configSetSelection.id === configSets.mainPreAudit.id)? {
     [gnosis.id]: "0xECd1823b3087acEE3C77928b1959c08d31A8F20e",
     [mainnet.id]: "0x87c5c294C9d0ACa6b9b2835A99FE0c9A444Aacc1",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
   } : (configSetSelection.id === configSets.mainOld.id)? {
     [gnosis.id]: "0xe6573F65efAbc351b69F9b73ed8e95772698938b",
     [mainnet.id]: "0x6cbEdC1920090EA4F28A38C1CD61c8D37b2cc323",
+    [sepolia.id]: "0x",
+    [gnosisChiado.id]: "0x",
   } : {
     [mainnet.id]: "0x",
     [gnosis.id]: "0x",
