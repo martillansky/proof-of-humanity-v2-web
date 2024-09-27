@@ -28,7 +28,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body
         className={cn(
-          "relative min-h-screen flex flex-col bg-shade-50 scrollbar",
+          "relative min-h-screen flex flex-col bg-primaryBackground scrollbar",
           inter.className
         )}
       >

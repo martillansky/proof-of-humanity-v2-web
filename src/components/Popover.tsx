@@ -28,7 +28,7 @@ const Popover: React.FC<PopoverInterface> = ({ trigger, children }) => {
 
   return (
     <Popup trigger={trigger} position={position} arrow={false}>
-      <div className="w-48 mt-1 bg-white rounded shadow-md shadow-shade-500/50">
+      <div className="w-48 mt-1 bg-whiteBackground text-secondaryText rounded shadow-md shadow-shade-500/50">
         {children}
       </div>
     </Popup>

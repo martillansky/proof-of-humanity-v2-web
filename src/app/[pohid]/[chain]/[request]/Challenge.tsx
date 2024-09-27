@@ -142,7 +142,7 @@ export default function Challenge({
       header="Challenge"
       trigger={<button className="btn-main">Challenge</button>}
     >
-      <div className="p-4 flex flex-col items-center">
+      <div className="p-4 flex flex-wrap flex-col items-center">
         <ALink className="flex" href={ipfs(arbitrationInfo.policy)}>
           <DocumentIcon className="fill-theme w-6 h-6" />
           <strong className="mr-1 text-theme font-semibold">

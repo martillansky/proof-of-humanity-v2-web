@@ -16,7 +16,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
   <span
     className={cn(
       "p-2 text-md cursor-pointer rounded flex items-center",
-      selected ? "bg-shade-400" : "hover:bg-shade-200"
+      selected ? "bg-whiteBackground" : "hover:bg-primaryBackground"
     )}
     onClick={onSelect}
   >

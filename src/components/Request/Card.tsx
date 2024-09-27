@@ -34,9 +34,9 @@ interface CardInterface extends ContentProps {
 }
 
 const LoadingFallback: React.FC = () => (
-  <div className="p-2 h-84 flex flex-col items-center bg-white">
-    <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-slate-200 rounded-full" />
-    <div className="animate-pulse w-1/2 h-4 bg-slate-200 rounded" />
+  <div className="p-2 h-84 flex flex-col items-center bg-whiteBackground">
+    <div className="animate-pulse mx-auto mb-2 h-32 w-32 bg-grey rounded-full" />
+    <div className="animate-pulse w-1/2 h-4 bg-grey rounded" />
   </div>
 );
 
@@ -82,15 +82,15 @@ const Content = ({
       : "";
 
   return (
-    <div className="p-3 h-full flex flex-col items-center bg-white">
+    <div className="p-3 h-full flex flex-col items-center bg-whiteBackground">
       <div
         className={"w-32 h-32 bg-no-repeat bg-cover bg-center rounded-full"}
         style={{ backgroundImage: `url('${ipfs(data?.photo!)}')` }}
       />
-      <span className="my-2 font-semibold truncate">{name}</span>
+      <span className="my-2 font-semibold truncate text-primaryText">{name}</span>
       <div className="grid grid-cols-3 items-center">
-        <ChainLogo chainId={chainId} className="w-4 h-4 fill-slate-400" />
-        <span className="text-slate-400">{shortenAddress(requester)}</span>
+        <ChainLogo chainId={chainId} className="w-4 h-4 fill-primaryText" />
+        <span className="text-secondaryText">{shortenAddress(requester)}</span>
       </div>
     </div>
   );
@@ -116,7 +116,7 @@ function Card({
   return (
     <Link
       href={`/${prettifyId(pohId)}/${chain.name.toLowerCase()}/${index}`}
-      className="h-84 rounded border bg-white shadow-sm flex-col overflow-hidden hover:scale-105 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
+      className="h-84 rounded border border-stroke bg-whiteBackground shadow-sm flex-col overflow-hidden hover:scale-105 hover:z-10 hover:shadow-xl transition duration-150 ease-out cursor-pointer wiggle"
     >
       <div className="justify-between font-light">
         <div className={`w-full h-1 bg-status-${statusColor}`} />

@@ -12,7 +12,7 @@ const AttachmentDisplay: React.FC = () => {
   const url = searchParams.get("url");
 
   return (
-    <div className="bg-shade-50 px-6 py-8 w-[96vw] md:w-[80vw] max-w-[1500px] mx-auto">
+    <div className="bg-primaryBackground px-6 py-8 w-[96vw] md:w-[80vw] max-w-[1500px] mx-auto">
       <div className="flex flex-col gap-2">
         <Header />
         {url ? (
@@ -26,7 +26,7 @@ const AttachmentDisplay: React.FC = () => {
               Open in new tab
               <Image
                 alt="Open in new tab"
-                className="fill-current text-blue-500"
+                className="fill-primaryText"
                 src="/logo/new-tab.svg"
                 width={16}
                 height={16}
