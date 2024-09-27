@@ -69,6 +69,7 @@ query Request($id: ID!) {
       }
       nbRounds
       rounds(orderBy: creationTime) {
+        creationTime
         requesterFund {
           amount
         }
