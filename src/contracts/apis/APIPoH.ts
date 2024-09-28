@@ -16,7 +16,7 @@ export interface CurrentRoundSideFunds {
 
 export interface StakeMultipliers {
     winnerStakeMultiplier: bigint | undefined;
-    looserStakeMultiplier: bigint | undefined;
+    loserStakeMultiplier: bigint | undefined;
     sharedStakeMultiplier: bigint | undefined;
 }
 
@@ -95,12 +95,12 @@ export class APIPoH {
         const apiReader = APIPoH.getApiReader(_chainId);
         const out: StakeMultipliers = {
             winnerStakeMultiplier: undefined,
-            looserStakeMultiplier: undefined,
+            loserStakeMultiplier: undefined,
             sharedStakeMultiplier: undefined
         };
         try {
             out.winnerStakeMultiplier = await apiReader.get('winnerStakeMultiplier');
-            out.looserStakeMultiplier = await apiReader.get('loserStakeMultiplier');
+            out.loserStakeMultiplier = await apiReader.get('loserStakeMultiplier');
             out.sharedStakeMultiplier = await apiReader.get('sharedStakeMultiplier');
             return out;
         } catch (error) {
