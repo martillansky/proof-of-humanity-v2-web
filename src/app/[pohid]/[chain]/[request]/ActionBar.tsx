@@ -53,6 +53,7 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   onChainVouches: Address[];
   offChainVouches: { voucher: Address; expiration: number; signature: Hash }[];
   expired: boolean;
+  arbitrationHistory: { __typename?: "ArbitratorHistory" | undefined; updateTime: any; registrationMeta: string; id: string; arbitrator: any; extraData: any; }
 }
 
 export default withClientConnected<ActionBarProps>(function ActionBar({
@@ -70,6 +71,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   offChainVouches,
   // advanceRequestsOnChainVouches,
   expired,
+  arbitrationHistory,
 }) {
   const chain = useChainParam()!;
   const { address } = useAccount();
@@ -432,16 +434,12 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               pohId={pohId}
               requestIndex={index}
               disputeId={currentChallenge.disputeId}
-              /* Subgraph does not update correctly arbitration data changes
-              arbitrator={contractData.arbitrationInfo.arbitrator}
-              extraData={contractData.arbitrationInfo.extraData} */
+              arbitrator={arbitrationHistory.arbitrator}
+              extraData={arbitrationHistory.extraData}
               contributor={address!}
               claimer={requester}
               challenger={currentChallenge.challenger?.id}
-              // Appelate instance funds makes sense when current round is bigger than zero which is the initial round
-              /* Subgraph needs redesign to have created a fresh round right after appelate is created
-              challengerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.challengerFund?.amount}
-              claimerFunds={currentChallenge.rounds.length>1 && currentChallenge.rounds.at(0)?.requesterFund.amount} */
+              currentChallenge={currentChallenge}
               chainId={chain.id}
             />
 
