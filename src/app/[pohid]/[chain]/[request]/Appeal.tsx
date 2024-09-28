@@ -14,8 +14,9 @@ import { toast } from "react-toastify";
 import { useEffectOnce } from "@legendapp/state/react";
 import TimeAgo from "components/TimeAgo";
 import { useLoading } from "hooks/useLoading";
-import { APIPoH, ArbitratorFromRequest, CurrentRoundSideFunds, StakeMultipliers } from "contracts/apis/APIPoH";
+import { APIPoH, StakeMultipliers } from "contracts/apis/APIPoH";
 import { APIArbitrator, ArbitratorsData, DisputeStatusEnum, SideEnum } from "contracts/apis/APIArbitrator";
+import { RequestQuery } from "generated/graphql";
 
 
 interface SideFundingProps {
@@ -109,29 +110,29 @@ const SideFunding: React.FC<SideFundingProps> = ({
 interface AppealProps {
   pohId: Address;
   requestIndex: number;
-  /* arbitrator: Address;
-  extraData: any, */
+  arbitrator: Address;
+  extraData: any,
   contributor: Address;
   claimer: Address;
   challenger: Address;
   disputeId: bigint;
-  /* challengerFunds: bigint;
-  claimerFunds: bigint; */
   chainId: SupportedChainId;
+  currentChallenge: ArrayElement<
+      NonNullable<NonNullable<RequestQuery>["request"]>["challenges"]
+    >;
 }
 
 const Appeal: React.FC<AppealProps> = ({
   pohId,
   requestIndex,
   disputeId,
-  /* arbitrator,
-  extraData, */
+  arbitrator,
+  extraData,
   contributor,
   chainId,
   claimer,
   challenger,
-  /* claimerFunds,
-  challengerFunds, */
+  currentChallenge
 }) => {
   const [totalClaimerCost, setTotalClaimerCost] = useState(0n);
   const [totalChallengerCost, setTotalChallengerCost] = useState(0n);
@@ -142,7 +143,6 @@ const Appeal: React.FC<AppealProps> = ({
   const [error, setError] = useState(false);
   const errorRef = useRef(false);
   const [loading, setLoading] = useState(true);
-  const [arbitrator, setArbitrator] = useState(null);
   const [claimerFunds, setClaimerFunds] = useState(0n);
   const [challengerFunds, setChallengerFunds] = useState(0n);
   
@@ -179,18 +179,15 @@ const Appeal: React.FC<AppealProps> = ({
 
     const getAppealData = async () => {
       try{
-        const arbitratorFromRequest: ArbitratorFromRequest = await APIPoH.getArbitratorFromRequest(chainId, pohId, requestIndex);
-        const arbitrator = arbitratorFromRequest.arbitrator!;
-        const extraData = arbitratorFromRequest.extraData!;
-        setArbitrator(arbitrator as any);
-
-        const currentRoundSideFunds: CurrentRoundSideFunds = await APIPoH.getCurrentRoundSideFunds(chainId, pohId, requestIndex, arbitrator, disputeId);
-        setClaimerFunds(currentRoundSideFunds.claimerFunds!);
-        setChallengerFunds(currentRoundSideFunds.challengerFunds!);
+        const isPartiallyFunded = Number(currentChallenge.nbRounds)+1 === currentChallenge.rounds.length;
+        const claimerFunds = isPartiallyFunded? currentChallenge.rounds.at(-1)?.requesterFund.amount: 0n;
+        const challengerFunds = isPartiallyFunded? (currentChallenge.rounds.at(-1)?.challengerFund? currentChallenge.rounds.at(-1)?.challengerFund?.amount: 0n): 0n;
+        setClaimerFunds(claimerFunds);
+        setChallengerFunds(challengerFunds);
 
         const stakeMultipliers: StakeMultipliers = await APIPoH.getStakeMultipliers(chainId);
         const winnerMult = stakeMultipliers.winnerStakeMultiplier;
-        const loserMult = stakeMultipliers.looserStakeMultiplier;
+        const loserMult = stakeMultipliers.loserStakeMultiplier;
         const sharedMult = stakeMultipliers.sharedStakeMultiplier; 
 
         const arbitratorsData: ArbitratorsData = await APIArbitrator.getArbitratorsData(chainId, arbitrator, disputeId, extraData);
@@ -198,14 +195,12 @@ const Appeal: React.FC<AppealProps> = ({
         const cost = arbitratorsData.cost;
         const period = arbitratorsData.period;
         const currentRuling = arbitratorsData.currentRuling;
-      
         
-        setPeriod(period as any);
+        setPeriod(period!);
         setDisputeStatus(Number(status) as DisputeStatusEnum);
-        //setDisputeStatus(1 as DisputeStatusEnum); // -------------------------------- JUST FOR TESTING
         formatCurrentRuling(Number(currentRuling) as SideEnum);
-        calculateTotalCost(cost as any, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));  
-        
+        calculateTotalCost(cost!, Number(currentRuling) as SideEnum, Number(winnerMult), Number(loserMult), Number(sharedMult));  
+
         setLoading(false);
       } catch (e) {
         !errorRef.current && toast.info("Unexpected error while reading appelate round info. Come back later");

@@ -235,6 +235,7 @@ export default async function Request({ params }: PageProps) {
         }
         onChainVouches={onChainVouches}
         offChainVouches={offChainVouches}
+        arbitrationHistory={request.arbitratorHistory}
       />
 
       <div className="mb-6 border border-stroke shadow bg-whiteBackground rounded">
