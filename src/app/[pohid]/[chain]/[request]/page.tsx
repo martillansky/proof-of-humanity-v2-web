@@ -235,22 +235,23 @@ export default async function Request({ params }: PageProps) {
         }
         onChainVouches={onChainVouches}
         offChainVouches={offChainVouches}
+        arbitrationHistory={request.arbitratorHistory}
       />
 
-      <div className="mb-6 border shadow bg-white rounded">
+      <div className="mb-6 border border-stroke shadow bg-whiteBackground rounded">
         {request.revocation && revocationFile && (
-          <div className="p-4 bg-shade-100">
+          <div className="p-4 bg-primaryBackground">
             <div className="relative">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-primaryText">
                 Revocation requested - {revocationFile.name}
                 {revocationFile.fileURI && (
                   <Attachment uri={revocationFile.fileURI} />
                 )}
               </div>
-              <p className="text-slate-600">{revocationFile.description}</p>
+              <p className="text-primaryText">{revocationFile.description}</p>
             </div>
             <div className="flex font-normal flex-wrap text-sm">
-              <span className="mr-2">Requested by</span>
+              <span className="mr-2 text-secondaryText">Requested by</span>
               <Identicon diameter={16} address={request.requester} />
               <ExternalLink
                 className="ml-1 text-blue-500 flex flex-wrap underline underline-offset-2 break-words break-all"
@@ -263,7 +264,7 @@ export default async function Request({ params }: PageProps) {
         )}
 
         <div className="flex flex-col md:flex-row">
-          <div className="pt-8 px-8 w-2/5 hidden md:flex flex-col items-stretch justify-between background border-r">
+          <div className="pt-8 px-8 w-2/5 hidden md:flex flex-col items-stretch justify-between background border-r border-stroke">
             <div className="flex flex-col items-center">
               {registrationFile && (
                 <Previewed
@@ -280,17 +281,17 @@ export default async function Request({ params }: PageProps) {
                 />
               )}
 
-              <span className="mt-4 mb-12 text-2xl">
+              <span className="mt-4 mb-12 text-2xl text-primaryText">
                 {/* {request.claimer.name} */}
                 {registrationFile? registrationFile.name: ''}
               </span>
 
-              <span className="text-sm font-light">
+              <span className="text-sm font-light text-secondaryText">
                 {registrationFile ? registrationFile.bio : ''}
               </span>
             </div>
 
-            <Label className="mb-8">
+            <Label className="mb-8 text-orange">
               Last update: <TimeAgo time={request.lastStatusChange} />
             </Label>
           </div>
@@ -300,7 +301,7 @@ export default async function Request({ params }: PageProps) {
               <div className="flex items-center">
                 <Identicon diameter={24} address={request.claimer.id} />
                 <ExternalLink
-                  className="ml-2 font-semibold underline underline-offset-2"
+                  className="ml-2 font-semibold underline underline-offset-2 text-primaryText"
                   href={explorerLink(request.claimer.id, chain)}
                 >
                   {request.claimer.id.slice(0, 20)}
@@ -308,10 +309,10 @@ export default async function Request({ params }: PageProps) {
                   {request.claimer.id.slice(20)}
                 </ExternalLink>
               </div>
-              <span className="flex items-center">
+              <span className="flex items-center text-primaryText">
                 <ChainLogo
                   chainId={chain.id}
-                  className="w-4 h-4 m-1 fill-black"
+                  className="w-4 h-4 m-1 fill-primaryText"
                 />
                 {chain.name}
               </span>
@@ -325,7 +326,7 @@ export default async function Request({ params }: PageProps) {
                 height={24}
                 width={24}
                 />
-               <Link href={`/${prettifyId(pohId)}`}>
+               <Link className="text-orange" href={`/${prettifyId(pohId)}`}>
                 {prettifyId(pohId).slice(0, 20)}
                 <wbr />
                 {prettifyId(pohId).slice(20)}
@@ -355,11 +356,11 @@ export default async function Request({ params }: PageProps) {
                 />
               )}
 
-              <span className="mt-4 mb-[16px] text-2xl">
+              <span className="mt-4 mb-[16px] text-2xl text-primaryText">
                 {request.claimer.name}
               </span>
 
-              <span className="mb-[32px] text-sm font-light">
+              <span className="mb-[32px] text-sm font-light text-secondaryText">
                 {registrationFile ? registrationFile.bio : ''}
               </span>
             </div>
@@ -377,9 +378,9 @@ export default async function Request({ params }: PageProps) {
                 <div className="w-full flex flex-col md:flex-row md:items-end font-normal grid justify-items-end">
                 <Link 
                   href={`/attachment?url=${ipfs(policyLink)}`}
-                  className="ml-2 underline underline-offset-2"
+                  className="ml-2 underline text-primaryText"
                 >
-                  <div className="group flex py-[8px] relative">
+                  <div className="group flex py-[8px] relative text-primaryText">
                     Policy in force at submission
                     <div className="\
                       group-hover:visible invisible \
@@ -390,7 +391,7 @@ export default async function Request({ params }: PageProps) {
                       text-justify text-[14px] p-[8px] \
                       left-1/2 -translate-x-1/2 m-4 mx-auto \
                       not-italic font-normal leading-[normal] outline-black outline-color: #E5E5E5 \
-                      w-[260px] md:w-[400px] z-10"
+                      w-[260px] md:w-[400px] z-10 bg-whiteBackground text-secondaryText"
                     >
                       <span>
                         {/* (Policy in force since {new Date(policyUpdate * 1000).toDateString()}) */}
@@ -408,7 +409,7 @@ export default async function Request({ params }: PageProps) {
                 </div>
               )}
               {vourchesForData.find((v) => v) && (
-                <div className="mt-8 flex flex-col">
+                <div className="mt-8 flex flex-col text-secondaryText">
                   Vouched for
                   <div className="flex flex-wrap gap-2">
                     {vourchesForData.map(async (vouch, idx) => { 
@@ -434,7 +435,7 @@ export default async function Request({ params }: PageProps) {
             </div>
             <div className="w-full flex-wrap md:flex-row md:items-center justify-between gap-2">
               {vouchersData.find((v) => v) && (
-                <div className="mt-8 flex flex-col">
+                <div className="mt-8 flex flex-col text-secondaryText">
                   Vouched by
                   <div className="flex flex-wrap gap-2">
                     {vouchersData.map(async (vouch, idx) => {
@@ -458,7 +459,7 @@ export default async function Request({ params }: PageProps) {
                 </div>
               )}
             </div>
-            <Label className="md:hidden mb-8">
+            <Label className="md:hidden mb-8 text-orange">
               Last update: <TimeAgo time={request.lastStatusChange} />
             </Label>
           </div>

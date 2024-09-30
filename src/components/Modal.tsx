@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({
         <div
           className={cn(
             "fixed z-30 absolute-centered w-4/5 md:w-3/5 xl:w-2/5",
-            { "bg-white rounded overflow-clip": formal },
+            { "bg-whiteBackground rounded overflow-clip border border-stroke": formal },
             className
           )}
         >

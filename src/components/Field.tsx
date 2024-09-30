@@ -22,7 +22,7 @@ function Field({ label, textarea = false, className, ...props }: FieldProps) {
         {textarea ? (
           <textarea
             className={cn(
-              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-lighten rounded-sm transition ease-in-out font-medium",
+              "block w-full px-4 py-2 border-none bg-whiteBackgroundWithOpacity bg-blend-lighten rounded-sm transition ease-in-out font-medium text-primaryText",
               "focus:ring-0",
               className
             )}
@@ -31,7 +31,7 @@ function Field({ label, textarea = false, className, ...props }: FieldProps) {
         ) : (
           <input
             className={cn(
-              "block w-full px-4 py-2 border-none bg-white bg-opacity-90 bg-blend-overlay rounded-sm font-medium",
+              "block w-full px-4 py-2 border-none bg-whiteBackgroundWithOpacity bg-blend-overlay rounded-sm font-medium text-primaryText",
               "focus-visible:outline-none",
               className
             )}

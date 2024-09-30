@@ -1,10 +1,34 @@
-import ExternalLink from "components/ExternalLink"
-import Popover from "components/Popover"
-import React from "react";
 import Image from "next/image";
-
+import React, { useEffect, useState } from "react";
+import ExternalLink from "components/ExternalLink";
+import Popover from "components/Popover";
 
 const Options: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove("dark");
+      setIsDarkMode(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDarkMode(true);
+    }
+  };
+
   return (
     <div className="flex flex-row mt-[16px] md:mt-0">
       <ExternalLink href="https://snapshot.org/#/poh.eth/">
@@ -49,7 +73,17 @@ const Options: React.FC = () => {
           </ExternalLink>
         </div>
       </Popover>
+
+      <Image
+        alt="toggle theme"
+        onClick={toggleTheme}
+        className="cursor-pointer ml-2"
+        src={isDarkMode ? " /logo/light-icon.svg" : "/logo/night-icon.svg"}
+        height={16}
+        width={16}
+      />
     </div>
   );
 };
+
 export default Options;

@@ -26,12 +26,12 @@ export default function Info({ nbRequests }: InfoProps) {
         height={128}
         width={128}
       />
-      <p>
+      <p className="text-primaryText">
         The Proof of Humanity ID is a soulbound ID. It corresponds to each
         unique human registered on Proof of Humanity.
       </p>
-      <p>
-        This POH ID had <strong>{nbRequests} requests</strong> in total
+      <p className="text-primaryText">
+        This POH ID had <strong>{nbRequests} requests</strong> claimed in this chain
       </p>
     </Modal>
   );

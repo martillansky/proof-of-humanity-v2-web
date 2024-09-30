@@ -24,6 +24,7 @@ import RemoveVouch from "./RemoveVouch";
 import Vouch from "./Vouch";
 import { getMyData } from "data/user";
 import useSWR from "swr";
+import Appeal from "./Appeal";
 
 
 enableReactUse();
@@ -52,6 +53,7 @@ interface ActionBarProps extends JSX.IntrinsicAttributes {
   onChainVouches: Address[];
   offChainVouches: { voucher: Address; expiration: number; signature: Hash }[];
   expired: boolean;
+  arbitrationHistory: { __typename?: "ArbitratorHistory" | undefined; updateTime: any; registrationMeta: string; id: string; arbitrator: any; extraData: any; }
 }
 
 export default withClientConnected<ActionBarProps>(function ActionBar({
@@ -69,6 +71,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   offChainVouches,
   // advanceRequestsOnChainVouches,
   expired,
+  arbitrationHistory,
 }) {
   const chain = useChainParam()!;
   const { address } = useAccount();
@@ -277,7 +280,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
   const statusColor = colorForStatus(status, revocation, expired);
 
   return (
-    <div className="paper py-[24px] px-[24px] flex flex-col md:flex-row justify-between items-center gap-[12px] lg:gap-[20px] border-b">
+    <div className="paper py-[24px] px-[24px] flex flex-col md:flex-row justify-between items-center gap-[12px] lg:gap-[20px] border-stroke bg-whiteBackground text-primaryText">
       <div className="flex items-center">
         <span className="mr-4">Status</span>
         <span
@@ -425,13 +428,28 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
               )}
               .
             </span>
+            
+            <div className="flex gap-4">
+            <Appeal
+              pohId={pohId}
+              requestIndex={index}
+              disputeId={currentChallenge.disputeId}
+              arbitrator={arbitrationHistory.arbitrator}
+              extraData={arbitrationHistory.extraData}
+              contributor={address!}
+              claimer={requester}
+              challenger={currentChallenge.challenger?.id}
+              currentChallenge={currentChallenge}
+              chainId={chain.id}
+            />
 
             <ExternalLink
               href={`https://resolve.kleros.io/cases/${currentChallenge.disputeId}`}
-              className="btn-main px-[24px]"
+              className="btn-main gradient px-[24px] h-[48px] rounded"
             >
               View case #{currentChallenge.disputeId}
             </ExternalLink>
+            </div>
           </>
         )}
 

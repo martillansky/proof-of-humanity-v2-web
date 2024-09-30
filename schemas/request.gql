@@ -68,7 +68,9 @@ query Request($id: ID!) {
         id
       }
       nbRounds
-      rounds(orderBy: creationTime) {
+      rounds(orderBy: index) {
+        creationTime
+        index
         requesterFund {
           amount
         }
@@ -80,6 +82,9 @@ query Request($id: ID!) {
     arbitratorHistory {
       updateTime
       registrationMeta
+      id
+      arbitrator
+      extraData
     }
   }
 }

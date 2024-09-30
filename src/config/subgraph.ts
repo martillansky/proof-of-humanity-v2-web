@@ -34,16 +34,16 @@ export const subgraph_url = {
   ),
   [sepolia.id]: (
     (configSetSelection.id === configSets.testOld.id) ? 
-    //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/v0.0.5" // OLD
-    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // OLD
+    //"https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/v0.0.14" // TESTNETS
+    "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia-test/version/latest" // Development
     : (configSetSelection.id === configSets.testNew.id) ? 
     "https://api.studio.thegraph.com/query/64099/proof-of-humanity-sepolia/version/latest"
     : ""
   ),
   [gnosisChiado.id]: (
     (configSetSelection.id === configSets.testOld.id) ? 
-    "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.2/gn" // OLD
-    //"https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.0/gn" // OLD
+    //"https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.2/gn" // TESTNETS
+    "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.0/gn" // Development
     : (configSetSelection.id === configSets.testNew.id) ? 
     "https://api.goldsky.com/api/public/project_cluh21be5gq0o01u27olk4rwl/subgraphs/proof-of-humanity-chiado/1.0.1/gn"
     : ""
