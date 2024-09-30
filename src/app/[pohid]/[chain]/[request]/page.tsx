@@ -226,7 +226,7 @@ export default async function Request({ params }: PageProps) {
         lastStatusChange={+request.lastStatusChange}
         revocation={request.revocation}
         currentChallenge={
-          request.challenges.length ? request.challenges.at(-1) : undefined
+          request.challenges && request.challenges.length > 0 ? request.challenges.at(-1) : undefined
         }
         funded={
           request.index >= 0
