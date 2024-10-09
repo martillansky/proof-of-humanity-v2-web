@@ -25,7 +25,7 @@ const MobileMenu = forwardRef(
     return (
       <div
         ref={ref}
-        className="md:hidden absolute top-16 right-0 gradient w-64 p-4 rounded shadow-lg z-10"
+        className="md:hidden absolute top-16 right-0 header-background w-64 p-4 rounded shadow-lg z-10"
       >
         <nav className="flex flex-col gap-y-4">
           <Link href="/" className={`${pathname === "/" ? "font-bold" : ""}`}>
