@@ -21,12 +21,42 @@ interface IHeader extends JSX.IntrinsicAttributes {
 
 export default withClientConnected(function Header({ policy }: IHeader) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { isConnected, address } = useAccount();
   const { chain } = usePublicClient();
   const web3Loaded = useWeb3Loaded();
   const { data: me } = useSWR(address, getMyData);
+
+  const detectTheme = () => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove("dark");
+      setIsDarkMode(false);
+    }
+  };
+
+  useEffect(() => {
+    detectTheme();
+
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setIsDarkMode(isDark);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,11 +77,15 @@ export default withClientConnected(function Header({ policy }: IHeader) {
   }, [menuOpen]);
 
   return (
-    <header className="h-16 md:h-16 px-6 pt-2 md:px-8 pb-2 w-full flex justify-between items-center text-white text-lg gradient shadow-sm relative">
+    <header className="h-16 md:h-16 px-6 pt-2 md:px-8 pb-2 w-full flex justify-between items-center text-white text-lg header-background shadow-sm relative">
       <Link href="/" className="flex items-center w-[156px]">
         <Image
           alt="proof of humanity logo"
-          src="/logo/poh-text-white.svg"
+          src={
+            isDarkMode
+              ? "/logo/poh-text-orange.svg"
+              : "/logo/poh-text-white.svg"
+          }
           height={48}
           width={156}
         />
