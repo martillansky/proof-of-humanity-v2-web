@@ -3,7 +3,7 @@
   html {
     @apply text-black;
   }
-  
+
   button {
     @apply cursor-pointer select-none;
   }
@@ -37,8 +37,8 @@
     @apply w-6 h-6 border border-orange rounded-full bg-lightOrange;
   }
 
-    .bordered {
-      @apply p-px gradient rounded;
+  .bordered {
+    @apply p-px gradient rounded;
   }
 
   .btn-main {
@@ -77,6 +77,14 @@
 
 @tailwind utilities;
 @layer utilities {
+  .header-background {
+    @apply gradient;
+  }
+
+  .dark .header-background {
+    background: theme("colors.dark.whiteBackground");
+  }
+
   .border-theme {
     border-color: theme("colors.light.theme");
   }
@@ -414,5 +422,17 @@
 
   .scrollbar::-webkit-scrollbar-thumb {
     @apply rounded-full bg-[#ff8ca9];
+  }
+
+  .dark .scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  .dark .scrollbar::-webkit-scrollbar-track {
+    @apply rounded-full bg-slate-700;
+  }
+
+  .dark .scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-500;
   }
 }
