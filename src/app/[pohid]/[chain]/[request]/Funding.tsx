@@ -45,7 +45,7 @@ const FundButton: React.FC<FundButtonProps> = ({
         <div className="w-full p-4 flex justify-center rounded font-bold">
           <span
             onClick={() => addedFund$.set(formatEth(totalCost - funded))}
-            className="mx-1 text-theme font-semibold underline underline-offset-2 cursor-pointer"
+            className="mx-1 text-orange font-semibold underline underline-offset-2 cursor-pointer"
           >
             {formatEther(totalCost - funded)}
           </span>{" "}

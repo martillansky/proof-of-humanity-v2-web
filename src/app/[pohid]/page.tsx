@@ -282,7 +282,7 @@ async function Profile({ params: { pohid } }: PageProps) {
             />
         ) : (
           <>
-            <span className="mb-6 text-theme">Not claimed</span>
+            <span className="mb-6 text-orange">Not claimed</span>
             <Link className="btn-main w-48 mb-6" href={`/${pohId}/claim`}>
               Claim humanity
             </Link>

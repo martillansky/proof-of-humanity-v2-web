@@ -318,7 +318,7 @@ export default async function Request({ params }: PageProps) {
               </span>
             </div>
 
-            <div className="mb-8 flex font-medium text-theme flex-wrap gap-x-[8px] gap-y-[8px]" >
+            <div className="mb-8 flex font-medium text-orange flex-wrap gap-x-[8px] gap-y-[8px]" >
               <div className="flex flex-row flex-wrap gap-x-[8px]">
                 <Image
                 alt="poh id"
