@@ -58,7 +58,7 @@ export const sanitizeRequest = async (request: RequestQuery['request'], chainId:
         request.humanity.winnerClaim[0].evidenceGroup.evidence = transferringRequest?.evidenceGroup.evidence as any;
       } else {
         //request.humanity = transferringRequestComplete?.humanity as any;
-        request.claimer = transferringRequestComplete?.claimer as any;
+        request.claimer.name = transferringRequestComplete?.claimer.name as any;
         request.evidenceGroup = transferringRequestComplete?.evidenceGroup as any;
         //request.challenges = transferringRequestComplete?.challenges as any;
       }
@@ -295,8 +295,9 @@ export const sanitizeClaimerData = async (out: Record<SupportedChainId, ClaimerQ
 
   if (voucherEvidenceChain) {
     const isClaimerIncomplete = 
-      out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.length > 0 &&
-      out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.length===0;
+      out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.length == 0 ||
+      (out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.length > 0 &&
+      out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence.length===0);
     
     if (isClaimerIncomplete) {
       const lastTransf = await getProfileLastTransferringRequest(voucherEvidenceChain.id, id);
@@ -318,7 +319,14 @@ export const sanitizeClaimerData = async (out: Record<SupportedChainId, ClaimerQ
             : '';
       
       if (!!lastTransf?.transferringRequest?.evidenceGroup.evidence) {
-        out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(lastTransf?.transferringRequest?.evidenceGroup.evidence));
+        //out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim.at(0)!.evidenceGroup.evidence = JSON.parse(JSON.stringify(lastTransf?.transferringRequest?.evidenceGroup.evidence));
+        out[voucherEvidenceChain.id].claimer!.registration!.humanity.winnerClaim = [
+          {
+            'index': lastTransf?.transferringRequest?.index, 
+            'resolutionTime': lastTransf?.transferringRequest?.lastStatusChange, 
+            'evidenceGroup': lastTransf?.transferringRequest?.evidenceGroup
+          }
+        ]
       }
     }
   } else { // If profile has been bridged, we need to look for the crossChainRegistration
