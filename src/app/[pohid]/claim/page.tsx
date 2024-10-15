@@ -25,7 +25,7 @@ export default async function Claim({ params: { pohid } }: PageProps) {
     return (
       <div className="m-auto flex flex-col text-center">
         <span className="font-semibold">Invalid Proof of Humanity ID:</span>
-        <span className="text-6xl font-light text-theme">{pohid}</span>
+        <span className="text-6xl font-light text-orange">{pohid}</span>
       </div>
     );
 

@@ -109,14 +109,14 @@ export default function Vouch({ pohId, claimer, web3Loaded, me, chain, address }
         </span>
         <button
           className={cn(
-            "p-2 outline -outline-offset-4 outline-theme mt-4 text-theme text-xl font-medium rounded hover:btn-main hover:outline-0"
+            "p-2 outline -outline-offset-4 outline-theme mt-4 text-orange text-xl font-medium rounded hover:btn-main hover:outline-0"
           )}
           onClick={gaslessVouch}
         >
           VOUCH
         </button>
         <span
-          className="mt-4 text-theme text-sm cursor-pointer underline underline-offset-2"
+          className="mt-4 text-orange text-sm cursor-pointer underline underline-offset-2"
           onClick={addVouch}
         >
           or vouch on chain

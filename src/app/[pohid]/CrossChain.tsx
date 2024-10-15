@@ -299,7 +299,7 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
         trigger={<button className="text-sky-500">Update state</button>}
       >
         <div className="p-4">
-          <span className="txt m-2">
+          <span className="txt m-2 text-primaryText">
             Update humanity state on another chain. If you use wallet contract
             make sure it has same address on both chains.
           </span>
@@ -308,10 +308,10 @@ export default withClientConnected<CrossChainProps>(function CrossChain({
             {supportedChains.map((chain) => (
               <div
                 key={chain.id}
-                className="m-2 p-2 flex items-center justify-between border"
+                className="m-2 p-2 flex items-center justify-between border text-primaryText"
               >
                 <div className="flex items-center">
-                  <ChainLogo chainId={chain.id} className="w-4 h-4 mr-1" />
+                  <ChainLogo chainId={chain.id} className="w-4 h-4 mr-1 fill-primaryText" />
                   {chain.name}{" "}
                   {chain === homeChain ||
                   humanity[chain.id].crossChainRegistration ||

@@ -46,7 +46,7 @@
   }
 
   .btn-sec {
-    @apply centered p-2 border-2 border-theme rounded-sm text-theme font-semibold uppercase disabled:opacity-40;
+    @apply centered p-2 border-2 border-theme rounded-sm text-orange font-semibold uppercase disabled:opacity-40;
   }
 
   .backdrop {
@@ -131,14 +131,6 @@
 
   .dark .text-orange {
     color: theme("colors.dark.orange");
-  }
-
-  .text-theme {
-    color: theme("colors.light.theme");
-  }
-
-  .dark .text-theme {
-    color: theme("colors.dark.theme");
   }
 
   .text-status-vouching {
