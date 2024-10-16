@@ -96,6 +96,30 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
   const [action, setAction] = useState(ActionType.NONE);
 
+  const [didIVouchFor, setDidIVouchFor] = useState(false);
+  const [isVouchOnchain, setIsVouchOnchain] = useState(false);
+
+  const handleDidIVouchFor = () => {
+    return (
+      onChainVouches.length + offChainVouches.length >= 0 &&
+      (onChainVouches.some((voucherAddress) => {
+        if (voucherAddress.toLocaleLowerCase() === address?.toLocaleLowerCase()) {
+          setIsVouchOnchain(true);
+          return true;
+        }
+        setIsVouchOnchain(false);
+        return false;
+      }) ||
+        offChainVouches.some(
+          (voucher) => voucher.voucher.toLocaleLowerCase() === address?.toLocaleLowerCase()
+        ))
+    );
+  };
+
+  useEffect(() => {
+    setDidIVouchFor(handleDidIVouchFor());
+  }, [address, action, requester, revocation, chain, userChainId]);
+
   useEffectOnce(() => {
     const checkVouchStatus = async () => {
       if (status === "resolved" || status === "withdrawn")
@@ -110,7 +134,11 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
           contractData.requiredNumberOfVouches
         )
           setAction(ActionType.ADVANCE);
-        else if (onChainVouches.length + offChainVouches.length >= 0)
+        else if (
+          (onChainVouches.length + offChainVouches.length >= 0) && 
+          didIVouchFor && 
+          isVouchOnchain
+        )
           setAction(ActionType.REMOVE_VOUCH);
         else setAction(ActionType.VOUCH);
       } else if (status == "resolving")
@@ -164,7 +192,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       [loading]
     )
   );
-  const [prepareWithdraw, withdraw, withdrawState] = usePoHWrite(
+  const [prepareWithdraw, withdraw] = usePoHWrite(
     "withdrawRequest",
     useMemo(
       () => ({
@@ -190,35 +218,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       //  multicallAdvanceFire
     ]
   );
-
-  const [isVouchGranted, setIsVouchGranted] = useState({
-    didIVouchFor: false,
-    isVouchOnchain: false,
-  });
-
-  useEffect(() => {
-    const didIVouchFor = () => {
-      return (
-        onChainVouches.length + offChainVouches.length >= 0 &&
-        (onChainVouches.some((voucherAddress) => {
-          if (voucherAddress === address?.toLocaleLowerCase()) {
-            setIsVouchGranted((prevState) => ({
-              ...prevState,
-              isVouchOnchain: true,
-            }));
-            return true;
-          }
-          return false;
-        }) ||
-          offChainVouches.some(
-            (voucher) => voucher.voucher === address?.toLocaleLowerCase()
-          ))
-      );
-    };
-
-    if (didIVouchFor())
-      setIsVouchGranted((prevState) => ({ ...prevState, didIVouchFor: true }));
-  }, [address, action, requester, revocation, chain, userChainId]);
 
   useEffect(() => {
     //useEffectOnce(() => {
@@ -276,13 +275,6 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       prepareWithdraw();
   }, [address, prepareWithdraw, action, requester, revocation, chain, userChainId]);
 
-
-  const [withdrawDisabled, setWithdrawDisabled] = useState(true);
-
-  useEffect(() => {
-    setWithdrawDisabled(pending || withdrawState.prepare !== "success");
-  }, [withdrawState.prepare])
-
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation, expired);
 
@@ -337,18 +329,18 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
                   />
                 )}
 
-                {requester === address?.toLowerCase() ? (
+                {requester.toLocaleLowerCase() === address?.toLowerCase() ? (
                   <button
-                    disabled={withdrawDisabled}
+                    disabled={userChainId!==chain.id}
                     className="btn-main mb-2"
                     onClick={withdraw}
                   >
                     Withdraw
                   </button>
-                ) : !isVouchGranted.didIVouchFor ? (
+                ) : !didIVouchFor ? (
                   <Vouch pohId={pohId} claimer={requester} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
-                ) : isVouchGranted.isVouchOnchain ? (
-                  <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
+                ) : isVouchOnchain ? (
+                  <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} chain={chain} userChainId={userChainId}/>
                 ) : null}
               </div>
             </>
@@ -359,18 +351,18 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             <span className="text-slate-400">Ready to advance</span>
 
             <div className="flex gap-4">
-              {requester === address?.toLowerCase() ? (
+              {requester.toLocaleLowerCase() === address?.toLowerCase() ? (
                 <button
-                  disabled={withdrawDisabled}
+                  disabled={userChainId!==chain.id}
                   className="btn-sec mb-2"
                   onClick={withdraw}
                 >
                   Withdraw
                 </button>
-              ) : !isVouchGranted.didIVouchFor ? (
+              ) : !didIVouchFor ? (
                 <Vouch pohId={pohId} claimer={requester} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
-              ) : isVouchGranted.isVouchOnchain ? (
-                <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} me={me} chain={chain} address={address} />
+              ) : isVouchOnchain ? (
+                <RemoveVouch requester={requester} pohId={pohId} web3Loaded={web3Loaded} chain={chain} userChainId={userChainId}/>
               ) : null}
               <button
                 disabled={pending}
