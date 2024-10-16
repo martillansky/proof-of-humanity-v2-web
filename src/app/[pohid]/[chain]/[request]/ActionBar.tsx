@@ -276,6 +276,13 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
       prepareWithdraw();
   }, [address, prepareWithdraw, action, requester, revocation, chain, userChainId]);
 
+
+  const [withdrawDisabled, setWithdrawDisabled] = useState(true);
+
+  useEffect(() => {
+    setWithdrawDisabled(pending || withdrawState.prepare !== "success");
+  }, [withdrawState.prepare])
+
   const totalCost = BigInt(contractData.baseDeposit) + arbitrationCost;
   const statusColor = colorForStatus(status, revocation, expired);
 
@@ -332,7 +339,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
 
                 {requester === address?.toLowerCase() ? (
                   <button
-                    disabled={pending || withdrawState.prepare !== "success"}
+                    disabled={withdrawDisabled}
                     className="btn-main mb-2"
                     onClick={withdraw}
                   >
@@ -354,7 +361,7 @@ export default withClientConnected<ActionBarProps>(function ActionBar({
             <div className="flex gap-4">
               {requester === address?.toLowerCase() ? (
                 <button
-                  disabled={pending || withdrawState.prepare !== "success"}
+                  disabled={withdrawDisabled}
                   className="btn-sec mb-2"
                   onClick={withdraw}
                 >
