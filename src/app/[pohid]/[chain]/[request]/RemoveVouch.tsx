@@ -13,12 +13,11 @@ interface RemoveVouchProps {
   pohId: Hash;
   requester: Address;
   web3Loaded: any;
-  me: any;
   chain: SupportedChain;
-  address: Address | undefined;
+  userChainId: number;
 }
 
-export default function RemoveVouch({ pohId, requester, web3Loaded, me, chain, address }: RemoveVouchProps) {
+export default function RemoveVouch({ pohId, requester, web3Loaded, chain, userChainId }: RemoveVouchProps) {
   const loading = useLoading();
   const [pending] = loading.use();
 
@@ -47,8 +46,8 @@ export default function RemoveVouch({ pohId, requester, web3Loaded, me, chain, a
 
   return (
     web3Loaded &&
-    me && me.homeChain?.id === chain.id && 
-    me.pohId && (
+    userChainId === chain.id && 
+    (
     <div className="flex gap-4">
       <button
         disabled={pending}
